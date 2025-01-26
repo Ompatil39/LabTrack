@@ -1,0 +1,326 @@
+DASHBOARD:-
+#TO_BE_ADDED
+@CAN_BE_ADDED
+~HARDER_TO_IMPLEMENT
+
+       Lab Statistics-
+        1_##_Lab Occupancy - Doughnut Chart (active, under maintenance, inactive).
+        _##_Device Status - Bar Chart (working vs faulty devices).
+        _##_Device Distribution by Lab - Horizontal Bar Chart (labs vs device count).
+        _##_Faulty Devices per Lab - Stacked Bar Chart (labs vs count of faulty devices).
+                @Labs Added Over Time - Line Chart (new labs added yearly/quarterly).
+            @@Lab Maintenance vs Active Ratio - Doughnut Chart (labs under maintenance vs active).
+
+        Grievance Statistics
+        2_##_Grievances by Category - Bar Chart (e.g., hardware, software, internet issues).
+        _##_Status of Grievances - Doughnut/Pie Chart (resolved vs pending vs in-progress).
+        _##_Grievances Trend - Line Chart (grievances over time).
+                ~Resolution Time Analysis - Bar Chart (average time taken to resolve grievances).
+                @Grievances by Lab - Horizontal Bar Chart (labs vs grievances count).
+                ~Grievance Escalation Rate - Line Chart (escalated grievances over time).
+                ~Resolved Grievances Percentage - Gauge Chart (percentage of resolved grievances).
+                Pending Grievances by Type - Stacked Bar Chart (types vs count of pending grievances).
+                @Grievances Over the Last Week - Line Chart (daily grievance count for the week).
+
+        Maintenance Statistics
+                ~Pending Maintenance Tasks - Bar Chart (tasks by category).
+        3_##_Maintenance Status Overview - Doughnut Chart (completed vs in-progress vs pending).
+        _##_Maintenance Requests by Lab - Horizontal Bar Chart (labs vs requests).
+        _##_Device Maintenance Trend - Line Chart (maintenance tasks over time).
+                ~Maintenance Completion Rate - Gauge Chart (percentage of completed tasks).
+                Faulty Devices Under Maintenance - Stacked Bar Chart (device type vs maintenance count).
+                Maintenance Downtime Impact - Bar Chart (hours of downtime by maintenance).
+                Resolved Maintenance Requests by Week - Line Chart (weekly resolutions).
+        _##_Average Maintenance Time Per Device - Bar Chart (average time for each type of device).
+                Top Labs Requiring Maintenance - Pie Chart (labs with the most maintenance requests).
+
+
+TO DO WORK:- 
+            1- Side menu bar hide text
+            2- hover effect for cards with icons animation
+            3- no image for user account circle, just diff icons for admin and incharge
+            4- SKELETON LOADER FOR DASHBOARD
+
+Here's the Chart.js code for the statistics marked with [ _##_ ] or similar notation:
+
+---
+
+### **Lab Statistics**
+
+1. **Lab Occupancy [1_##]**  
+
+const labOccupancyCtx = document.getElementById("labOccupancy").getContext("2d");
+new Chart(labOccupancyCtx, {
+  type: "doughnut",
+  data: {
+    labels: ["Active", "Under Maintenance", "Inactive"],
+    datasets: [
+      {
+        data: [60, 25, 15], // Example data
+        backgroundColor: ["#4caf50", "#ffc107", "#f44336"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+  },
+});
+
+
+2. **Device Status [ _##_ ]**  
+
+const deviceStatusCtx = document.getElementById("deviceStatus").getContext("2d");
+new Chart(deviceStatusCtx, {
+  type: "bar",
+  data: {
+    labels: ["Working", "Faulty"],
+    datasets: [
+      {
+        label: "Device Status",
+        data: [150, 20], // Example data
+        backgroundColor: ["#4caf50", "#f44336"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Device Status" } },
+      y: { title: { display: true, text: "Count" } },
+    },
+  },
+});
+
+
+3. **Device Distribution by Lab [ _##_ ]**  
+
+const deviceDistributionCtx = document.getElementById("deviceDistribution").getContext("2d");
+new Chart(deviceDistributionCtx, {
+  type: "bar",
+  data: {
+    labels: ["Lab A", "Lab B", "Lab C"],
+    datasets: [
+      {
+        label: "Device Count",
+        data: [40, 50, 30], // Example data
+        backgroundColor: ["#2196f3", "#4caf50", "#ffc107"],
+      },
+    ],
+  },
+  options: {
+    indexAxis: "y",
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Count" } },
+      y: { title: { display: true, text: "Labs" } },
+    },
+  },
+});
+
+
+4. **Faulty Devices per Lab [ _##_ ]**  
+
+const faultyDevicesCtx = document.getElementById("faultyDevices").getContext("2d");
+new Chart(faultyDevicesCtx, {
+  type: "bar",
+  data: {
+    labels: ["Lab A", "Lab B", "Lab C"],
+    datasets: [
+      {
+        label: "Faulty PCs",
+        data: [5, 8, 3],
+        backgroundColor: "#f44336",
+      },
+      {
+        label: "Faulty Printers",
+        data: [2, 4, 1],
+        backgroundColor: "#ff9800",
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Labs" } },
+      y: { title: { display: true, text: "Count" } },
+    },
+  },
+});
+
+
+---
+
+### **Grievance Statistics**
+
+1. **Grievances by Category [2_##]**  
+
+const grievancesByCategoryCtx = document.getElementById("grievancesByCategory").getContext("2d");
+new Chart(grievancesByCategoryCtx, {
+  type: "bar",
+  data: {
+    labels: ["Hardware", "Software", "Internet"],
+    datasets: [
+      {
+        label: "Grievances",
+        data: [15, 10, 5], // Example data
+        backgroundColor: ["#2196f3", "#4caf50", "#ffc107"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Categories" } },
+      y: { title: { display: true, text: "Count" } },
+    },
+  },
+});
+
+
+2. **Status of Grievances [ _##_ ]**  
+
+const grievanceStatusCtx = document.getElementById("grievanceStatus").getContext("2d");
+new Chart(grievanceStatusCtx, {
+  type: "doughnut",
+  data: {
+    labels: ["Resolved", "Pending", "In Progress"],
+    datasets: [
+      {
+        data: [30, 10, 5], // Example data
+        backgroundColor: ["#4caf50", "#f44336", "#ffc107"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+  },
+});
+
+
+3. **Grievances Trend [ _##_ ]**  
+
+const grievancesTrendCtx = document.getElementById("grievancesTrend").getContext("2d");
+new Chart(grievancesTrendCtx, {
+  type: "line",
+  data: {
+    labels: ["Jan", "Feb", "Mar", "Apr"], // Example months
+    datasets: [
+      {
+        label: "Grievances",
+        data: [5, 10, 8, 7], // Example data
+        borderColor: "#2196f3",
+        fill: false,
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Months" } },
+      y: { title: { display: true, text: "Count" } },
+    },
+  },
+});
+
+
+4. **Pending Grievances by Type [ _##_ ]**  
+
+const pendingGrievancesCtx = document.getElementById("pendingGrievances").getContext("2d");
+new Chart(pendingGrievancesCtx, {
+  type: "bar",
+  data: {
+    labels: ["Hardware", "Software", "Internet"],
+    datasets: [
+      {
+        label: "Pending Grievances",
+        data: [5, 3, 2], // Example data
+        backgroundColor: ["#f44336", "#ff9800", "#4caf50"],
+      },
+    ],
+  },
+  options: {
+    indexAxis: "y",
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Count" } },
+      y: { title: { display: true, text: "Categories" } },
+    },
+  },
+});
+
+
+---
+
+### **Maintenance Statistics**
+
+1. **Maintenance Status Overview [3_##]**  
+
+const maintenanceStatusCtx = document.getElementById("maintenanceStatus").getContext("2d");
+new Chart(maintenanceStatusCtx, {
+  type: "doughnut",
+  data: {
+    labels: ["Completed", "In Progress", "Pending"],
+    datasets: [
+      {
+        data: [50, 20, 30], // Example data
+        backgroundColor: ["#4caf50", "#ffc107", "#f44336"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+  },
+});
+
+
+2. **Maintenance Requests by Lab [ _##_ ]**  
+
+const maintenanceRequestsCtx = document.getElementById("maintenanceRequests").getContext("2d");
+new Chart(maintenanceRequestsCtx, {
+  type: "bar",
+  data: {
+    labels: ["Lab A", "Lab B", "Lab C"],
+    datasets: [
+      {
+        label: "Maintenance Requests",
+        data: [5, 10, 3], // Example data
+        backgroundColor: ["#2196f3", "#4caf50", "#ffc107"],
+      },
+    ],
+  },
+  options: {
+    indexAxis: "y",
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Requests" } },
+      y: { title: { display: true, text: "Labs" } },
+    },
+  },
+});
+
+
+Average Maintenance Time Per Device [ ## ]:
+const averageMaintenanceTimeCtx = document
+  .getElementById("averageMaintenanceTime")
+  .getContext("2d");
+
+new Chart(averageMaintenanceTimeCtx, {
+  type: "bar",
+  data: {
+    labels: ["PC", "Printer", "Monitor", "Keyboard"], // Example device types
+    datasets: [
+      {
+        label: "Average Maintenance Time (Hours)",
+        data: [2.5, 3.0, 1.5, 1.0], // Example data in hours
+        backgroundColor: ["#4caf50", "#2196f3", "#ffc107", "#f44336"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+    scales: {
+      x: { title: { display: true, text: "Device Types" } },
+      y: { title: { display: true, text: "Time (Hours)" } },
+    },
+  },
+});
