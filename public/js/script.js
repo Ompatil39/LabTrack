@@ -113,7 +113,25 @@ new Chart(deviceDistributionCtx, {
     },
   },
 });
-
+// Chart 6
+const grievanceStatusCtx = document
+  .getElementById("grievanceStatus")
+  .getContext("2d");
+new Chart(grievanceStatusCtx, {
+  type: "pie",
+  data: {
+    labels: ["Resolved", "Pending", "In Progress"],
+    datasets: [
+      {
+        data: [30, 10, 5], // Example data
+        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+      },
+    ],
+  },
+  options: {
+    plugins: { legend: { display: true, position: "top" } },
+  },
+});
 // Chart 4
 const faultyDevicesCtx = document
   .getElementById("faultyDevices")
@@ -169,25 +187,7 @@ new Chart(grievancesByCategoryCtx, {
   },
 });
 
-// Chart 6
-const grievanceStatusCtx = document
-  .getElementById("grievanceStatus")
-  .getContext("2d");
-new Chart(grievanceStatusCtx, {
-  type: "doughnut",
-  data: {
-    labels: ["Resolved", "Pending", "In Progress"],
-    datasets: [
-      {
-        data: [30, 10, 5], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-  },
-});
+
 
 // Chart 7
 const grievancesTrendCtx = document
