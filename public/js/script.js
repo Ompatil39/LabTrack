@@ -8,7 +8,7 @@ new Chart(ctx, {
       {
         label: "Lab Status",
         data: [100, 30, 40],
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#f3545d", "#fdaf4b", "#1d7af3"],
         borderColor: ["#ffffff", "#ffffff", "#ffffff"],
         borderWidth: 2,
       },
@@ -59,7 +59,7 @@ new Chart(maintenanceRequestsCtx, {
       {
         label: "Maintenance Requests",
         data: [7, 3, 9, 4, 6, 3, 4, 2],
-        backgroundColor: "#48abf7",
+        backgroundColor: "#2c4a63",
         borderWidth: 2,
         barThickness: 50,
       },
@@ -100,7 +100,7 @@ new Chart(deviceDistributionCtx, {
       {
         label: "Device Count",
         data: [40, 50, 30, 45, 25, 35, 20, 15],
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#80b1da", "#fdaf4b", "#1d7af3"],
       },
     ],
   },
@@ -139,7 +139,7 @@ new Chart(faultyDevicesCtx, {
       {
         label: "Faulty PCs",
         data: [5, 8, 3, 6, 4, 2, 7, 1],
-        backgroundColor: "#2c4a63",
+        backgroundColor: "#f3545d",
       },
       {
         label: "Faulty Printers",
@@ -169,7 +169,7 @@ new Chart(grievancesByCategoryCtx, {
       {
         label: "Grievances",
         data: [15, 10, 5],
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#177dff", "#4caf50", "#fdaf4b"],
       },
     ],
   },
@@ -197,7 +197,7 @@ new Chart(grievanceStatusCtx, {
     datasets: [
       {
         data: [30, 10, 5],
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
       },
     ],
   },
@@ -248,7 +248,7 @@ new Chart(maintenanceStatusCtx, {
     datasets: [
       {
         data: [50, 20, 30],
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#f44336", "#177dff", "#fdaf4b"],
       },
     ],
   },
@@ -260,7 +260,7 @@ new Chart(maintenanceStatusCtx, {
   },
 });
 
-// Chart 9
+// Chart 9: Pending Grievances (Bar with Bounce Animation)
 const pendingGrievancesCtx = document
   .getElementById("pendingGrievances")
   .getContext("2d");
@@ -272,7 +272,7 @@ new Chart(pendingGrievancesCtx, {
       {
         label: "Pending Grievances",
         data: [5, 3, 2], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
+        backgroundColor: ["#80b6f4", "#4caf50", "#fdaf4b"],
       },
     ],
   },
@@ -286,7 +286,7 @@ new Chart(pendingGrievancesCtx, {
   },
 });
 
-// Chart 10
+// Chart 10: Average Maintenance Time (Bar with Fade Animation)
 const averageMaintenanceTimeCtx = document
   .getElementById("averageMaintenanceTime")
   .getContext("2d");
@@ -298,7 +298,7 @@ new Chart(averageMaintenanceTimeCtx, {
       {
         label: "Average Maintenance Time (Hours)",
         data: [2.5, 3.0, 1.5, 1.0], // Example data in hours
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0", "#d3e3f1"],
+        backgroundColor: ["#2c4a63", "#fdaf4b", "#80b6f4", "#1d7af3"],
       },
     ],
   },
