@@ -1,0 +1,301 @@
+<!-- body {
+  font-family: "Inter", sans-serif;
+  background-color: #f5f7fa;
+  margin: 0;
+  padding: 0;
+  /* #fffdfe #09324e */
+}
+.container {
+  display: flex;
+  height: 100vh;
+}
+.sidebar {
+  width: 200px;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.sidebar img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+.sidebar h1 {
+  font-size: 24px;
+  margin: 0;
+  padding: 10px 0;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.sidebar ul li {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+}
+.sidebar ul li i {
+  margin-right: 10px;
+}
+.sidebar ul li span {
+  font-size: 14px;
+  color: #888;
+  margin-left: auto;
+}
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.content-header h2 {
+  font-size: 24px;
+  margin: 0;
+}
+.content-header .actions {
+  display: flex;
+  align-items: center;
+}
+.content-header .actions button {
+  background-color: #ff5a5f;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.content-header .actions button i {
+  margin-right: 5px;
+}
+.content-header .actions .search {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+.content-header .actions .search input {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 5px;
+}
+.content-header .actions .search i {
+  color: #888;
+}
+.chart {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.chart h3 {
+  font-size: 18px;
+  margin: 0 0 20px;
+}
+.chart img {
+  width: 100%;
+  border-radius: 10px;
+}
+.table {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table table th,
+.table table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+.table table th {
+  background-color: #f0f0f0;
+}
+.table table td img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+.table table td .badge {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.badge-social {
+  background-color: #007bff;
+  color: #fff;
+}
+.badge-outreach {
+  background-color: #28a745;
+  color: #fff;
+}
+.badge-referrals {
+  background-color: #ffc107;
+  color: #fff;
+}
+.badge-word {
+  background-color: #dc3545;
+  color: #fff;
+} -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prody Dashboard</title>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../public/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar Section -->
+    <div class="sidebar">
+      <!-- Logo and Title -->
+      <img src="https://placehold.co/30x30" alt="Prody Logo">
+      <h1>LabTrack</h1>
+
+      <!-- Navigation Links -->
+      <ul>
+        <li><i class="fas fa-tachometer-alt"></i> Dashboard</li>
+        <li><i class="fas fa-folder"></i> Projects <span>3/5</span></li>
+        <li><i class="fas fa-chart-line"></i> Analytics</li>
+        <li><i class="fas fa-file-alt"></i> Reports <span>New</span></li>
+        <li><i class="fas fa-puzzle-piece"></i> Extensions</li>
+        <li><i class="fas fa-building"></i> Companies <span>17</span></li>
+        <li><i class="fas fa-users"></i> People <span>164</span></li>
+      </ul>
+
+      <!-- Help Center Section -->
+      <div class="help-center">
+        <h3>Help Center</h3>
+        <ul>
+          <li><i class="fas fa-bell"></i> Notifications <span>3</span></li>
+          <li><i class="fas fa-fire"></i> Ember Crest</li>
+        </ul>
+
+        <!-- Starter Set Overview -->
+        <div class="starter-set">
+          <h3>Starter Set Overview</h3>
+          <p>3 of 5 projects created</p>
+          <img src="https://placehold.co/100x50" alt="Starter Set Overview">
+          <button>
+            Get Full Access <i class="fas fa-rocket"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+      <!-- Header Section -->
+      <div class="content-header">
+        <h2>House Spectrum Ltd</h2>
+        <div class="actions">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search">
+          </div>
+          <button>
+            <i class="fas fa-plus"></i> Add New
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="chart">
+        <h3>Consolidated Budget</h3>
+        <img src="https://placehold.co/600x300" alt="Consolidated Budget Chart">
+      </div>
+
+      <!-- Table Section -->
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Deals</th>
+              <th>Contact</th>
+              <th>Email</th>
+              <th>Value</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>01</td>
+              <td>Acme</td>
+              <td>
+                <img src="https://placehold.co/30x30" alt="Tyra Dhillon">
+                Tyra Dhillon
+              </td>
+              <td>tyradhillon@acme.com</td>
+              <td>$3,912</td>
+              <td><span class="badge badge-social">Social Networks</span></td>
+            </tr>
+            <tr>
+              <td>02</td>
+              <td>Academic Project</td>
+              <td>
+                <img src="https://placehold.co/30x30" alt="Brittni Lando">
+                Brittni Lando
+              </td>
+              <td>lando@academicproject.com</td>
+              <td>$2,345</td>
+              <td><span class="badge badge-outreach">Outreach</span></td>
+            </tr>
+            <tr>
+              <td>03</td>
+              <td>Aimbus</td>
+              <td>
+                <img src="https://placehold.co/30x30" alt="Kevin Chen">
+                Kevin Chen
+              </td>
+              <td>chen@aimbus.com</td>
+              <td>$13,864</td>
+              <td><span class="badge badge-referrals">Referrals</span></td>
+            </tr>
+            <tr>
+              <td>04</td>
+              <td>Big Bang Production</td>
+              <td>
+                <img src="https://placehold.co/30x30" alt="Josh Ryan">
+                Josh Ryan
+              </td>
+              <td>joshryan@gmail.com</td>
+              <td>$6,314</td>
+              <td><span class="badge badge-word">Word-of-mouth</span></td>
+            </tr>
+            <tr>
+              <td>05</td>
+              <td>Book Launch</td>
+              <td>
+                <img src="https://placehold.co/30x30" alt="Chieko Chuta">
+                Chieko Chuta
+              </td>
+              <td>chieko67@booklaunch.com</td>
+              <td>$5,982</td>
+              <td><span class="badge badge-outreach">Outreach</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
