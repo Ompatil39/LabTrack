@@ -9,7 +9,7 @@ new Chart(ctx, {
         label: "Lab Status 2",
         data: [100, 30, 40], // Different data
         backgroundColor: [
-          "#2c4a63", // blue-4 2c4a63 
+          "#2c4a63", // blue-4 2c4a63
           "#80b1da", // blue-7
           "#c2daf0", // blue-10 c2daf0
         ],
@@ -87,7 +87,6 @@ new Chart(maintenanceRequestsCtx, {
     },
   },
 });
-
 
 // Chart 3
 const deviceDistributionCtx = document
