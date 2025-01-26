@@ -138,7 +138,7 @@
             <div>
               <canvas id="myChart"></canvas>
             </div>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
           </div>
           <!--  -->
           <div class="items item-6">
@@ -150,20 +150,19 @@
         </div>
         <!-- Dashboard CARDS Section 3 -->
         <div class="grid-container-2">
-            <div class="items item-7">
-              <span class="font-rale">Active Devices</span>
-              <div>
-                <canvas id="myChart"></canvas>
-              </div>
-              <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            </div>
-            <div class="items item-8">
-              <span class="font-rale">Maintenance Requests</span>
-              <div>
-                <canvas id="maintenanceRequests"></canvas>
-              </div>
+          <div class="items item-6">
+            <span class="font-rale">Lab Ocupancy</span>
+            <div>
+              <canvas id="deviceDistribution"></canvas>
             </div>
           </div>
+          <div class="items item-8">
+            <span class="font-rale">Grievance Trend</span>
+            <div>
+              <canvas id="faultyDevices"></canvas>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- SMALL CHARTS Sparkline  -->
@@ -177,6 +176,7 @@
         fillColor: "rgba(23, 125, 255, 0.14)",
       });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../public/js/script.js"></script>
   </body>
 </html>
