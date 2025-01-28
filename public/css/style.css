@@ -48,6 +48,8 @@ body {
 /* ------------------------ Sidebar Styles ------------------------ */
 .sidebar {
   width: 15rem;
+  height: 100dvh;
+  position: fixed;
   font-family: "Raleway", sans-serif;
   background: linear-gradient(135deg, #fffdfe, #ffffff);
   border-right: 0.0625rem solid #e0e0e0;
@@ -128,6 +130,7 @@ body {
   max-width: 100%;
   box-sizing: border-box;
   overflow-y: auto;
+  margin-left: 15rem;
 }
 
 /* ------------------------ Header Styles ------------------------ */
@@ -162,7 +165,7 @@ body {
 }
 
 /* ------------------------ FLEX Styles ------------------------ */
-.grid-container-1 {
+.card-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.7rem;
@@ -275,7 +278,7 @@ body {
   }
 
   /* Stack grid items in one column on smaller screens */
-  .grid-container-1 {
+  .card-container {
     grid-template-columns: 1fr;
   }
 

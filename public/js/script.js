@@ -286,6 +286,40 @@ new Chart(pendingGrievancesCtx, {
   },
 });
 
+// GAUGE CHART
+const labOccupancyCtx = document
+  .getElementById("labOccupancy")
+  .getContext("2d");
+new Chart(labOccupancyCtx, {
+  type: "doughnut",
+  data: {
+    labels: ["Active", "Under Maintenance", "In-Active"],
+    datasets: [
+      {
+        data: [7, 1, 0], // Values for the gauge
+        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"], // Colors for each segment
+      },
+    ],
+  },
+  options: {
+    circumference: 180, // Semi-circle (180 degrees)
+    rotation: -90, // Start from the bottom
+    animation: {
+      animateScale: true, // Enable scaling animation
+      animateRotate: true, // Enable rotation animation
+    },
+    cutout: "50%", // Increased thickness of the circular segments (smaller cutout)
+    plugins: {
+      legend: {
+        display: true,
+        position: "top", // Legend position
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false, // Allow custom width and height
+  },
+});
+
 // Chart 10: Average Maintenance Time (Bar with Fade Animation)
 const averageMaintenanceTimeCtx = document
   .getElementById("averageMaintenanceTime")

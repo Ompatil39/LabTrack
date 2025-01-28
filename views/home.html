@@ -89,7 +89,7 @@
         </div>
 
         <!-- Dashboard CARDS Section 1-->
-        <div class="grid-container-1">
+        <div class="card-container">
           <div class="items item-1">
             <span class="font-rale">Total Labs</span>
             <div class="mid">
@@ -157,7 +157,7 @@
             </div>
           </div>
           <div class="items item-8">
-            <span class="font-rale">Grievance Trend</span>
+            <span class="font-rale">Faulty Devices</span>
             <div>
               <canvas id="faultyDevices"></canvas>
             </div>
@@ -166,7 +166,7 @@
 
         <!-- Additional Charts -->
         <div class="grid-container-2">
-          <div class="items item-9">
+          <div class="items item-8">
             <span class="font-rale">Grievances by Category</span>
             <div>
               <canvas id="grievancesByCategory"></canvas>
@@ -181,48 +181,54 @@
         </div>
 
         <div class="grid-container-2">
-          <div class="items item-11">
+          <div class="items item-6">
             <span class="font-rale">Maintenance Status</span>
+            <div>
+              <canvas id="grievancesTrend"></canvas>
+            </div>
+          </div>
+          <div class="items item-5">
+            <span class="font-rale">Pending Grievances</span>
             <div>
               <canvas id="maintenanceStatus"></canvas>
             </div>
           </div>
-          <div class="items item-12">
-            <span class="font-rale">Pending Grievances</span>
+          <div class="items item-5">
+            <span class="font-rale">Lab Occupancy</span>
             <div>
-              <canvas id="pendingGrievances"></canvas>
+              <canvas id="labOccupancy"></canvas>
             </div>
           </div>
         </div>
 
         <div class="grid-container-2">
-          <div class="items item-13">
+          <div class="items item-6">
             <span class="font-rale">Average Maintenance Time (Hours)</span>
             <div>
-              <canvas id="averageMaintenanceTime"></canvas>
+              <canvas id="pendingGrievances"></canvas>
             </div>
           </div>
-          <div class="items item-14">
+          <div class="items item-6">
             <span class="font-rale">Lab Utilization Trend</span>
             <div>
-              <canvas id="labUtilizationTrend"></canvas>
+              <canvas id="averageMaintenanceTime"></canvas>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- SMALL CHARTS Sparkline  -->
-    <script>
-      $("#totalLabs").sparkline([1, 1, 2, 4], {
-        type: "line",
-        height: "50",
-        width: "100%",
-        lineWidth: "2",
-        lineColor: "#177dff",
-        fillColor: "rgba(23, 125, 255, 0.14)",
-      });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../public/js/script.js"></script>
   </body>
 </html>
+<!-- SMALL CHARTS Sparkline  -->
+<script>
+  $("#totalLabs").sparkline([1, 1, 2, 4], {
+    type: "line",
+    height: "50",
+    width: "100%",
+    lineWidth: "2",
+    lineColor: "#177dff",
+    fillColor: "rgba(23, 125, 255, 0.14)",
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../public/js/script.js"></script>
