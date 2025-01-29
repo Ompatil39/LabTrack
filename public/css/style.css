@@ -41,7 +41,7 @@ body {
 .container {
   display: flex;
   flex-wrap: wrap;
-  height: 100dvh;
+  height: 100%;
   overflow-x: hidden;
 }
 
@@ -164,20 +164,47 @@ body {
   margin-right: 0.225rem;
 }
 
-/* ------------------------ FLEX Styles ------------------------ */
+/* ------------------------ CONTAINERS  FLEX Styles ------------------------ */
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.7rem;
 }
 
-.grid-container-2 {
+
+.ex {
+  display: grid;
+  /* grid-template-columns: minmax(250px, 1fr) minmax(400px, 2fr) minmax(250px, 1fr); */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.ex2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.ex3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.large {
+  grid-column: 2 / 4;
+}
+/* .grid-container-2 {
   display: flex;
+  justify-content: center;
   flex-grow: 1;
   gap: 0.7rem;
   margin-top: 0.7rem;
   flex-wrap: wrap;
-}
+} */
 
 /* ------------------------ Item Styles ------------------------ */
 .items {
@@ -189,17 +216,24 @@ body {
   box-shadow: var(--box-shadow);
   flex-direction: column;
   align-items: center;
+  transition: transform 0.2s ease-in, box-shadow 0.2s ease;
 }
 
 .items span {
   text-align: left;
+
 }
-#totalLabs{
+
+/* .items:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+} */
+
+#totalLabs {
   justify-content: center;
   width: 50%;
 }
-.mid{
-  
+.mid {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -246,21 +280,19 @@ body {
 
 .item-5 {
   padding: 1.25rem;
-  min-width: 15dvw;
+  /* min-width: 15dvw; */
   max-width: 20dvw;
   height: fit-content;
   flex: 1;
 }
 .item-6 {
   width: 36dvw;
-  height: fit-content;
+  /* height: max-content; */
 }
 .item-8 {
   width: 36dvw;
   height: fit-content;
 }
-/* ----------------------------------------------------------------- */
-/* ----------------------------------------------------------------- */
 /* ----------------------------------------------------------------- */
 /* ------------------------ Media Queries ------------------------ */
 @media (max-width: 768px) {
@@ -268,9 +300,13 @@ body {
   .sidebar {
     width: 10rem;
   }
-
-  .header .search-bar input {
-    width: 8rem;
+  .sidebar .logo span {
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+  }
+  .main-content {
+    margin-left: 10rem;
   }
 
   .content .title h1 {
@@ -281,7 +317,9 @@ body {
   .card-container {
     grid-template-columns: 1fr;
   }
-
+  .ex {
+    grid-template-columns: 1fr;
+  }
   .grid-container-2 {
     flex-direction: column;
     width: 100%;

@@ -131,48 +131,61 @@
         </div>
 
         <!-- Dashboard CARDS Section 1 -->
-        <div class="grid-container-2">
+        <div class="ex">
           <!--  -->
-          <div class="items item-5">
+          <div class="items small">
             <span class="font-rale">Active Devices</span>
-            <div>
+            <div class="chart">
               <canvas id="myChart"></canvas>
             </div>
           </div>
           <!--  -->
-          <div class="items item-6">
+          <div class="items large">
             <span class="font-rale">Maintenance Requests</span>
-            <div class="canvas1">
+            <div class="chart">
               <canvas id="maintenanceRequests"></canvas>
+            </div>
+          </div>
+          <!--  -->
+          <div class="items small">
+            <span class="font-rale">Lab Occupancy</span>
+            <div class="chart">
+              <canvas id="labOccupancy"></canvas>
             </div>
           </div>
         </div>
 
         <!-- Dashboard CARDS Section 2 -->
-        <div class="grid-container-2">
-          <div class="items item-6">
-            <span class="font-rale">Device Distribution</span>
-            <div>
-              <canvas id="deviceDistribution"></canvas>
-            </div>
-          </div>
-          <div class="items item-8">
+        <div class="ex2">
+          <div class="items">
             <span class="font-rale">Faulty Devices</span>
             <div>
               <canvas id="faultyDevices"></canvas>
             </div>
           </div>
+          <div class="items">
+            <span class="font-rale">Grievances Trend</span>
+            <div>
+              <canvas id="grievancesTrend"></canvas>
+            </div>
+          </div>
         </div>
 
         <!-- Additional Charts -->
-        <div class="grid-container-2">
-          <div class="items item-8">
-            <span class="font-rale">Grievances by Category</span>
+        <div class="ex">
+          <div class="items">
+            <span class="font-rale">Maintenance Status</span>
             <div>
-              <canvas id="grievancesByCategory"></canvas>
+              <canvas id="maintenanceStatus"></canvas>
             </div>
           </div>
-          <div class="items item-10">
+          <div class="items large">
+            <span class="font-rale">Device Distribution</span>
+            <div>
+              <canvas id="deviceDistribution"></canvas>
+            </div>
+          </div>
+          <div class="items">
             <span class="font-rale">Grievance Status</span>
             <div>
               <canvas id="grievanceStatus"></canvas>
@@ -180,41 +193,28 @@
           </div>
         </div>
 
-        <div class="grid-container-2">
-          <div class="items item-6">
-            <span class="font-rale">Maintenance Status</span>
-            <div>
-              <canvas id="grievancesTrend"></canvas>
-            </div>
-          </div>
-          <div class="items item-5">
+        <div class="ex3">
+          <div class="items">
             <span class="font-rale">Pending Grievances</span>
-            <div>
-              <canvas id="maintenanceStatus"></canvas>
-            </div>
-          </div>
-          <div class="items item-5">
-            <span class="font-rale">Lab Occupancy</span>
-            <div>
-              <canvas id="labOccupancy"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid-container-2">
-          <div class="items item-6">
-            <span class="font-rale">Average Maintenance Time (Hours)</span>
             <div>
               <canvas id="pendingGrievances"></canvas>
             </div>
           </div>
-          <div class="items item-6">
-            <span class="font-rale">Lab Utilization Trend</span>
+          <div class="items">
+            <span class="font-rale">Grievances by Category</span>
+            <div>
+              <canvas id="grievancesByCategory"></canvas>
+            </div>
+          </div>
+          <div class="items">
+            <span class="font-rale">Average Maintenance Time (Hours)</span>
             <div>
               <canvas id="averageMaintenanceTime"></canvas>
             </div>
           </div>
-        </div>
+        </div>  
+        <!--  -->
+      
       </div>
     </div>
   </body>

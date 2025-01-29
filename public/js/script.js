@@ -3,12 +3,12 @@ const ctx = document.getElementById("myChart").getContext("2d");
 new Chart(ctx, {
   type: "doughnut",
   data: {
-    labels: ["ACTIVE", "UNDER MAINTENANCE", "INACTIVE"],
+    labels: ["Active", "Under Maintenance", "In-Active"],
     datasets: [
       {
         label: "Lab Status",
         data: [100, 30, 40],
-        backgroundColor: ["#f3545d", "#fdaf4b", "#1d7af3"],
+        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
         borderColor: ["#ffffff", "#ffffff", "#ffffff"],
         borderWidth: 2,
       },
@@ -23,12 +23,12 @@ new Chart(ctx, {
     plugins: {
       legend: {
         position: "top",
-        display: false,
+        display: true,
         labels: {
-          color: "#19374f",
-          font: { size: 14, family: "Poppins" },
+          font : {size: 10},
         },
       },
+      usePointStyle : true,
       tooltip: {
         backgroundColor: "#d3e3f1",
         titleColor: "#19374f",
@@ -59,7 +59,7 @@ new Chart(maintenanceRequestsCtx, {
       {
         label: "Maintenance Requests",
         data: [7, 3, 9, 4, 6, 3, 4, 2],
-        backgroundColor: "#2c4a63",
+        backgroundColor: ["#80b1da", "#fdaf4b", "#1d7af3"],
         borderWidth: 2,
         barThickness: 50,
       },
@@ -217,11 +217,11 @@ const grievancesTrendCtx = document
 new Chart(grievancesTrendCtx, {
   type: "line",
   data: {
-    labels: ["Jan", "Feb", "Mar", "Apr"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
     datasets: [
       {
         label: "Grievances",
-        data: [5, 10, 8, 7],
+        data: [3, 8, 7, 12, 6, 9, 7, 10],
         borderColor: "#2c4a63",
         backgroundColor: "#c2daf0",
         fill: false,
@@ -248,7 +248,7 @@ new Chart(maintenanceStatusCtx, {
     datasets: [
       {
         data: [50, 20, 30],
-        backgroundColor: ["#f44336", "#177dff", "#fdaf4b"],
+        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
       },
     ],
   },

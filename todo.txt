@@ -1,3 +1,20 @@
+#flex ex for DASHBOARD structure
+/* .ex {
+  display: flex;
+  width: 100%;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+  flex-wrap: wrap;
+}
+.small {
+  flex-grow: 0;
+  align-items: center;
+}
+.large {
+  flex-grow: 1;
+  align-items: center;
+} */
+
 DASHBOARD:-
 #TO_BE_ADDED
 @CAN_BE_ADDED
