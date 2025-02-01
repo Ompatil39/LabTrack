@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Monitoring System</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
       integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
@@ -83,7 +84,6 @@
           </div>
           <div class="user-info">
             <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-
             <span class="font-rale"
               ><i class="fa-solid fa-circle-user"></i> Joxy Inc.
             </span>
@@ -96,7 +96,7 @@
             <span class="font-rale">Total Labs</span>
             <div class="mid">
               <div class="font-number value">8</div>
-              <div id="totalLabs"></div>
+              <div id="totalLas"></div>
             </div>
             <span class="highlight"
               ><i class="fa-solid fa-arrow-trend-up"></i> +1 added this
@@ -132,65 +132,70 @@
           </div>
         </div>
 
+        <!-- CHARTS Section -->
         <!-- Dashboard CARDS Section 1 -->
+        <!-- CHARTS Section -->
         <div class="ex">
-          <!--  -->
           <div class="items small">
             <span class="font-rale">Active Devices</span>
             <div class="chart">
-              <canvas id="myChart"></canvas>
+              <div id="myChart" class="chart"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
-          <!--  -->
           <div class="items large">
             <span class="font-rale">Maintenance Requests</span>
             <div class="chart">
-              <canvas id="maintenanceRequests"></canvas>
+              <div id="maintenanceRequests"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
-          <!--  -->
           <div class="items small">
             <span class="font-rale">Lab Occupancy</span>
             <div class="chart">
-              <canvas id="labOccupancy"></canvas>
+              <div id="labOccupancy"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
         </div>
 
-        <!-- Dashboard CARDS Section 2 -->
         <div class="ex2">
           <div class="items">
             <span class="font-rale">Faulty Devices</span>
-            <div>
-              <canvas id="faultyDevices"></canvas>
+            <div class="chart">
+              <div id="faultyDevices"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
           <div class="items">
             <span class="font-rale">Grievances Trend</span>
-            <div>
-              <canvas id="grievancesTrend"></canvas>
+            <div class="chart">
+              <div id="grievancesTrend"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
         </div>
 
-        <!-- Additional Charts -->
         <div class="ex">
           <div class="items">
             <span class="font-rale">Maintenance Status</span>
-            <div>
-              <canvas id="maintenanceStatus"></canvas>
+            <div class="chart">
+              <div id="maintenanceStatus"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
           <div class="items large">
             <span class="font-rale">Device Distribution</span>
-            <div>
-              <canvas id="deviceDistribution"></canvas>
+            <div class="chart">
+              <div id="deviceDistribution"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
           <div class="items">
             <span class="font-rale">Grievance Status</span>
-            <div>
-              <canvas id="grievanceStatus"></canvas>
+            <div class="chart">
+              <div id="grievanceStatus"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
         </div>
@@ -198,24 +203,27 @@
         <div class="ex3">
           <div class="items">
             <span class="font-rale">Pending Grievances</span>
-            <div>
-              <canvas id="pendingGrievances"></canvas>
+            <div class="chart">
+              <div id="pendingGrievances"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
           <div class="items">
             <span class="font-rale">Grievances by Category</span>
-            <div>
-              <canvas id="grievancesByCategory"></canvas>
+            <div class="chart">
+              <div id="grievancesByCategory"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
           <div class="items">
             <span class="font-rale">Average Maintenance Time (Hours)</span>
-            <div>
-              <canvas id="averageMaintenanceTime"></canvas>
+            <div class="chart">
+              <div id="averageMaintenanceTime"></div>
+              <!-- Removed fixed height -->
             </div>
           </div>
         </div>
-        <!--  -->
+        <!-- CHARTS Section END -->
       </div>
     </div>
   </body>
@@ -231,5 +239,6 @@
     fillColor: "rgba(23, 125, 255, 0.14)",
   });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../public/js/script.js"></script>
