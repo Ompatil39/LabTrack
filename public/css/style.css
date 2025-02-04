@@ -216,7 +216,42 @@ hr.solid {
 .large {
   grid-column: 2 / 4;
 }
-#myChart,
+.ex {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(300px, 1fr)
+  ); /* Adjust grid layout */
+  grid-gap: 20px;
+}
+
+.items {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart::after {
+  content: "";
+  display: block;
+  padding-top: 60%; /* Aspect ratio for charts, adjust to rectangular as needed */
+}
+
+.chart > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* #myChart,
 #maintenanceRequests,
 #labOccupancy,
 #faultyDevices,
@@ -230,7 +265,7 @@ hr.solid {
   width: 100% !important;
   height: 100% !important;
   min-height: 300px;
-}
+} */
 /* .chart {
   height: 300px; 
   width: 100%; 
@@ -240,6 +275,7 @@ hr.solid {
 
 /* ------------------------ Item Styles ------------------------ */
 .items {
+  height: 100%;
   font-size: 1.4rem;
   font-weight: 550;
   padding: 1rem 1.25rem;
