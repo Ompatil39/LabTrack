@@ -84,16 +84,12 @@ hr.solid {
 
 .menu-title {
   padding-left: 0.4rem;
-  color: #6e6e6e;
+  color: #6E6E6E;
 }
 .sidebar .menu {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-.chart canvas {
-  width: 100% !important;
-  height: auto !important;
 }
 
 .sidebar .menu li {
@@ -216,27 +212,14 @@ hr.solid {
 .large {
   grid-column: 2 / 4;
 }
-#myChart,
-#maintenanceRequests,
-#labOccupancy,
-#faultyDevices,
-#grievancesTrend,
-#maintenanceStatus,
-#deviceDistribution,
-#grievanceStatus,
-#pendingGrievances,
-#grievancesByCategory,
-#averageMaintenanceTime {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 300px;
-}
-/* .chart {
-  height: 300px; 
-  width: 100%; 
+/* .grid-container-2 {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+  flex-wrap: wrap;
 } */
-
-/* Make the charts responsive */
 
 /* ------------------------ Item Styles ------------------------ */
 .items {
