@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 1 Dashboard - Modern UI</title>
+    <style>
+        /* Modern Color Scheme */
+        :root {
+            --primary: #2A2F35;
+            --secondary: #3A3F47;
+            --accent: #00D1B2;
+            --text: #F8F9FA;
+            --success: #48C774;
+            --warning: #FFDD57;
+            --danger: #FF3860;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: var(--secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .lab-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            background: var(--success);
+            color: var(--primary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Device Table */
+        .device-table-container {
+            background: var(--secondary);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .device-table th,
+        .device-table td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .device-table th {
+            background: var(--glass);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Maintenance Timeline */
+        .timeline {
+            border-left: 2px solid var(--accent);
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--secondary);
+            border-radius: 0.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 1rem;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* Modern Tabs */
+        .tab-container {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 2px solid var(--glass);
+        }
+
+        .tab-button {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .tab-button.active {
+            opacity: 1;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .device-table th,
+            .device-table td {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="lab-header">
+        <h1 class="lab-title">
+            Lab 1 - CS101
+            <span class="status-chip">Active</span>
+        </h1>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Devices</div>
+                <div class="stat-value">45</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">In Use</div>
+                <div class="stat-value">22</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Available</div>
+                <div class="stat-value">20</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Maintenance</div>
+                <div class="stat-value">3</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="tab-container">
+        <nav class="tab-nav">
+            <button class="tab-button active">Devices</button>
+            <button class="tab-button">Analytics</button>
+            <button class="tab-button">Maintenance</button>
+            <button class="tab-button">Issues</button>
+        </nav>
+
+        <!-- Devices Tab -->
+        <div class="tab-content">
+            <div class="device-table-container">
+                <table class="device-table">
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Last User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🖥 PC-001</td>
+                            <td>Desktop</td>
+                            <td>
+                                <span class="status-indicator" style="color: var(--success);">
+                                    <span class="status-dot"></span>
+                                    Available
+                                </span>
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>🖨 PRN-01</td>
+                            <td>Printer</td>
+                            <td>
+                                <span class="status-indicator" style="color: var(--danger);">
+                                    <span class="status-dot"></span>
+                                    Maintenance
+                                </span>
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <!-- Add more rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Section -->
+    <div class="timeline">
+        <div class="timeline-item">
+            <h3>2023-08-15 - Hardware Upgrade</h3>
+            <p>Updated all motherboard firmware</p>
+            <div class="tech-badge">👨💻 Technician: John Smith</div>
+        </div>
+        <div class="timeline-item">
+            <h3>2023-08-10 - Printer Repair</h3>
+            <p>Fixed paper feed mechanism on PRN-01</p>
+            <div class="tech-badge">👩💻 Technician: Sarah Johnson</div>
+        </div>
+    </div>
+</body>
+</html>

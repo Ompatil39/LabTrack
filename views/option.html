@@ -170,6 +170,95 @@
   </style>
 
   <body>
+    <div class="labs-grid">
+      <div class="lab-card">
+        <div class="lab-header">
+          <h2>🧪 Lab 1 - CS101</h2>
+          <span class="status-chip">🟢 Active</span>
+        </div>
+        <div class="lab-stats">
+          <div class="stat">
+            <span class="stat-value">45</span>
+            <span class="stat-label">Devices</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">22</span>
+            <span class="stat-label">In Use</span>
+          </div>
+        </div>
+        <button class="view-lab-button">View Lab</button>
+      </div>
+      <!-- Repeat for other labs -->
+    </div>
+
+    <style>
+      .labs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+      }
+
+      .lab-card {
+        background: #2a2f35;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .lab-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      .lab-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .status-chip {
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        background: #27ae60;
+        color: white;
+        font-weight: 600;
+      }
+
+      .lab-stats {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00d1b2;
+      }
+
+      .stat-label {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+      }
+
+      .view-lab-button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #00d1b2;
+        border: none;
+        border-radius: 0.5rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
     <div class="container">
       <!-- Sidebar Section -->
       <div class="sidebar">

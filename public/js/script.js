@@ -8,7 +8,8 @@ new Chart(ctx, {
       {
         label: "Lab Status",
         data: [100, 30, 40],
-        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
+        // Updated bluish light colors
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
         borderColor: ["#ffffff", "#ffffff", "#ffffff"],
         borderWidth: 2,
       },
@@ -23,12 +24,14 @@ new Chart(ctx, {
     plugins: {
       legend: {
         position: "top",
+        align: "center", // Ensure legends are in one row
         display: true,
         labels: {
-          font : {size: 10},
+          boxWidth: 15, // Smaller colored box for the legend
+          font: { size: 10 },
         },
       },
-      usePointStyle : true,
+      usePointStyle: true,
       tooltip: {
         backgroundColor: "#d3e3f1",
         titleColor: "#19374f",
@@ -59,8 +62,19 @@ new Chart(maintenanceRequestsCtx, {
       {
         label: "Maintenance Requests",
         data: [7, 3, 9, 4, 6, 3, 4, 2],
-        backgroundColor: ["#80b1da", "#fdaf4b", "#1d7af3"],
+        // Cycle through bluish hues
+        backgroundColor: [
+          "#a2d2ff",
+          "#89c2d9",
+          "#70a1ff",
+          "#a2d2ff",
+          "#89c2d9",
+          "#70a1ff",
+          "#a2d2ff",
+          "#89c2d9",
+        ],
         borderWidth: 2,
+        borderRadius: 8,
         barThickness: 50,
       },
     ],
@@ -100,7 +114,17 @@ new Chart(deviceDistributionCtx, {
       {
         label: "Device Count",
         data: [40, 50, 30, 45, 25, 35, 20, 15],
-        backgroundColor: ["#80b1da", "#fdaf4b", "#1d7af3"],
+        // Repeating bluish hues for consistency
+        backgroundColor: [
+          "#a2d2ff",
+          "#89c2d9",
+          "#70a1ff",
+          "#a2d2ff",
+          "#89c2d9",
+          "#70a1ff",
+          "#a2d2ff",
+          "#89c2d9",
+        ],
       },
     ],
   },
@@ -139,12 +163,13 @@ new Chart(faultyDevicesCtx, {
       {
         label: "Faulty PCs",
         data: [5, 8, 3, 6, 4, 2, 7, 1],
-        backgroundColor: "#f3545d",
+        // Updated to a bluish tone
+        backgroundColor: "#70a1ff",
       },
       {
         label: "Faulty Printers",
         data: [2, 4, 1, 3, 2, 1, 4, 2],
-        backgroundColor: "#80b1da",
+        backgroundColor: "#a2d2ff",
       },
     ],
   },
@@ -169,7 +194,8 @@ new Chart(grievancesByCategoryCtx, {
       {
         label: "Grievances",
         data: [15, 10, 5],
-        backgroundColor: ["#177dff", "#4caf50", "#fdaf4b"],
+        // Updated bluish shades for each category
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
       },
     ],
   },
@@ -197,7 +223,8 @@ new Chart(grievanceStatusCtx, {
     datasets: [
       {
         data: [30, 10, 5],
-        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
+        // Updated to bluish light tones
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
       },
     ],
   },
@@ -206,7 +233,17 @@ new Chart(grievanceStatusCtx, {
       animateRotate: true,
       animateScale: true,
     },
-    plugins: { legend: { display: true, position: "top" } },
+    plugins: {
+      legend: {
+        position: "top",
+        align: "center",
+        display: true,
+        labels: {
+          boxWidth: 15, // Smaller colored box
+          font: { size: 10 },
+        },
+      },
+    },
   },
 });
 
@@ -222,8 +259,9 @@ new Chart(grievancesTrendCtx, {
       {
         label: "Grievances",
         data: [3, 8, 7, 12, 6, 9, 7, 10],
-        borderColor: "#2c4a63",
-        backgroundColor: "#c2daf0",
+        // Updated to a bluish palette
+        borderColor: "#70a1ff",
+        backgroundColor: "#d0e9ff",
         fill: false,
       },
     ],
@@ -248,7 +286,8 @@ new Chart(maintenanceStatusCtx, {
     datasets: [
       {
         data: [50, 20, 30],
-        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"],
+        // Updated to bluish tones
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
       },
     ],
   },
@@ -256,7 +295,17 @@ new Chart(maintenanceStatusCtx, {
     animation: {
       animateScale: true,
     },
-    plugins: { legend: { display: true, position: "top" } },
+    plugins: {
+      legend: {
+        position: "top",
+        align: "center",
+        display: true,
+        labels: {
+          boxWidth: 15, // Smaller legend boxes for circular charts
+          // Text font remains the same
+        },
+      },
+    },
   },
 });
 
@@ -271,8 +320,9 @@ new Chart(pendingGrievancesCtx, {
     datasets: [
       {
         label: "Pending Grievances",
-        data: [5, 3, 2], // Example data
-        backgroundColor: ["#80b6f4", "#4caf50", "#fdaf4b"],
+        data: [5, 3, 2],
+        // Updated to bluish shades
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
       },
     ],
   },
@@ -286,7 +336,7 @@ new Chart(pendingGrievancesCtx, {
   },
 });
 
-// GAUGE CHART
+// GAUGE CHART: Lab Occupancy (Doughnut with Custom Animation)
 const labOccupancyCtx = document
   .getElementById("labOccupancy")
   .getContext("2d");
@@ -296,8 +346,9 @@ new Chart(labOccupancyCtx, {
     labels: ["Active", "Under Maintenance", "In-Active"],
     datasets: [
       {
-        data: [7, 1, 0], // Values for the gauge
-        backgroundColor: ["#2c4a63", "#fdaf4b", "#f3545d"], // Colors for each segment
+        data: [7, 1, 0],
+        // Updated to bluish shades
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff"],
       },
     ],
   },
@@ -305,18 +356,23 @@ new Chart(labOccupancyCtx, {
     circumference: 180, // Semi-circle (180 degrees)
     rotation: -90, // Start from the bottom
     animation: {
-      animateScale: true, // Enable scaling animation
-      animateRotate: true, // Enable rotation animation
+      animateScale: true,
+      animateRotate: true,
     },
-    cutout: "50%", // Increased thickness of the circular segments (smaller cutout)
+    cutout: "50%",
     plugins: {
       legend: {
+        position: "top",
+        align: "center",
         display: true,
-        position: "top", // Legend position
+        labels: {
+          boxWidth: 15, // Smaller box size for the legend
+          font: { size: 10 },
+        },
       },
     },
     responsive: true,
-    maintainAspectRatio: false, // Allow custom width and height
+    maintainAspectRatio: true,
   },
 });
 
@@ -327,12 +383,13 @@ const averageMaintenanceTimeCtx = document
 new Chart(averageMaintenanceTimeCtx, {
   type: "bar",
   data: {
-    labels: ["PC", "Printer", "Monitor", "Keyboard"], // Example device types
+    labels: ["PC", "Printer", "Monitor", "Keyboard"],
     datasets: [
       {
         label: "Average Maintenance Time (Hours)",
-        data: [2.5, 3.0, 1.5, 1.0], // Example data in hours
-        backgroundColor: ["#2c4a63", "#fdaf4b", "#80b6f4", "#1d7af3"],
+        data: [2.5, 3.0, 1.5, 1.0],
+        // Updated to bluish tones (using a couple of repeating shades)
+        backgroundColor: ["#a2d2ff", "#89c2d9", "#70a1ff", "#89c2d9"],
       },
     ],
   },
