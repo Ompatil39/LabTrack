@@ -3,189 +3,90 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computer Labs</title>
-    <link rel="stylesheet" href="styles.css" />
-    <!-- Font Awesome for Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-    />
+    <title>Document</title>
+    <style>
+      .icon-based {
+        background-color: var(--card-bg-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid transparent;
+      }
+
+      .icon-based:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        border-color: var(--primary-accent);
+      }
+
+      .icon-based .lab-header {
+        margin-bottom: 1rem;
+      }
+
+      .icon-based .lab-header h4 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--main-text-color);
+        margin: 0;
+      }
+
+      .icon-based .lab-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .icon-based .stat {
+        text-align: center;
+      }
+
+      .icon-based .stat i {
+        font-size: 1.5rem;
+        color: var(--primary-accent);
+        margin-bottom: 0.5rem;
+      }
+
+      .icon-based .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--main-text-color);
+      }
+
+      .icon-based .stat-label {
+        font-size: 0.875rem;
+        color: var(--secondary-text-color);
+      }
+    </style>
   </head>
-  <style>
-    /* General Styles */
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #f8f9fa;
-      color: #2c3e50;
-      margin: 0;
-      padding: 0;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    /* Lab List Container */
-    .lab-list-container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .lab-list-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #2c3e50;
-    }
-
-    /* Lab Grid */
-    .lab-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    /* Lab Card */
-    .lab-card {
-      background-color: #ffffff;
-      border-radius: 0.625rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .lab-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Lab Icon */
-    .lab-icon {
-      font-size: 2.5rem;
-      color: #3498db;
-      margin-bottom: 1rem;
-    }
-
-    /* Lab Name */
-    .lab-name {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #2c3e50;
-    }
-
-    /* Lab Description */
-    .lab-description {
-      font-size: 1rem;
-      color: #7f8c8d;
-      margin: 0;
-    }
-
-    /* Lab Details */
-    .lab-details {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #7f8c8d;
-    }
-
-    .lab-capacity,
-    .lab-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .lab-status i {
-      color: #2ecc71; /* Green for Available */
-    }
-
-    .lab-status.occupied i {
-      color: #e74c3c; /* Red for Occupied */
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .lab-list-title {
-        font-size: 2rem;
-      }
-
-      .lab-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      }
-    }
-
-    @media (max-width: 480px) {
-      .lab-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
   <body>
-    <div class="lab-list-container">
-      <h1 class="lab-list-title">Computer Labs</h1>
-      <div class="lab-grid">
-        <!-- Lab Card 1 -->
-        <a href="lab1.html" class="lab-card">
-          <div class="lab-icon">
+    <div class="lab-container">
+      <!-- Lab Card 1 -->
+      <a href="lab-details.html" class="lab-card icon-based">
+        <div class="lab-header">
+          <h4>Lab 1 - COA101</h4>
+          <div class="status-chip">
+            <span class="highlight">
+              <i class="fas fa-check-circle"></i> Active
+            </span>
+          </div>
+        </div>
+        <div class="lab-stats">
+          <div class="stat">
             <i class="fas fa-desktop"></i>
-            <!-- Computer Icon -->
+            <span class="stat-value">40</span>
+            <span class="stat-label">Devices</span>
           </div>
-          <h2 class="lab-name">Lab 1</h2>
-          <p class="lab-description">Software Development Lab</p>
-          <div class="lab-details">
-            <span class="lab-capacity"
-              ><i class="fas fa-users"></i> 30 Systems</span
-            >
-            <span class="lab-status"
-              ><i class="fas fa-circle"></i> Available</span
-            >
+          <div class="stat">
+            <i class="fas fa-tools"></i>
+            <span class="stat-value">8</span>
+            <span class="stat-label">Under Maintenance</span>
           </div>
-        </a>
+        </div>
+      </a>
 
-        <!-- Lab Card 2 -->
-        <a href="lab2.html" class="lab-card">
-          <div class="lab-icon">
-            <i class="fas fa-server"></i>
-            <!-- Server Icon -->
-          </div>
-          <h2 class="lab-name">Lab 2</h2>
-          <p class="lab-description">Networking and Security Lab</p>
-          <div class="lab-details">
-            <span class="lab-capacity"
-              ><i class="fas fa-users"></i> 25 Systems</span
-            >
-            <span class="lab-status"
-              ><i class="fas fa-circle"></i> Occupied</span
-            >
-          </div>
-        </a>
-
-        <!-- Lab Card 3 -->
-        <a href="lab3.html" class="lab-card">
-          <div class="lab-icon">
-            <i class="fas fa-laptop-code"></i>
-            <!-- Coding Icon -->
-          </div>
-          <h2 class="lab-name">Lab 3</h2>
-          <p class="lab-description">AI and Machine Learning Lab</p>
-          <div class="lab-details">
-            <span class="lab-capacity"
-              ><i class="fas fa-users"></i> 20 Systems</span
-            >
-            <span class="lab-status"
-              ><i class="fas fa-circle"></i> Available</span
-            >
-          </div>
-        </a>
-
-        <!-- Add more lab cards as needed -->
-      </div>
+      <!-- Add more lab cards as needed -->
     </div>
   </body>
 </html>
