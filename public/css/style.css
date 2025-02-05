@@ -78,11 +78,15 @@ h4 {
   margin-bottom: 1rem;
 }
 
+.colour {
+  color: var(--primary-accent);
+}
+
 .sidebar .logo span {
   font-size: 1.9rem;
   letter-spacing: 0.05em;
   font-weight: 800;
-  color: var(--main-text-color);
+  color: #3498db;
 }
 
 hr.solid {
@@ -356,7 +360,6 @@ hr.solid {
 
 /* LAB>HTML FILE CSS */
 .lab-container {
-  cursor: pointer;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   flex-wrap: wrap;
@@ -373,9 +376,16 @@ hr.solid {
   overflow: hidden;
 }
 
+/* option 2 */
 .lab-card:hover {
   border: 1px solid var(--primary-accent);
   z-index: 500;
+  .stat1 i {
+    color: var(--primary-accent);
+  }
+  .stat-value1 {
+    color: var(--active-bg-color);
+  }
 }
 
 .arrow-icon {
@@ -392,55 +402,82 @@ hr.solid {
   padding: 0.4rem;
 }
 
-.lab-header h4 {
+.lab-header1 h4 {
   font-weight: 500;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   letter-spacing: 0.01ch;
 }
 
-.lab-header {
+.lab-header1 {
   margin-bottom: 0rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.sub-title {
+.icon {
+  font-size: 2rem;
+  color: #7f8c8d;
+}
+
+.sub-title1 {
   padding-left: 0.3rem;
   font-size: 1rem;
   color: var(--secondary-text-color);
 }
 
-.status-chip {
+.status-chip1 {
   align-self: center;
   font-weight: 600;
-  margin-left: auto;
+  /* margin-left: auto; */
 }
 
-.lab-stats {
+.lab-stats1 {
   padding-top: 0.75rem;
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 1.4rem;
 }
 
-.stat {
+.stat1 {
   text-align: center;
 }
 
-.stat-value {
+.stat1 i {
+  color: var(--secondary-text-color);
+}
+
+.stat-value1 {
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-.stat-label {
+.stat-label1 {
   color: var(--secondary-text-color);
   font-size: 1rem;
 }
 
+.stat1 i {
+  margin-left: 0px; /* Adds space between text and icon */
+  /* color: #555; Adjust color if needed */
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .view-lab-button {
+  margin-top: 1rem;
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: var(--primary-accent);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.6rem;
   color: white;
+  font-size: 1.2rem !important;
   font-weight: 600;
   cursor: pointer;
 }

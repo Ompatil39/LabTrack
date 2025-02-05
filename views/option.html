@@ -3,378 +3,188 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prody Dashboard</title>
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="../public/css/style.css" />
+    <title>Computer Labs</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Font Awesome for Icons -->
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
     />
   </head>
   <style>
+    /* General Styles */
     body {
       font-family: "Inter", sans-serif;
-      background-color: #f5f7fa;
+      background-color: #f8f9fa;
+      color: #2c3e50;
       margin: 0;
       padding: 0;
-      /* #fffdfe #09324e */
     }
-    .container {
-      display: flex;
-      height: 100vh;
+
+    a {
+      text-decoration: none;
+      color: inherit;
     }
-    .sidebar {
-      width: 200px;
-      background-color: #fff;
-      border-right: 1px solid #e0e0e0;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    /* Lab List Container */
+    .lab-list-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
-    .sidebar img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
+
+    .lab-list-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #2c3e50;
     }
-    .sidebar h1 {
-      font-size: 24px;
+
+    /* Lab Grid */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Lab Card */
+    .lab-card {
+      background-color: #ffffff;
+      border-radius: 0.625rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .lab-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Lab Icon */
+    .lab-icon {
+      font-size: 2.5rem;
+      color: #3498db;
+      margin-bottom: 1rem;
+    }
+
+    /* Lab Name */
+    .lab-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+
+    /* Lab Description */
+    .lab-description {
+      font-size: 1rem;
+      color: #7f8c8d;
       margin: 0;
-      padding: 10px 0;
     }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar ul li {
-      padding: 10px 0;
+
+    /* Lab Details */
+    .lab-details {
       display: flex;
-      align-items: center;
-    }
-    .sidebar ul li i {
-      margin-right: 10px;
-    }
-    .sidebar ul li span {
-      font-size: 14px;
-      color: #888;
-      margin-left: auto;
-    }
-    .content {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .content-header {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #7f8c8d;
     }
-    .content-header h2 {
-      font-size: 24px;
-      margin: 0;
-    }
-    .content-header .actions {
+
+    .lab-capacity,
+    .lab-status {
       display: flex;
       align-items: center;
+      gap: 0.5rem;
     }
-    .content-header .actions button {
-      background-color: #ff5a5f;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 10px;
+
+    .lab-status i {
+      color: #2ecc71; /* Green for Available */
     }
-    .content-header .actions button i {
-      margin-right: 5px;
+
+    .lab-status.occupied i {
+      color: #e74c3c; /* Red for Occupied */
     }
-    .content-header .actions .search {
-      display: flex;
-      align-items: center;
-      background-color: #f0f0f0;
-      padding: 5px 10px;
-      border-radius: 5px;
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .lab-list-title {
+        font-size: 2rem;
+      }
+
+      .lab-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
     }
-    .content-header .actions .search input {
-      border: none;
-      background: none;
-      outline: none;
-      padding: 5px;
-    }
-    .content-header .actions .search i {
-      color: #888;
-    }
-    .chart {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .chart h3 {
-      font-size: 18px;
-      margin: 0 0 20px;
-    }
-    .chart img {
-      width: 100%;
-      border-radius: 10px;
-    }
-    .table {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .table table th,
-    .table table td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .table table th {
-      background-color: #f0f0f0;
-    }
-    .table table td img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-    }
-    .table table td .badge {
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-    }
-    .badge-social {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .badge-outreach {
-      background-color: #28a745;
-      color: #fff;
-    }
-    .badge-referrals {
-      background-color: #ffc107;
-      color: #fff;
-    }
-    .badge-word {
-      background-color: #dc3545;
-      color: #fff;
+
+    @media (max-width: 480px) {
+      .lab-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
-
   <body>
-    <div class="labs-grid">
-      <div class="lab-card">
-        <div class="lab-header">
-          <h2>🧪 Lab 1 - CS101</h2>
-          <span class="status-chip">🟢 Active</span>
-        </div>
-        <div class="lab-stats">
-          <div class="stat">
-            <span class="stat-value">45</span>
-            <span class="stat-label">Devices</span>
+    <div class="lab-list-container">
+      <h1 class="lab-list-title">Computer Labs</h1>
+      <div class="lab-grid">
+        <!-- Lab Card 1 -->
+        <a href="lab1.html" class="lab-card">
+          <div class="lab-icon">
+            <i class="fas fa-desktop"></i>
+            <!-- Computer Icon -->
           </div>
-          <div class="stat">
-            <span class="stat-value">22</span>
-            <span class="stat-label">In Use</span>
+          <h2 class="lab-name">Lab 1</h2>
+          <p class="lab-description">Software Development Lab</p>
+          <div class="lab-details">
+            <span class="lab-capacity"
+              ><i class="fas fa-users"></i> 30 Systems</span
+            >
+            <span class="lab-status"
+              ><i class="fas fa-circle"></i> Available</span
+            >
           </div>
-        </div>
-        <button class="view-lab-button">View Lab</button>
-      </div>
-      <!-- Repeat for other labs -->
-    </div>
+        </a>
 
-    <style>
-      .labs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        padding: 1rem;
-      }
-
-      .lab-card {
-        background: #2a2f35;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .lab-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      }
-
-      .lab-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-
-      .status-chip {
-        padding: 0.5rem 1rem;
-        border-radius: 2rem;
-        background: #27ae60;
-        color: white;
-        font-weight: 600;
-      }
-
-      .lab-stats {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .stat {
-        text-align: center;
-      }
-
-      .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #00d1b2;
-      }
-
-      .stat-label {
-        color: #7f8c8d;
-        font-size: 0.9rem;
-      }
-
-      .view-lab-button {
-        width: 100%;
-        padding: 0.75rem;
-        background: #00d1b2;
-        border: none;
-        border-radius: 0.5rem;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-      }
-    </style>
-    <div class="container">
-      <!-- Sidebar Section -->
-      <div class="sidebar">
-        <!-- Logo and Title -->
-        <!-- <img src="https://placehold.co/30x30" alt="Prody Logo"> -->
-        <h1>LabTrack</h1>
-
-        <!-- Navigation Links -->
-        <ul>
-          <li><i class="fas fa-tachometer-alt"></i> Dashboard</li>
-          <li><i class="fas fa-folder"></i> Projects <span>3/5</span></li>
-          <li><i class="fas fa-chart-line"></i> Analytics</li>
-          <li><i class="fas fa-file-alt"></i> Reports <span>New</span></li>
-          <li><i class="fas fa-puzzle-piece"></i> Extensions</li>
-          <li><i class="fas fa-building"></i> Companies <span>17</span></li>
-          <li><i class="fas fa-users"></i> People <span>164</span></li>
-        </ul>
-
-        <!-- Help Center Section -->
-      </div>
-
-      <!-- Content Section -->
-      <div class="content">
-        <!-- Header Section -->
-        <div class="content-header">
-          <h2>House Spectrum Ltd</h2>
-          <div class="actions">
-            <div class="search">
-              <i class="fas fa-search"></i>
-              <input type="text" placeholder="Search" />
-            </div>
-            <button><i class="fas fa-plus"></i> Add New</button>
+        <!-- Lab Card 2 -->
+        <a href="lab2.html" class="lab-card">
+          <div class="lab-icon">
+            <i class="fas fa-server"></i>
+            <!-- Server Icon -->
           </div>
-        </div>
+          <h2 class="lab-name">Lab 2</h2>
+          <p class="lab-description">Networking and Security Lab</p>
+          <div class="lab-details">
+            <span class="lab-capacity"
+              ><i class="fas fa-users"></i> 25 Systems</span
+            >
+            <span class="lab-status"
+              ><i class="fas fa-circle"></i> Occupied</span
+            >
+          </div>
+        </a>
 
-        <!-- Chart Section -->
-        <div class="chart">
-          <h3>Consolidated Budget</h3>
-          <img
-            src="https://placehold.co/600x300"
-            alt="Consolidated Budget Chart"
-          />
-        </div>
+        <!-- Lab Card 3 -->
+        <a href="lab3.html" class="lab-card">
+          <div class="lab-icon">
+            <i class="fas fa-laptop-code"></i>
+            <!-- Coding Icon -->
+          </div>
+          <h2 class="lab-name">Lab 3</h2>
+          <p class="lab-description">AI and Machine Learning Lab</p>
+          <div class="lab-details">
+            <span class="lab-capacity"
+              ><i class="fas fa-users"></i> 20 Systems</span
+            >
+            <span class="lab-status"
+              ><i class="fas fa-circle"></i> Available</span
+            >
+          </div>
+        </a>
 
-        <!-- Table Section -->
-        <div class="table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Deals</th>
-                <th>Contact</th>
-                <th>Email</th>
-                <th>Value</th>
-                <th>Source</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>01</td>
-                <td>Acme</td>
-                <td>
-                  <img src="https://placehold.co/30x30" alt="Tyra Dhillon" />
-                  Tyra Dhillon
-                </td>
-                <td>tyradhillon@acme.com</td>
-                <td>$3,912</td>
-                <td><span class="badge badge-social">Social Networks</span></td>
-              </tr>
-              <tr>
-                <td>02</td>
-                <td>Academic Project</td>
-                <td>
-                  <img src="https://placehold.co/30x30" alt="Brittni Lando" />
-                  Brittni Lando
-                </td>
-                <td>lando@academicproject.com</td>
-                <td>$2,345</td>
-                <td><span class="badge badge-outreach">Outreach</span></td>
-              </tr>
-              <tr>
-                <td>03</td>
-                <td>Aimbus</td>
-                <td>
-                  <img src="https://placehold.co/30x30" alt="Kevin Chen" />
-                  Kevin Chen
-                </td>
-                <td>chen@aimbus.com</td>
-                <td>$13,864</td>
-                <td><span class="badge badge-referrals">Referrals</span></td>
-              </tr>
-              <tr>
-                <td>04</td>
-                <td>Big Bang Production</td>
-                <td>
-                  <img src="https://placehold.co/30x30" alt="Josh Ryan" />
-                  Josh Ryan
-                </td>
-                <td>joshryan@gmail.com</td>
-                <td>$6,314</td>
-                <td><span class="badge badge-word">Word-of-mouth</span></td>
-              </tr>
-              <tr>
-                <td>05</td>
-                <td>Book Launch</td>
-                <td>
-                  <img src="https://placehold.co/30x30" alt="Chieko Chuta" />
-                  Chieko Chuta
-                </td>
-                <td>chieko67@booklaunch.com</td>
-                <td>$5,982</td>
-                <td><span class="badge badge-outreach">Outreach</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- Add more lab cards as needed -->
       </div>
     </div>
   </body>
