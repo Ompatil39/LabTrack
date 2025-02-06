@@ -43,11 +43,11 @@ h4 {
 
 /* ------------------------ Font Families ------------------------ */
 .font-rale {
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", sans-serif !important;
 }
 
 .font-number {
-  font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif !important;
 }
 
 /* ------------------------ Container Styles ------------------------ */
@@ -79,21 +79,26 @@ h4 {
 }
 
 .colour {
+  margin-right: 2px;
+  font-size: 2.2rem !important;
+  font-weight: 900 !important;
   color: var(--primary-accent);
+  background: linear-gradient(to bottom, #5dade2 0%, #3498db 100%, #3498db 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .sidebar .logo span {
   font-size: 1.9rem;
   letter-spacing: 0.05em;
   font-weight: 800;
-  color: #3498db;
+  color: var(--main-text-color);
 }
 
 hr.solid {
   display: block;
-  height: 1px;
   border: 0;
-  border-top: 1px solid var(--border-color);
+  border-top: 0.09rem solid var(--border-color);
   margin: 1em 0;
   padding: 0;
   margin-bottom: 1rem;
@@ -230,6 +235,7 @@ hr.solid {
 .ex3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  /* min-height: 280px; */
   gap: 0.8rem;
   margin-top: 0.8rem;
 }
@@ -325,39 +331,6 @@ hr.solid {
 .item-8 {
   width: 36dvw;
   height: fit-content;
-}
-
-/* ------------------------ Media Queries ------------------------ */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 10rem;
-  }
-
-  .sidebar .logo span {
-    font-size: 1.6rem;
-  }
-
-  .main-content {
-    margin-left: 10rem;
-  }
-
-  .card-container {
-    grid-template-columns: 1fr;
-  }
-
-  .ex {
-    grid-template-columns: 1fr;
-  }
-
-  .item-1,
-  .item-2,
-  .item-3,
-  .item-4,
-  .item-5,
-  .item-6 {
-    flex: 1;
-    min-width: 100%;
-  }
 }
 
 /* LAB.html  CSS*/
@@ -467,7 +440,7 @@ hr.solid {
   border-radius: var(--border-radius);
   color: white;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700 !important;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -475,6 +448,74 @@ hr.solid {
 .view-lab-button:hover {
   background-color: #2980b9;
 }
+
+/* Floating Action Button (FAB) */
+.fab {
+  position: fixed;
+  bottom: 4rem;
+  right: 2rem;
+  background-color: var(--warning-accent);
+  color: white;
+  padding: 1rem;
+  font-weight: 700 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 0.625rem;
+  box-shadow:var(--box-shadow);
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fab:hover {
+  background-color: white;
+  color: var(--warning-accent);
+  transform: scale(1.05);
+  font-size: 1.15rem;
+  border: 2px solid var(--warning-accent);
+  font-weight:var(--box-shadow);
+}
+
+.fab i {
+  font-size: 1.1rem;
+}
+
+
+/* ------------------------ Media Queries ------------------------ */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 10rem;
+  }
+
+  .sidebar .logo span {
+    font-size: 1.6rem;
+  }
+
+  .main-content {
+    margin-left: 10rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ex,
+  .ex2,
+  .ex3 {
+    grid-template-columns: 1fr;
+  }
+
+  .item-1,
+  .item-2,
+  .item-3,
+  .item-4,
+  .item-5,
+  .item-6 {
+    flex: 1;
+    min-width: 100%;
+  }
+}
+
 @media (max-width: 1340px) {
   .lab-container {
     grid-template-columns: repeat(2, minmax(200px, 1fr));
@@ -482,6 +523,11 @@ hr.solid {
 }
 @media (max-width: 966px) {
   .lab-container {
+    grid-template-columns: 1fr;
+  }
+  .ex,
+  .ex2,
+  .ex3 {
     grid-template-columns: 1fr;
   }
 }

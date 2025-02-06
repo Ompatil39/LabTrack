@@ -1,92 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      .icon-based {
-        background-color: var(--card-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        padding: 1.5rem;
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid transparent;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Members Card</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .icon-based:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        border-color: var(--primary-accent);
-      }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-      .icon-based .lab-header {
-        margin-bottom: 1rem;
-      }
+    /* Card Container */
+    .team-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 280px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-      .icon-based .lab-header h4 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--main-text-color);
-        margin: 0;
-      }
+    .team-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
 
-      .icon-based .lab-stats {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-      }
+    /* Profile Image */
+    .team-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 4px solid #3498db;
+    }
 
-      .icon-based .stat {
-        text-align: center;
-      }
+    /* Name */
+    .team-card h2 {
+      font-size: 1.5rem;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
 
-      .icon-based .stat i {
-        font-size: 1.5rem;
-        color: var(--primary-accent);
-        margin-bottom: 0.5rem;
-      }
+    /* Role */
+    .team-card h3 {
+      font-size: 1rem;
+      color: #3498db;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
 
-      .icon-based .stat-value {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--main-text-color);
-      }
+    /* Description */
+    .team-card p {
+      font-size: 0.9rem;
+      color: #6d6d72;
+      line-height: 1.5;
+    }
 
-      .icon-based .stat-label {
-        font-size: 0.875rem;
-        color: var(--secondary-text-color);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="lab-container">
-      <!-- Lab Card 1 -->
-      <a href="lab-details.html" class="lab-card icon-based">
-        <div class="lab-header">
-          <h4>Lab 1 - COA101</h4>
-          <div class="status-chip">
-            <span class="highlight">
-              <i class="fas fa-check-circle"></i> Active
-            </span>
-          </div>
-        </div>
-        <div class="lab-stats">
-          <div class="stat">
-            <i class="fas fa-desktop"></i>
-            <span class="stat-value">40</span>
-            <span class="stat-label">Devices</span>
-          </div>
-          <div class="stat">
-            <i class="fas fa-tools"></i>
-            <span class="stat-value">8</span>
-            <span class="stat-label">Under Maintenance</span>
-          </div>
-        </div>
-      </a>
+    /* Social Icons (Optional) */
+    .team-card .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
 
-      <!-- Add more lab cards as needed -->
+    .team-card .social-icons a {
+      color: #3498db;
+      font-size: 1.2rem;
+      transition: color 0.3s ease;
+    }
+
+    .team-card .social-icons a:hover {
+      color: #2e86c1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Team Member Card -->
+  <div class="team-card">
+    <img src="https://via.placeholder.com/100" alt="Team Member">
+    <h2>John Doe</h2>
+    <h3>Lab Manager</h3>
+    <p>Oversees the maintenance and operations of all computer labs, ensuring smooth functionality.</p>
+    <div class="social-icons">
+      <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
+      <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
     </div>
-  </body>
+  </div>
+
+  <!-- Font Awesome for Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
 </html>
