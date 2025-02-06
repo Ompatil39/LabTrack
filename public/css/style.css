@@ -83,7 +83,12 @@ h4 {
   font-size: 2.2rem !important;
   font-weight: 900 !important;
   color: var(--primary-accent);
-  background: linear-gradient(to bottom, #5dade2 0%, #3498db 100%, #3498db 100%);
+  background: linear-gradient(
+    to bottom,
+    #5dade2 0%,
+    #3498db 100%,
+    #3498db 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -205,6 +210,7 @@ hr.solid {
   align-items: center;
   font-size: 1.2rem;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .header .user-info i {
@@ -463,8 +469,9 @@ hr.solid {
   align-items: center;
   text-decoration: none;
   border-radius: 0.625rem;
-  box-shadow:var(--box-shadow);
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--box-shadow);
+  transition: background-color 0.3s ease, transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .fab:hover {
@@ -473,13 +480,210 @@ hr.solid {
   transform: scale(1.05);
   font-size: 1.15rem;
   border: 2px solid var(--warning-accent);
-  font-weight:var(--box-shadow);
+  font-weight: var(--box-shadow);
 }
 
 .fab i {
   font-size: 1.1rem;
 }
 
+/* ------------------------ Maintenance Module Styles ------------------------ */
+/* ------------------------MAINTENANCE MODULE CSS ----------------------------- */
+/* Lab Selection */
+.choose{
+  margin: 0;
+  font-family: "Raleway", sans-serif !important;
+  font-size: 2rem;
+  font-weight: 700;
+}
+/* Lab Selector Wrapper */
+.lab-selector-wrapper {
+  margin-bottom: 1.4rem;
+}
+
+.lab-selector-wrapper h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+/* Lab Selector Container */
+.lab-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Lab Selector Slider */
+.lab-selector-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  flex: 1;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+
+.lab-selector-slider::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+/* Lab Selector Card */
+.lab-selector-card {
+  flex: 0 0 auto;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+  background-color 0.2s ease;
+  width: 150px; /* Fixed width for each card */
+}
+
+.lab-selector-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.lab-selector-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+}
+
+.lab-selector-card p {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* Selected Lab Card */
+.lab-selector-card.selected {
+  background-color: #3498db; /* Blue background for selected lab */
+  color: white; /* White text for better contrast */
+}
+
+.lab-selector-card.selected h3{
+  font-size: 1.4rem;
+  color: white;
+}
+
+.lab-selector-card.selected p {
+  font-size: 1rem;
+  color: white; /* Ensure text is visible on the selected background */
+}
+
+/* Lab Navigation Buttons */
+.lab-nav-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.lab-nav-button:hover {
+  background-color: #2980b9;
+}
+
+.lab-nav-button.prev {
+  margin-right: 0.5rem;
+}
+
+.lab-nav-button.next {
+  margin-left: 0.5rem;
+}
+/* Card View */
+.card-view {
+  display: flex;
+  gap: 1.5rem;
+  font-family: inherit !important;
+  margin-bottom: 2rem;
+}
+
+.card {
+  flex: 1;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+}
+
+.card p {
+  margin: 0.5rem 0 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.card i {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: rgba(52, 152, 219, 0.345);
+}
+
+.card.scheduled {
+  border-top: 6px solid #3498db;
+}
+
+.card.ongoing {
+  border-top: 4px solid #f1c40f;
+}
+
+.card.completed {
+  border-top: 4px solid #2ecc71;
+}
+
+/* Status Styles */
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.status.in-progress {
+  background-color: #f1c40f;
+  color: #fff;
+}
+
+.status.completed {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.status.critical {
+  background-color: #e74c3c;
+  color: #fff;
+}
 
 /* ------------------------ Media Queries ------------------------ */
 @media (max-width: 768px) {

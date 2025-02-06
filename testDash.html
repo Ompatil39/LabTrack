@@ -3,350 +3,243 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responsive Chart Dashboard</title>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
-      integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <title>Lab Computer Maintenance</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
+    />
     <style>
-      /* Root Variables */
       :root {
-        --main-bg-color: #f5f7fa;
+        --main-bg-color: #f8f9fa;
+        --sidebar-bg-color: #ffffff;
         --card-bg-color: #ffffff;
-        --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        --border-radius: 10px;
+        --main-text-color: #2c3e50;
+        --secondary-text-color: #7f8c8d;
+        --primary-accent: #3498db;
+        --secondary-accent: #2ecc71;
+        --warning-accent: #e74c3c;
+        --hover-bg-color: #ecf0f1;
+        --active-bg-color: #3498db;
+        --border-color: #e0e0e0;
+        --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         --padding: 1rem;
+        --border-radius: 0.625rem;
       }
 
-      /* General Reset */
       body {
+        font-family: "Arial", sans-serif;
         margin: 0;
-        font-family: Arial, sans-serif;
+        padding: 0;
         background-color: var(--main-bg-color);
-        padding: 1rem;
+        color: var(--main-text-color);
       }
 
-      /* Grid Container */
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-      }
-
-      /* Grid Item */
-      .grid-item {
-        background-color: var(--card-bg-color);
-        box-shadow: var(--card-shadow);
-        border-radius: var(--border-radius);
+      .container {
         padding: var(--padding);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--main-text-color);
+        margin-bottom: 20px;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: var(--card-bg-color);
+        box-shadow: var(--box-shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      th {
+        background-color: var(--primary-accent);
+        color: white;
+        font-weight: bold;
+      }
+
+      tr:hover {
+        background-color: var(--hover-bg-color);
+      }
+
+      .status {
+        padding: 6px 12px;
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        display: inline-block;
+      }
+
+      .status.completed {
+        background-color: var(--secondary-accent);
+        color: white;
+      }
+
+      .status.pending {
+        background-color: var(--warning-accent);
+        color: white;
+      }
+
+      .status.in-progress {
+        background-color: var(--primary-accent);
+        color: white;
+      }
+
+      .edit-btn {
+        background-color: var(--primary-accent);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: var(--border-radius);
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 5px;
       }
 
-      /* Chart Container */
-      .chart-container {
-        position: relative;
-        width: 100%;
-        height: 300px;
+      .edit-btn:hover {
+        background-color: var(--active-bg-color);
+      }
+
+      /* DataTables Custom Styling */
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_filter,
+      .dataTables_wrapper .dataTables_info,
+      .dataTables_wrapper .dataTables_paginate {
+        margin: var(--padding) 0;
+      }
+
+      .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 6px 12px;
+        margin-left: 10px;
+      }
+
+      .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 6px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        margin: 0 2px;
+        color: var(--main-text-color);
+      }
+
+      .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: var(--hover-bg-color);
+        color: var(--primary-accent);
+      }
+
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background-color: var(--primary-accent);
+        color: white;
+        border-color: var(--primary-accent);
       }
     </style>
   </head>
   <body>
-    <div class="dashboard-grid">
-      <div class="grid-item">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <canvas id="myChart"></canvas>
-      </div>
-      <div class="grid-item"><canvas id="maintenanceRequests"></canvas></div>
-      <div class="grid-item"><canvas id="deviceDistribution"></canvas></div>
-      <div class="grid-item"><canvas id="faultyDevices"></canvas></div>
-      <div class="grid-item"><canvas id="grievancesByCategory"></canvas></div>
-      <div class="grid-item"><canvas id="grievanceStatus"></canvas></div>
-      <div class="grid-item"><canvas id="grievancesTrend"></canvas></div>
-      <div class="grid-item"><canvas id="maintenanceStatus"></canvas></div>
-      <div class="grid-item"><canvas id="pendingGrievances"></canvas></div>
-      <div class="grid-item"><canvas id="averageMaintenanceTime"></canvas></div>
+    <div class="container">
+      <h1>Lab Computer Maintenance</h1>
+      <table id="maintenanceTable" class="display">
+        <thead>
+          <tr>
+            <th>Computer ID</th>
+            <th>Last Maintenance Date</th>
+            <th>Status</th>
+            <th>Issues</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PC001</td>
+            <td>2023-10-15</td>
+            <td><span class="status completed">Completed</span></td>
+            <td>None</td>
+            <td>
+              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>PC002</td>
+            <td>2023-09-30</td>
+            <td><span class="status pending">Pending</span></td>
+            <td>Keyboard not working</td>
+            <td>
+              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>PC003</td>
+            <td>2023-10-10</td>
+            <td><span class="status in-progress">In Progress</span></td>
+            <td>Software update required</td>
+            <td>
+              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>PC004</td>
+            <td>2023-09-25</td>
+            <td><span class="status completed">Completed</span></td>
+            <td>Replaced hard drive</td>
+            <td>
+              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>PC005</td>
+            <td>2023-10-05</td>
+            <td><span class="status pending">Pending</span></td>
+            <td>Monitor flickering</td>
+            <td>
+              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <script>
-     // Chart 1
-const ctx = document.getElementById("myChart").getContext("2d");
-new Chart(ctx, {
-  type: "doughnut",
-  data: {
-    labels: ["ACTIVE", "UNDER MAINTENANCE", "INACTIVE"],
-    datasets: [
-      {
-        label: "Lab Status 2",
-        data: [100, 30, 40], // Different data
-        backgroundColor: [
-          "#2c4a63", // blue-4 2c4a63
-          "#80b1da", // blue-7
-          "#c2daf0", // blue-10 c2daf0
-        ],
-        borderColor: [
-          "#ffffff", // White border
-          "#ffffff",
-          "#ffffff",
-        ],
-        borderWidth: 2,
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "#19374f", // Text color
-          font: {
-            size: 14,
-            family: "Poppins",
+      $(document).ready(function () {
+        $("#maintenanceTable").DataTable({
+          responsive: true,
+          dom: '<"top"<"left-col"l><"center-col"f>>rt<"bottom"ip><"clear">',
+          language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+              previous: "<i class='fas fa-chevron-left'></i>",
+              next: "<i class='fas fa-chevron-right'></i>",
+            },
           },
-        },
-      },
-      tooltip: {
-        backgroundColor: "#d3e3f1", // Tooltip background
-        titleColor: "#19374f", // Tooltip title color
-        bodyColor: "#19374f", // Tooltip body color
-      },
-    },
-  },
-});
-
-// Chart 2
-const maintenanceRequestsCtx = document
-  .getElementById("maintenanceRequests")
-  .getContext("2d");
-new Chart(maintenanceRequestsCtx, {
-  type: "bar",
-  data: {
-    labels: ["Lab A", "Lab B", "Lab C", "Lab D"], // Example labs
-    datasets: [
-      {
-        label: "Maintenance Requests",
-        data: [5, 3, 8, 2], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0", "#d3e3f1"],
-        borderWidth: 1,
-      },
-    ],
-  },
-  options: {
-    plugins: {
-      legend: { display: true, position: "top" },
-    },
-    scales: {
-      x: { title: { display: true, text: "Labs" } },
-      y: { title: { display: true, text: "Requests" } },
-    },
-  },
-});
-
-// Chart 3
-const deviceDistributionCtx = document
-  .getElementById("deviceDistribution")
-  .getContext("2d");
-new Chart(deviceDistributionCtx, {
-  type: "bar",
-  data: {
-    labels: ["Lab A", "Lab B", "Lab C"],
-    datasets: [
-      {
-        label: "Device Count",
-        data: [40, 50, 30], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    indexAxis: "y",
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Count" } },
-      y: { title: { display: true, text: "Labs" } },
-    },
-  },
-});
-
-// Chart 4
-const faultyDevicesCtx = document
-  .getElementById("faultyDevices")
-  .getContext("2d");
-new Chart(faultyDevicesCtx, {
-  type: "bar",
-  data: {
-    labels: ["Lab A", "Lab B", "Lab C"],
-    datasets: [
-      {
-        label: "Faulty PCs",
-        data: [5, 8, 3],
-        backgroundColor: "#2c4a63",
-      },
-      {
-        label: "Faulty Printers",
-        data: [2, 4, 1],
-        backgroundColor: "#80b1da",
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Labs" } },
-      y: { title: { display: true, text: "Count" } },
-    },
-  },
-});
-
-// Chart 5
-const grievancesByCategoryCtx = document
-  .getElementById("grievancesByCategory")
-  .getContext("2d");
-new Chart(grievancesByCategoryCtx, {
-  type: "bar",
-  data: {
-    labels: ["Hardware", "Software", "Internet"],
-    datasets: [
-      {
-        label: "Grievances",
-        data: [15, 10, 5], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Categories" } },
-      y: { title: { display: true, text: "Count" } },
-    },
-  },
-});
-
-// Chart 6
-const grievanceStatusCtx = document
-  .getElementById("grievanceStatus")
-  .getContext("2d");
-new Chart(grievanceStatusCtx, {
-  type: "doughnut",
-  data: {
-    labels: ["Resolved", "Pending", "In Progress"],
-    datasets: [
-      {
-        data: [30, 10, 5], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-  },
-});
-
-// Chart 7
-const grievancesTrendCtx = document
-  .getElementById("grievancesTrend")
-  .getContext("2d");
-new Chart(grievancesTrendCtx, {
-  type: "line",
-  data: {
-    labels: ["Jan", "Feb", "Mar", "Apr"], // Example months
-    datasets: [
-      {
-        label: "Grievances",
-        data: [5, 10, 8, 7], // Example data
-        borderColor: "#2c4a63",
-        backgroundColor: "#c2daf0",
-        fill: false,
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Months" } },
-      y: { title: { display: true, text: "Count" } },
-    },
-  },
-});
-
-// Chart 8
-const maintenanceStatusCtx = document
-  .getElementById("maintenanceStatus")
-  .getContext("2d");
-new Chart(maintenanceStatusCtx, {
-  type: "doughnut",
-  data: {
-    labels: ["Completed", "In Progress", "Pending"],
-    datasets: [
-      {
-        data: [50, 20, 30], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-  },
-});
-
-// Chart 9
-const pendingGrievancesCtx = document
-  .getElementById("pendingGrievances")
-  .getContext("2d");
-new Chart(pendingGrievancesCtx, {
-  type: "bar",
-  data: {
-    labels: ["Hardware", "Software", "Internet"],
-    datasets: [
-      {
-        label: "Pending Grievances",
-        data: [5, 3, 2], // Example data
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0"],
-      },
-    ],
-  },
-  options: {
-    indexAxis: "y",
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Count" } },
-      y: { title: { display: true, text: "Categories" } },
-    },
-  },
-});
-
-// Chart 10
-const averageMaintenanceTimeCtx = document
-  .getElementById("averageMaintenanceTime")
-  .getContext("2d");
-new Chart(averageMaintenanceTimeCtx, {
-  type: "bar",
-  data: {
-    labels: ["PC", "Printer", "Monitor", "Keyboard"], // Example device types
-    datasets: [
-      {
-        label: "Average Maintenance Time (Hours)",
-        data: [2.5, 3.0, 1.5, 1.0], // Example data in hours
-        backgroundColor: ["#2c4a63", "#80b1da", "#c2daf0", "#d3e3f1"],
-      },
-    ],
-  },
-  options: {
-    plugins: { legend: { display: true, position: "top" } },
-    scales: {
-      x: { title: { display: true, text: "Device Types" } },
-      y: { title: { display: true, text: "Time (Hours)" } },
-    },
-  },
-});
-
-
-      // (Other charts follow the same pattern)
+          columnDefs: [
+            { orderable: true, targets: [0, 1, 2, 3] },
+            { orderable: false, targets: [4] },
+          ],
+        });
+      });
     </script>
   </body>
 </html>

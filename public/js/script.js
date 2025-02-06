@@ -139,8 +139,8 @@ new Chart(labOccupancyCtx, {
         align: "center",
         display: true,
         labels: {
-          boxWidth: 15, // Smaller box size for the legend
-          font: { size: 10 },
+          // boxWidth: 15, // Smaller box size for the legend
+          // font: { size: 12 },
         },
       },
     },
