@@ -1,245 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lab Computer Maintenance</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
-    />
-    <style>
-      :root {
-        --main-bg-color: #f8f9fa;
-        --sidebar-bg-color: #ffffff;
-        --card-bg-color: #ffffff;
-        --main-text-color: #2c3e50;
-        --secondary-text-color: #7f8c8d;
-        --primary-accent: #3498db;
-        --secondary-accent: #2ecc71;
-        --warning-accent: #e74c3c;
-        --hover-bg-color: #ecf0f1;
-        --active-bg-color: #3498db;
-        --border-color: #e0e0e0;
-        --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        --padding: 1rem;
-        --border-radius: 0.625rem;
-      }
 
-      body {
-        font-family: "Arial", sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: var(--main-bg-color);
-        color: var(--main-text-color);
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Management Table</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    :root {
+      --main-bg-color: #f8f9fa;
+      --sidebar-bg-color: #ffffff;
+      --card-bg-color: #ffffff;
+      --main-text-color: #2c3e50;
+      --secondary-text-color: #7f8c8d;
+      --primary-accent: #3498db;
+      --secondary-accent: #2ecc71;
+      --warning-accent: #e74c3c;
+      --hover-bg-color: #ecf0f1;
+      --active-bg-color: #3498db;
+      --border-color: #e0e0e0;
+      --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --padding: 1rem;
+      --border-radius: 0.625rem;
+    }
 
-      .container {
-        padding: var(--padding);
-        max-width: 1200px;
-        margin: 0 auto;
-      }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--main-bg-color);
+      margin: 0;
+      padding: var(--padding);
+      color: var(--main-text-color);
+    }
 
-      h1 {
-        text-align: center;
-        color: var(--main-text-color);
-        margin-bottom: 20px;
-        font-size: 2rem;
-        font-weight: 600;
-      }
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background-color: var(--card-bg-color);
-        box-shadow: var(--box-shadow);
-        border-radius: var(--border-radius);
-        overflow: hidden;
-      }
+    .filters input,
+    .filters select {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--card-bg-color);
+      color: var(--main-text-color);
+    }
 
-      th,
-      td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid var(--border-color);
-      }
+    .filters input {
+      flex: 1;
+      max-width: 300px;
+    }
 
-      th {
-        background-color: var(--primary-accent);
-        color: white;
-        font-weight: bold;
-      }
+    .table-container {
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow-x: auto;
+      padding: var(--padding);
+    }
 
-      tr:hover {
-        background-color: var(--hover-bg-color);
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-      .status {
-        padding: 6px 12px;
-        border-radius: var(--border-radius);
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-        display: inline-block;
-      }
+    th,
+    td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
 
-      .status.completed {
-        background-color: var(--secondary-accent);
-        color: white;
-      }
+    th {
+      background-color: var(--sidebar-bg-color);
+      color: var(--main-text-color);
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+    }
 
-      .status.pending {
-        background-color: var(--warning-accent);
-        color: white;
-      }
+    th:hover {
+      background-color: var(--hover-bg-color);
+    }
 
-      .status.in-progress {
-        background-color: var(--primary-accent);
-        color: white;
-      }
+    th i {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--secondary-text-color);
+      opacity: 0.5;
+      font-size: 12px;
+    }
 
-      .edit-btn {
-        background-color: var(--primary-accent);
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: var(--border-radius);
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
+    td {
+      color: var(--secondary-text-color);
+    }
 
-      .edit-btn:hover {
-        background-color: var(--active-bg-color);
-      }
+    tr:hover {
+      background-color: var(--hover-bg-color);
+    }
 
-      /* DataTables Custom Styling */
-      .dataTables_wrapper .dataTables_length,
-      .dataTables_wrapper .dataTables_filter,
-      .dataTables_wrapper .dataTables_info,
-      .dataTables_wrapper .dataTables_paginate {
-        margin: var(--padding) 0;
-      }
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: var(--border-radius);
+      font-size: 12px;
+      font-weight: 500;
+      color: white;
+    }
 
-      .dataTables_wrapper .dataTables_filter input {
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        padding: 6px 12px;
-        margin-left: 10px;
-      }
+    .status-active {
+      background-color: var(--secondary-accent);
+    }
 
-      .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 6px 12px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        margin: 0 2px;
-        color: var(--main-text-color);
-      }
+    .status-in-repair {
+      background-color: var(--warning-accent);
+    }
 
-      .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: var(--hover-bg-color);
-        color: var(--primary-accent);
-      }
+    .status-faulty {
+      background-color: var(--warning-accent);
+    }
 
-      .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: var(--primary-accent);
-        color: white;
-        border-color: var(--primary-accent);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Lab Computer Maintenance</h1>
-      <table id="maintenanceTable" class="display">
-        <thead>
-          <tr>
-            <th>Computer ID</th>
-            <th>Last Maintenance Date</th>
-            <th>Status</th>
-            <th>Issues</th>
-            <th>Edit</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>PC001</td>
-            <td>2023-10-15</td>
-            <td><span class="status completed">Completed</span></td>
-            <td>None</td>
-            <td>
-              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-            </td>
-          </tr>
-          <tr>
-            <td>PC002</td>
-            <td>2023-09-30</td>
-            <td><span class="status pending">Pending</span></td>
-            <td>Keyboard not working</td>
-            <td>
-              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-            </td>
-          </tr>
-          <tr>
-            <td>PC003</td>
-            <td>2023-10-10</td>
-            <td><span class="status in-progress">In Progress</span></td>
-            <td>Software update required</td>
-            <td>
-              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-            </td>
-          </tr>
-          <tr>
-            <td>PC004</td>
-            <td>2023-09-25</td>
-            <td><span class="status completed">Completed</span></td>
-            <td>Replaced hard drive</td>
-            <td>
-              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-            </td>
-          </tr>
-          <tr>
-            <td>PC005</td>
-            <td>2023-10-05</td>
-            <td><span class="status pending">Pending</span></td>
-            <td>Monitor flickering</td>
-            <td>
-              <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    .status-decommissioned {
+      background-color: var(--secondary-text-color);
+    }
 
-    <script>
-      $(document).ready(function () {
-        $("#maintenanceTable").DataTable({
-          responsive: true,
-          dom: '<"top"<"left-col"l><"center-col"f>>rt<"bottom"ip><"clear">',
-          language: {
-            search: "",
-            searchPlaceholder: "Search...",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-              previous: "<i class='fas fa-chevron-left'></i>",
-              next: "<i class='fas fa-chevron-right'></i>",
-            },
-          },
-          columnDefs: [
-            { orderable: true, targets: [0, 1, 2, 3] },
-            { orderable: false, targets: [4] },
-          ],
-        });
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions i {
+      cursor: pointer;
+      color: var(--primary-accent);
+    }
+
+    .actions i:hover {
+      color: var(--active-bg-color);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="filters">
+    <input type="text" id="search" placeholder="Search using ID, Name...">
+    <select id="labFilter">
+      <option value="">All Labs</option>
+      <option value="Lab A">Lab A</option>
+      <option value="Lab B">Lab B</option>
+      <option value="Lab C">Lab C</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">All Statuses</option>
+      <option value="Active">Active</option>
+      <option value="In Repair">In Repair</option>
+      <option value="Faulty">Faulty</option>
+      <option value="Decommissioned">Decommissioned</option>
+    </select>
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="PC">PC</option>
+      <option value="Printer">Printer</option>
+      <option value="Mouse">Mouse</option>
+      <option value="Keyboard">Keyboard</option>
+    </select>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(5)">Last Maintenance <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(6)">Next Maintenance <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>001</td>
+          <td>Dell Monitor</td>
+          <td>Monitor</td>
+          <td>Lab A</td>
+          <td><span class="status status-active">Active</span></td>
+          <td>2023-01-15</td>
+          <td>2023-07-15</td>
+          <td>No issues</td>
+          <td class="actions">
+            <i class="fas fa-edit" title="Edit"></i>
+            <i class="fas fa-trash" title="Delete"></i>
+            <i class="fas fa-info-circle" title="View Details"></i>
+          </td>
+        </tr>
+        <tr>
+          <td>002</td>
+          <td>HP Printer</td>
+          <td>Printer</td>
+          <td>Lab B</td>
+          <td><span class="status status-in-repair">In Repair</span></td>
+          <td>2022-12-10</td>
+          <td>2023-06-10</td>
+          <td>Paper jam issue</td>
+          <td class="actions">
+            <i class="fas fa-edit" title="Edit"></i>
+            <i class="fas fa-trash" title="Delete"></i>
+            <i class="fas fa-info-circle" title="View Details"></i>
+          </td>
+        </tr>
+        <tr>
+          <td>003</td>
+          <td>Logitech Mouse</td>
+          <td>Mouse</td>
+          <td>Lab C</td>
+          <td><span class="status status-faulty">Faulty</span></td>
+          <td>2023-03-20</td>
+          <td>2023-09-20</td>
+          <td>Left click not working</td>
+          <td class="actions">
+            <i class="fas fa-edit" title="Edit"></i>
+            <i class="fas fa-trash" title="Delete"></i>
+            <i class="fas fa-info-circle" title="View Details"></i>
+          </td>
+        </tr>
+        <tr>
+          <td>004</td>
+          <td>Apple Keyboard</td>
+          <td>Keyboard</td>
+          <td>Lab A</td>
+          <td><span class="status status-decommissioned">Decommissioned</span></td>
+          <td>2021-05-05</td>
+          <td>N/A</td>
+          <td>Replaced with new model</td>
+          <td class="actions">
+            <i class="fas fa-edit" title="Edit"></i>
+            <i class="fas fa-trash" title="Delete"></i>
+            <i class="fas fa-info-circle" title="View Details"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function sortTable(columnIndex) {
+      const table = document.querySelector('table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+
+      rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+        return aValue.localeCompare(bValue, undefined, { numeric: true });
       });
-    </script>
-  </body>
+
+      // Clear the table body
+      while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+      }
+
+      // Append sorted rows
+      rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Filter functionality
+    document.getElementById('search').addEventListener('input', filterTable);
+    document.getElementById('labFilter').addEventListener('change', filterTable);
+    document.getElementById('statusFilter').addEventListener('change', filterTable);
+    document.getElementById('categoryFilter').addEventListener('change', filterTable);
+
+    function filterTable() {
+      const searchValue = document.getElementById('search').value.toLowerCase();
+      const labFilter = document.getElementById('labFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+      const categoryFilter = document.getElementById('categoryFilter').value;
+
+      const rows = document.querySelectorAll('tbody tr');
+
+      rows.forEach(row => {
+        const deviceName = row.cells[1].textContent.toLowerCase();
+        const lab = row.cells[3].textContent;
+        const status = row.cells[4].textContent;
+        const category = row.cells[2].textContent;
+
+        const matchesSearch = deviceName.includes(searchValue);
+        const matchesLab = labFilter === '' || lab === labFilter;
+        const matchesStatus = statusFilter === '' || status === statusFilter;
+        const matchesCategory = categoryFilter === '' || category === categoryFilter;
+
+        if (matchesSearch && matchesLab && matchesStatus && matchesCategory) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+
 </html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Monitoring System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+        integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Include Sparkline Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
+
+    <link rel="stylesheet" href="../public/css/style.css" />
+    <script src="https://kit.fontawesome.com/0319a73572.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,200,0,200&icon_names=dns" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <span><i class="fa-brands fa-watchman-monitoring colour"></i>LabTrack</span>
+            </div>
+            <hr class="solid" />
+            <ul class="menu">
+                <li class="menu-title">Menu</li>
+                <!-- Dashboard Link -->
+                <li>
+                    <a href="home.html">
+                        <i class="fa-solid fa-chart-pie"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="labs.html">
+                        <i class="fa-solid fa-network-wired"></i>
+                        Labs
+                    </a>
+                </li>
+                <li>
+                    <a href="maintenance.html">
+                        <i class="fa-solid fa-user-gear"></i> Maintenance
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="inventory.html">
+                        <i class="fa-solid fa-warehouse"></i> Inventory
+                    </a>
+                </li>
+                <li>
+                    <a href="grievance.html">
+                        <i class="fa-solid fa-paper-plane"></i> Grievance
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <!-- User Info Section -->
+                <div class="sub-heading">
+                    <span>Inventory Management</span>
+                </div>
+                <div class="user-info">
+                    <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
+                    <span class="font-rale"><i class="fa-solid fa-circle-user"></i> Joxy Inc.
+                    </span>
+                </div>
+            </div>
+
+            <!-- CONTENT START BELOW HEADER -->
+            <!-- Card View -->
+            <div class="card-view">
+                <div class="card blue-top">
+                    <h3>Total Labs</h3>
+                    <p class="font-number">8</p>
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div class="card green-top">
+                    <h3>Total Devices</h3>
+                    <p class="font-number">160</p>
+                    <i class="fa-solid fa-computer"></i>
+                </div>
+                <div class="card yellow-top">
+                    <h3>In Repair</h3>
+                    <p class="font-number">30</p>
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="card red-top">
+                    <h3>Faulty Devices</h3>
+                    <p class="font-number">40</p>
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+            </div>
+            <!-- CARDs VIEW END -->
+            <!-- Table View -->
+            <div class="items">
+                <div class="sub-heading">
+                    <span>Lab Device Inventory</span>
+                </div>
+                
+                <div class="header1">
+                    <div class="filters">
+                        <input type="text" id="search" placeholder="Search using ID, Name...">
+                        <select id="labFilter">
+                            <option value="">All Labs</option>
+                            <option value="Lab A">Lab A</option>
+                            <option value="Lab B">Lab B</option>
+                            <option value="Lab C">Lab C</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="In Repair">In Repair</option>
+                            <option value="Faulty">Faulty</option>
+                            <!-- <option value="Decommissioned">Decommissioned</option> -->
+                        </select>
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="PC">PC</option>
+                            <option value="Printer">Printer</option>
+                            <option value="Mouse">Mouse</option>
+                            <option value="Keyboard">Keyboard</option>
+                        </select>
+                    </div>
+                </div> 
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(5)">Last Grievance <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1001</td>
+                            <td>Dell Monitor</td>
+                            <td>Monitor</td>
+                            <td>Lab A</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-07-15</td>
+                            <td>Working fine</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1002</td>
+                            <td>HP Printer</td>
+                            <td>Printer</td>
+                            <td>Lab B</td>
+                            <td><span class="status status-repair">In Repair</span></td>
+                            <td>2024-06-10</td>
+                            <td>Paper jam issue</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1003</td>
+                            <td>Logitech Mouse</td>
+                            <td>Mouse</td>
+                            <td>Lab C</td>
+                            <td><span class="status status-faulty">Faulty</span></td>
+                            <td>2024-05-05</td>
+                            <td>Left click not working</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1003</td>
+                            <td>Logitech Mouse</td>
+                            <td>Mouse</td>
+                            <td>Lab C</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-05-05</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1004</td>
+                            <td>Dell Keyboard</td>
+                            <td>Keyboard</td>
+                            <td>Lab A</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-06-12</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1005</td>
+                            <td>HP Monitor</td>
+                            <td>Monitor</td>
+                            <td>Lab B</td>
+                            <td><span class="status status-repair">Repair</span></td>
+                            <td>2024-04-20</td>
+                            <td>Screen flickering</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1006</td>
+                            <td>Logitech Mouse</td>
+                            <td>Mouse</td>
+                            <td>Lab C</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-07-01</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1007</td>
+                            <td>Dell Monitor</td>
+                            <td>Monitor</td>
+                            <td>Lab D</td>
+                            <td><span class="status status-faulty">Faulty</span></td>
+                            <td>2024-03-15</td>
+                            <td>Dead pixels</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1008</td>
+                            <td>HP Keyboard</td>
+                            <td>Keyboard</td>
+                            <td>Lab A</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-08-22</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1009</td>
+                            <td>Dell Monitor</td>
+                            <td>Monitor</td>
+                            <td>Lab B</td>
+                            <td><span class="status status-repair">Repair</span></td>
+                            <td>2024-02-10</td>
+                            <td>Power button not working</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1010</td>
+                            <td>Logitech Mouse</td>
+                            <td>Mouse</td>
+                            <td>Lab C</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-09-05</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1011</td>
+                            <td>HP Monitor</td>
+                            <td>Monitor</td>
+                            <td>Lab D</td>
+                            <td><span class="status status-repair">Repair</span></td>
+                            <td>2024-01-30</td>
+                            <td>Blurred display</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+                        <tr>
+                            <td>1012</td>
+                            <td>Dell Keyboard</td>
+                            <td>Keyboard</td>
+                            <td>Lab A</td>
+                            <td><span class="status status-active">Active</span></td>
+                            <td>2024-10-18</td>
+                            <td>N/A</td>
+                            <td><i class="fas fa-ellipsis-h"></i></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <a href="#">Previous</a>
+                    <a href="#">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">Next</a>
+                </div>
+            </div>
+            <!-- TABLE VIEW END -->
+        </div>
+        <!-- CONTENT END  -->
+    </div>
+    </div>
+</body>
+<script>
+    function sortTable(columnIndex) {
+        const table = document.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        // Retrieve and toggle sorting order
+        const currentOrder = table.getAttribute(`data-sort-${columnIndex}`) || "desc"; // Default: descending
+        const isAscending = currentOrder === "desc"; // Toggle
+        table.setAttribute(`data-sort-${columnIndex}`, isAscending ? "asc" : "desc");
+
+        rows.sort((a, b) => {
+            const aValue = a.cells[columnIndex].textContent.trim();
+            const bValue = b.cells[columnIndex].textContent.trim();
+
+            // Handle numeric sorting
+            const numA = parseFloat(aValue);
+            const numB = parseFloat(bValue);
+            const isNumeric = !isNaN(numA) && !isNaN(numB);
+
+            if (isNumeric) {
+                return isAscending ? numA - numB : numB - numA;
+            } else {
+                return isAscending
+                    ? aValue.localeCompare(bValue, undefined, { numeric: true })
+                    : bValue.localeCompare(aValue, undefined, { numeric: true });
+            }
+        });
+
+        // Clear and append sorted rows
+        tbody.innerHTML = "";
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Filter functionality
+    document.getElementById('search').addEventListener('input', filterTable);
+    document.getElementById('labFilter').addEventListener('change', filterTable);
+    document.getElementById('statusFilter').addEventListener('change', filterTable);
+    document.getElementById('categoryFilter').addEventListener('change', filterTable);
+
+    function filterTable() {
+        const searchValue = document.getElementById('search').value.toLowerCase();
+        const labFilter = document.getElementById('labFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+
+        const rows = document.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const deviceName = row.cells[1].textContent.toLowerCase();
+            const lab = row.cells[3].textContent;
+            const status = row.cells[4].textContent;
+            const category = row.cells[2].textContent;
+
+            const matchesSearch = deviceName.includes(searchValue);
+            const matchesLab = labFilter === '' || lab === labFilter;
+            const matchesStatus = statusFilter === '' || status === statusFilter;
+            const matchesCategory = categoryFilter === '' || category === categoryFilter;
+
+            row.style.display = matchesSearch && matchesLab && matchesStatus && matchesCategory ? '' : 'none';
+        });
+    }
+</script>
+
+</html>

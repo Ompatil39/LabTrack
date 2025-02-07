@@ -90,6 +90,7 @@ h4 {
     #3498db 100%
   );
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -228,14 +229,14 @@ hr.solid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.8rem;
-  margin-top: 0.8rem;
+  margin-top: 1.4rem;
 }
 
 .ex2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
-  margin-top: 0.8rem;
+  margin-top: 1rem;
 }
 
 .ex3 {
@@ -243,7 +244,7 @@ hr.solid {
   grid-template-columns: 1fr 1fr 1fr;
   /* min-height: 280px; */
   gap: 0.8rem;
-  margin-top: 0.8rem;
+  margin-top: 1rem;
 }
 
 .chart1 {
@@ -478,7 +479,7 @@ hr.solid {
   background-color: white;
   color: var(--warning-accent);
   transform: scale(1.05);
-  font-size: 1.15rem;
+  /* font-size: 1.1rem; */
   border: 2px solid var(--warning-accent);
   font-weight: var(--box-shadow);
 }
@@ -490,7 +491,7 @@ hr.solid {
 /* ------------------------ Maintenance Module Styles ------------------------ */
 /* ------------------------MAINTENANCE MODULE CSS ----------------------------- */
 /* Lab Selection */
-.choose{
+.choose {
   margin: 0;
   font-family: "Raleway", sans-serif !important;
   font-size: 2rem;
@@ -540,7 +541,7 @@ hr.solid {
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease,
-  background-color 0.2s ease;
+    background-color 0.2s ease;
   width: 150px; /* Fixed width for each card */
 }
 
@@ -567,7 +568,7 @@ hr.solid {
   color: white; /* White text for better contrast */
 }
 
-.lab-selector-card.selected h3{
+.lab-selector-card.selected h3 {
   font-size: 1.4rem;
   color: white;
 }
@@ -606,16 +607,17 @@ hr.solid {
 }
 /* Card View */
 .card-view {
+  margin-top: 1.5rem;
   display: flex;
   gap: 1.5rem;
   font-family: inherit !important;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .card {
   flex: 1;
   background-color: #fff;
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -636,7 +638,7 @@ hr.solid {
 
 .card p {
   margin: 0.5rem 0 0;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: #3498db;
 }
@@ -646,19 +648,35 @@ hr.solid {
   bottom: 1rem;
   right: 1rem;
   font-size: 1.5rem;
-  color: rgba(52, 152, 219, 0.345);
+  color: rgba(52, 152, 219, 0.25);
 }
 
-.card.scheduled {
-  border-top: 6px solid #3498db;
+.blue-left {
+  border-left: 6px solid #3498db;
+}
+.yellow-left {
+  border-left: 6px solid #f1c40f;
+}
+.green-left {
+  border-left: 6px solid #2ecc71;
+}
+.red-left {
+  border-left: 6px solid var(--warning-accent);
 }
 
-.card.ongoing {
-  border-top: 4px solid #f1c40f;
+.blue-top {
+  border-top: 5px solid #3498db;
 }
 
-.card.completed {
-  border-top: 4px solid #2ecc71;
+.yellow-top {
+  border-top: 5px solid #f1c40f;
+}
+
+.green-top {
+  border-top: 5px solid #2ecc71;
+}
+.red-top {
+  border-top: 5px solid var(--warning-accent);
 }
 
 /* Status Styles */
@@ -685,6 +703,164 @@ hr.solid {
   color: #fff;
 }
 
+/* ------------------------ INENTORY Module Styles ------------------------ */
+/* ------------------------INVENTORY MODULE CSS ----------------------------- */
+/* INVENTORY STYLES */
+table {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  /* border-bottom: 1px solid var(--border-color); */
+}
+
+th {
+  font-size: 1.18rem;
+  background-color: var(--sidebar-bg-color);
+  color: var(--main-text-color);
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+
+th:hover {
+  background-color: var(--hover-bg-color);
+}
+
+th i {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary-text-color);
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+td {
+  color: var(--secondary-text-color);
+}
+
+tr:hover {
+  background-color: var(--hover-bg-color);
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-active {
+  background-color: var(--secondary-accent);
+  color: white;
+}
+
+.status-repair {
+  background-color: #f1c40f;
+  color: white;
+}
+
+.status-faulty {
+  background-color: var(--warning-accent);
+  color: white;
+}
+
+.status-decommissioned {
+  background-color: var(--secondary-text-color);
+  color: white;
+}
+.pagination {
+  font-size: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.pagination a {
+  margin: 0 5px;
+  text-decoration: none;
+  color: var(--active-bg-color);
+}
+.pagination a:hover {
+  text-decoration: underline;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+}
+
+.filters input{
+  margin-right: auto;
+}
+
+.filters input,
+.filters select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  color: var(--main-text-color);
+  transition: all 0.3s ease;
+  outline: none;
+  background: var(--sidebar-bg-color);
+  cursor: pointer;
+}
+
+
+/* .filters input:hover,
+.filters select:hover {
+  background-color: var(--hover-bg-color);
+} */
+/* Focus Styles */
+.filters input:focus,
+.filters select:focus {
+  background-color: white;
+}
+
+/* Active Styles */
+.filters input:active,
+.filters select:active {
+  transform: translateY(0);
+}
+
+.filters select option {
+  border: none;
+  background-color: white; 
+  color: var(--main-text-color); 
+  padding: 8px;
+}
+
+.filters select option:hover {
+  background-color: #ae1111 !important; 
+  /* color: var(--main-text-color) ;  */
+}
+
+
+@media (max-width: 600px) {
+  .filters {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
+  }
+}
+
+
 /* ------------------------ Media Queries ------------------------ */
 @media (max-width: 768px) {
   .sidebar {
@@ -692,7 +868,7 @@ hr.solid {
   }
 
   .sidebar .logo span {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
   }
 
   .main-content {
