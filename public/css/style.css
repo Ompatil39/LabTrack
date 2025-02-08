@@ -41,6 +41,10 @@ h4 {
   margin: 0;
 }
 
+.icon-color {
+  color: var(--primary-accent) !important;
+}
+
 /* ------------------------ Font Families ------------------------ */
 .font-rale {
   font-family: "Raleway", sans-serif !important;
@@ -608,14 +612,18 @@ hr.solid {
 /* Card View */
 .card-view {
   margin-top: 1.5rem;
-  display: flex;
+  /* display: flex; */
+  /* flex-wrap: wrap; */
   gap: 1.5rem;
   font-family: inherit !important;
   margin-bottom: 1.5rem;
 }
-
+.card-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
 .card {
-  flex: 1;
+  /* flex: 1; */
   background-color: #fff;
   padding: 1.2rem;
   border-radius: 0.75rem;
@@ -706,9 +714,15 @@ hr.solid {
 /* ------------------------ INENTORY Module Styles ------------------------ */
 /* ------------------------INVENTORY MODULE CSS ----------------------------- */
 /* INVENTORY STYLES */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
 table {
+  font-family: inherit !important;
   margin-top: 0.5rem;
   font-size: 1.05rem;
+  border-radius: 1rem;
   width: 100%;
   border-collapse: collapse;
 }
@@ -722,11 +736,11 @@ td {
 
 th {
   font-size: 1.18rem;
-  background-color: var(--sidebar-bg-color);
+  background-color: rgba(52, 152, 219, 0.15);
   color: var(--main-text-color);
   font-weight: 600;
   cursor: pointer;
-  position: relative;
+  position: sticky;
 }
 
 th:hover {
@@ -753,10 +767,11 @@ tr:hover {
 
 .status {
   display: inline-block;
+  text-align: center;
   padding: 4px 8px;
-  border-radius: var(--border-radius);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 0.7rem;
+  border-radius: 0.4rem;
+  font-weight: 600;
 }
 
 .status-active {
@@ -793,89 +808,175 @@ tr:hover {
   text-decoration: underline;
 }
 
+/* Header container */
+.header1 {
+  background-color: transparent;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Filters container */
 .filters {
   display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
-  padding: var(--padding);
-  border-radius: var(--border-radius);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.filters input{
-  margin-right: auto;
+/* Input and select common styles */
+input,
+select {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: white;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
-.filters input,
-.filters select {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  color: var(--main-text-color);
-  transition: all 0.3s ease;
+/* Input focus state */
+input:focus {
   outline: none;
-  background: var(--sidebar-bg-color);
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+/* Select customization */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
   cursor: pointer;
 }
 
-
-/* .filters input:hover,
-.filters select:hover {
-  background-color: var(--hover-bg-color);
-} */
-/* Focus Styles */
-.filters input:focus,
-.filters select:focus {
-  background-color: white;
+/* Select hover effect */
+select:hover {
+  border-color: #bdbdbd;
 }
 
-/* Active Styles */
-.filters input:active,
-.filters select:active {
-  transform: translateY(0);
+/* Option hover effect */
+select option:hover {
+  background-color: #f5f5f5 !important;
 }
 
-.filters select option {
+/* Action Menu Styles */
+.actions-menu {
+  position: relative;
+  cursor: pointer;
+}
+
+.actions-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.actions-menu.active .actions-dropdown {
+  display: block;
+}
+
+.actions-dropdown button {
+  width: 100%;
+  padding: 0.75rem 1rem;
   border: none;
-  background-color: white; 
-  color: var(--main-text-color); 
-  padding: 8px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #333;
 }
 
-.filters select option:hover {
-  background-color: #ae1111 !important; 
-  /* color: var(--main-text-color) ;  */
+.actions-dropdown button:hover {
+  background: #f8f9fa;
 }
 
-
-@media (max-width: 600px) {
-  .filters {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filters input,
-  .filters select {
-    width: 100%;
-  }
+.actions-dropdown button i {
+  width: 18px;
+  color: #666;
 }
 
+.fa-ellipsis-h {
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
+}
 
-/* ------------------------ Media Queries ------------------------ */
+.fa-ellipsis-h:hover {
+  background: #f0f0f0;
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- Media Queries --------------------------------------- */
 @media (max-width: 768px) {
+  .main-content {
+    margin-left: 4rem !important;
+  }
+  .header .user-info span {
+    font-size: 0px !important;
+  }
+  .sub-heading {
+    font-size: 1.2rem;
+  }
   .sidebar {
-    width: 10rem;
+    width: 4rem;
+    padding: 1.35rem 0.5rem;
   }
 
   .sidebar .logo span {
+    /* display: none; */
+    font-size: 0px !important;
+  }
+
+  .menu-title {
+    display: none;
+  }
+  .sidebar .menu li a i {
+    margin-right: 0rem;
+    justify-content: center;
+  }
+
+  .sidebar .menu li a {
+    justify-content: center;
+    position: relative;
+    font-size: 0px;
+  }
+
+  /* Hide text spans */
+  .sidebar .menu li a i + span,
+  .sidebar .menu li a i + *:not(i) {
+    display: none;
+  }
+
+  /* Alternative: Hide all text nodes */
+  .sidebar .menu li a {
+    font-size: 0;
+  }
+
+  .sidebar .menu li a i {
     font-size: 1.2rem;
   }
 
-  .main-content {
-    margin-left: 10rem;
+  hr.solid {
+    margin: 0.75em 0;
   }
 
-  .card-container {
+  .card-container,
+  .card-view {
     grid-template-columns: 1fr;
   }
 
@@ -884,6 +985,9 @@ tr:hover {
   .ex3 {
     grid-template-columns: 1fr;
   }
+  /* .large {
+    grid-column: span 1;
+  } */
 
   .item-1,
   .item-2,
@@ -893,6 +997,13 @@ tr:hover {
   .item-6 {
     flex: 1;
     min-width: 100%;
+  }
+  .header1 {
+    padding: 1rem;
+  }
+
+  .filters {
+    flex-direction: column;
   }
 }
 
@@ -909,5 +1020,14 @@ tr:hover {
   .ex2,
   .ex3 {
     grid-template-columns: 1fr;
+  }
+  .filters {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
   }
 }

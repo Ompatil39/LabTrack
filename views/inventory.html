@@ -63,7 +63,7 @@
                 </li>
                 <li class="active">
                     <a href="inventory.html">
-                        <i class="fa-solid fa-warehouse"></i> Inventory
+                        <i class="fa-solid fa-warehouse"></i> <span>Inventory</span>
                     </a>
                 </li>
                 <li>
@@ -84,7 +84,7 @@
                 </div>
                 <div class="user-info">
                     <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-                    <span class="font-rale"><i class="fa-solid fa-circle-user"></i> Joxy Inc.
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Joxy Inc.
                     </span>
                 </div>
             </div>
@@ -144,154 +144,169 @@
                             <option value="Keyboard">Keyboard</option>
                         </select>
                     </div>
-                </div> 
-                <table>
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(5)">Last Grievance <i class="fas fa-sort"></i></th>
-                            <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1001</td>
-                            <td>Dell Monitor</td>
-                            <td>Monitor</td>
-                            <td>Lab A</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-07-15</td>
-                            <td>Working fine</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1002</td>
-                            <td>HP Printer</td>
-                            <td>Printer</td>
-                            <td>Lab B</td>
-                            <td><span class="status status-repair">In Repair</span></td>
-                            <td>2024-06-10</td>
-                            <td>Paper jam issue</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1003</td>
-                            <td>Logitech Mouse</td>
-                            <td>Mouse</td>
-                            <td>Lab C</td>
-                            <td><span class="status status-faulty">Faulty</span></td>
-                            <td>2024-05-05</td>
-                            <td>Left click not working</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1003</td>
-                            <td>Logitech Mouse</td>
-                            <td>Mouse</td>
-                            <td>Lab C</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-05-05</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1004</td>
-                            <td>Dell Keyboard</td>
-                            <td>Keyboard</td>
-                            <td>Lab A</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-06-12</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1005</td>
-                            <td>HP Monitor</td>
-                            <td>Monitor</td>
-                            <td>Lab B</td>
-                            <td><span class="status status-repair">Repair</span></td>
-                            <td>2024-04-20</td>
-                            <td>Screen flickering</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1006</td>
-                            <td>Logitech Mouse</td>
-                            <td>Mouse</td>
-                            <td>Lab C</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-07-01</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1007</td>
-                            <td>Dell Monitor</td>
-                            <td>Monitor</td>
-                            <td>Lab D</td>
-                            <td><span class="status status-faulty">Faulty</span></td>
-                            <td>2024-03-15</td>
-                            <td>Dead pixels</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1008</td>
-                            <td>HP Keyboard</td>
-                            <td>Keyboard</td>
-                            <td>Lab A</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-08-22</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1009</td>
-                            <td>Dell Monitor</td>
-                            <td>Monitor</td>
-                            <td>Lab B</td>
-                            <td><span class="status status-repair">Repair</span></td>
-                            <td>2024-02-10</td>
-                            <td>Power button not working</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1010</td>
-                            <td>Logitech Mouse</td>
-                            <td>Mouse</td>
-                            <td>Lab C</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-09-05</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1011</td>
-                            <td>HP Monitor</td>
-                            <td>Monitor</td>
-                            <td>Lab D</td>
-                            <td><span class="status status-repair">Repair</span></td>
-                            <td>2024-01-30</td>
-                            <td>Blurred display</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1012</td>
-                            <td>Dell Keyboard</td>
-                            <td>Keyboard</td>
-                            <td>Lab A</td>
-                            <td><span class="status status-active">Active</span></td>
-                            <td>2024-10-18</td>
-                            <td>N/A</td>
-                            <td><i class="fas fa-ellipsis-h"></i></td>
-                        </tr>
-
-                    </tbody>
-                </table>
+                </div>
+                <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(5)">Last Grievance <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1001</td>
+                                    <td>Dell Monitor</td>
+                                    <td>Monitor</td>
+                                    <td>Lab A</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-07-15</td>
+                                    <td>Working fine</td>
+                                    <td class="actions-menu" onclick="toggleMenu(this)">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                        <div class="actions-dropdown">
+                                            <button>
+                                                <i class="fas fa-edit icon-color"></i>
+                                                Edit
+                                            </button>
+                                            <button>
+                                                <i class="fas fa-trash-alt icon-color"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>1002</td>
+                                    <td>HP Printer</td>
+                                    <td>Printer</td>
+                                    <td>Lab B</td>
+                                    <td><span class="status status-repair">In Repair</span></td>
+                                    <td>2024-06-10</td>
+                                    <td>Paper jam issue</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1003</td>
+                                    <td>Logitech Mouse</td>
+                                    <td>Mouse</td>
+                                    <td>Lab C</td>
+                                    <td><span class="status status-faulty">Faulty</span></td>
+                                    <td>2024-05-05</td>
+                                    <td>Left click not working</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1003</td>
+                                    <td>Logitech Mouse</td>
+                                    <td>Mouse</td>
+                                    <td>Lab C</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-05-05</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1004</td>
+                                    <td>Dell Keyboard</td>
+                                    <td>Keyboard</td>
+                                    <td>Lab A</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-06-12</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1005</td>
+                                    <td>HP Monitor</td>
+                                    <td>Monitor</td>
+                                    <td>Lab B</td>
+                                    <td><span class="status status-repair">Repair</span></td>
+                                    <td>2024-04-20</td>
+                                    <td>Screen flickering</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1006</td>
+                                    <td>Logitech Mouse</td>
+                                    <td>Mouse</td>
+                                    <td>Lab C</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-07-01</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1007</td>
+                                    <td>Dell Monitor</td>
+                                    <td>Monitor</td>
+                                    <td>Lab D</td>
+                                    <td><span class="status status-faulty">Faulty</span></td>
+                                    <td>2024-03-15</td>
+                                    <td>Dead pixels</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1008</td>
+                                    <td>HP Keyboard</td>
+                                    <td>Keyboard</td>
+                                    <td>Lab A</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-08-22</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1009</td>
+                                    <td>Dell Monitor</td>
+                                    <td>Monitor</td>
+                                    <td>Lab B</td>
+                                    <td><span class="status status-repair">Repair</span></td>
+                                    <td>2024-02-10</td>
+                                    <td>Power button not working</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1010</td>
+                                    <td>Logitech Mouse</td>
+                                    <td>Mouse</td>
+                                    <td>Lab C</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-09-05</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1011</td>
+                                    <td>HP Monitor</td>
+                                    <td>Monitor</td>
+                                    <td>Lab D</td>
+                                    <td><span class="status status-repair">Repair</span></td>
+                                    <td>2024-01-30</td>
+                                    <td>Blurred display</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>1012</td>
+                                    <td>Dell Keyboard</td>
+                                    <td>Keyboard</td>
+                                    <td>Lab A</td>
+                                    <td><span class="status status-active">Active</span></td>
+                                    <td>2024-10-18</td>
+                                    <td>N/A</td>
+                                    <td><i class="fas fa-ellipsis-h"></i></td>
+                                </tr>
+                        
+                            </tbody>
+                        </table>
+                </div>                 
+                
                 <div class="pagination">
                     <a href="#">Previous</a>
                     <a href="#">1</a>
@@ -368,6 +383,24 @@
             row.style.display = matchesSearch && matchesLab && matchesStatus && matchesCategory ? '' : 'none';
         });
     }
+
+    function toggleMenu(element) {
+            // Close all other menus
+            document.querySelectorAll('.actions-menu').forEach(menu => {
+                if (menu !== element) menu.classList.remove('active');
+            });
+            // Toggle current menu
+            element.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.actions-menu')) {
+                document.querySelectorAll('.actions-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
 </script>
 
 </html>
