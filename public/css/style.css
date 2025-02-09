@@ -636,6 +636,18 @@ hr.solid {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  .red-hover{
+    color: var(--warning-accent);
+  }
+  .blue-hover{
+    color: var(--active-bg-color);
+  }
+  .green-hover{
+    color: var(--secondary-accent);
+  }
+  .yellow-hover{
+    color: #f1c40f;
+  }
 }
 
 .card h3 {
@@ -675,7 +687,11 @@ hr.solid {
 .blue-top {
   border-top: 5px solid #3498db;
 }
-
+.blue-top:hover {
+  .card i{
+    color: #3498db;
+  }
+}
 .yellow-top {
   border-top: 5px solid #f1c40f;
 }
