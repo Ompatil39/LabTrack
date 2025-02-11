@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Monitoring System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+        integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Include Sparkline Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
+
+    <link rel="stylesheet" href="../public/css/style.css" />
+    <script src="https://kit.fontawesome.com/0319a73572.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,200,0,200&icon_names=dns" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <span><i class="fa-brands fa-watchman-monitoring colour"></i>LabTrack</span>
+            </div>
+            <hr class="solid" />
+            <ul class="menu">
+                <li class="menu-title">Menu</li>
+                <!-- Dashboard Link -->
+                <li>
+                    <a href="home.html">
+                        <i class="fa-solid fa-chart-pie"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="labs.html">
+                        <i class="fa-solid fa-network-wired"></i>
+                        Labs
+                    </a>
+                </li>
+                <li>
+                    <a href="maintenance.html">
+                        <i class="fa-solid fa-user-gear"></i><span>Maintenance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <i class="fa-solid fa-warehouse"></i> Inventory
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="grievance.html">
+                        <i class="fa-solid fa-paper-plane"></i> Grievance
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <!-- User Info Section -->
+                <div class="sub-heading">
+                    <span>Grievance Management</span>
+                </div>
+                <div class="user-info">
+                    <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Joxy Inc.
+                    </span>
+                </div>
+            </div>
+
+            <!-- CONTENT START BELOW HEADER -->
+            <!-- Lab Selection Dropdown -->
+            <!-- <div class="lab-selector-wrapper items">
+                <h2 class="choose">Select a Lab</h2>
+                <div class="lab-selector-container">
+                    <button class="lab-nav-button prev" onclick="scrollLabs(-1)">
+                        <i class="fa-solid fa-caret-left"></i>
+                    </button>
+                    <div class="lab-selector-slider">
+                        <div class="lab-selector-card" data-lab-id="L001" onclick="selectLab('L001')">
+                            <h3>Lab 1</h3>
+                            <p>ID: L001</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L002" onclick="selectLab('L002')">
+                            <h3>Lab 2</h3>
+                            <p>ID: L002</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L003" onclick="selectLab('L003')">
+                            <h3>Lab 3</h3>
+                            <p>ID: L003</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L004" onclick="selectLab('L004')">
+                            <h3>Lab 4</h3>
+                            <p>ID: L004</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L005" onclick="selectLab('L005')">
+                            <h3>Lab 5</h3>
+                            <p>ID: L005</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L006" onclick="selectLab('L006')">
+                            <h3>Lab 6</h3>
+                            <p>ID: L006</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L007" onclick="selectLab('L007')">
+                            <h3>Lab 7</h3>
+                            <p>ID: L007</p>
+                        </div>
+                        <div class="lab-selector-card" data-lab-id="L008" onclick="selectLab('L008')">
+                            <h3>Lab 8</h3>
+                            <p>ID: L008</p>
+                        </div>
+                    </div>
+                    <button class="lab-nav-button next" onclick="scrollLabs(1)">
+                        <i class="fa-solid fa-caret-right"></i>
+                    </button>
+                </div>
+            </div> -->
+
+            <!-- Card View -->
+            <div class="card-view">
+                <div class="card blue-top">
+                    <h3>Total Grievance</h3>
+                    <p class="font-number">8</p>
+                    <i class="fa-solid fa-server blue-hover"></i>
+                </div>
+                <div class="card green-top">
+                    <h3>Total Solved</h3>
+                    <p class="font-number">160</p>
+                    <i class="fa-solid fa-computer green-hover"></i>
+                </div>
+                <div class="card yellow-top">
+                    <h3>In Repair</h3>
+                    <p class="font-number">30</p>
+                    <i class="fas fa-tools yellow-hover"></i>
+                </div>
+                <div class="card red-top">
+                    <h3>Faulty Devices</h3>
+                    <p class="font-number">40</p>
+                    <i class="fas fa-triangle-exclamation red-hover"></i>
+                </div>
+            </div>
+            <!-- CARDs VIEW END -->
+            <!-- Add after card-view section -->
+            <div class="items">
+                <!-- Filters and Search Bar -->
+                <div class="sub-heading">
+                    <span>Latest Grievances</span>
+                </div>
+                <div class="header1 ">
+                    <div class="filters font-rale">
+                        <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
+                        <select id="labFilter">
+                            <option value="">All Labs</option>
+                            <option value="Lab A">Lab A</option>
+                            <option value="Lab B">Lab B</option>
+                            <option value="Lab C">Lab C</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="In Repair">In Repair</option>
+                            <option value="Faulty">Faulty</option>
+                            <!-- <option value="Decommissioned">Decommissioned</option> -->
+                        </select>
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="PC">PC</option>
+                            <option value="Printer">Printer</option>
+                            <option value="Mouse">Mouse</option>
+                            <option value="Keyboard">Keyboard</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <div class="filter-bar">
+                    <div class="search-group">
+                        <input type="text" placeholder="Search by name or ID..." class="search-input">
+                        <select class="filter-select">
+                            <option>All Statuses</option>
+                            <option>Pending</option>
+                            <option>In Progress</option>
+                            <option>Resolved</option>
+                            <option>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="action-group">
+                        <button class="btn-secondary"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div> -->
+
+                <!-- Grievance Table -->
+                <table class="grievance-table">
+                    <thead>
+                        <tr>
+                            <th>Grievance ID <i class="fas fa-sort"></i></th>
+                            <th>Student Name <i class="fas fa-sort"></i></th>
+                            <th>Device/Category <i class="fas fa-sort"></i></th>
+                            <th>Status <i class="fas fa-sort"></i></th>
+                            <th>Submission Date <i class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i
+                                        class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#GRV001</td>
+                            <td>John Doe</td>
+                            <td>Computer 12</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>2024-03-15</td>
+                            <td>
+                                <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Status Update Modal -->
+            <div class="modal-overlay" id="statusModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Update Grievance Status</h3>
+                        <button class="close-btn" onclick="closeStatusModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="statusForm">
+                            <div class="form-group">
+                                <label>Current Status:</label>
+                                <select class="status-select">
+                                    <option>Pending</option>
+                                    <option>In Progress</option>
+                                    <option>Resolved</option>
+                                    <option>Rejected</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Add Comment:</label>
+                                <textarea class="comment-box" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox"> Notify Student via Email
+                                </label>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-primary">Save Changes</button>
+                                <button type="button" class="btn-secondary" onclick="closeStatusModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CONTENT END  -->
+    </div>
+    </div>
+</body>
+<script>
+    // Modal Handling
+        function openStatusModal() {
+            document.getElementById('statusModal').style.display = 'flex';
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('statusModal');
+            if (event.target === modal) {
+                closeStatusModal();
+            }
+        }
+
+    function scrollLabs(direction) {
+        const slider = document.querySelector(".lab-selector-slider");
+        const scrollAmount = 200; // Adjust scroll distance as needed
+        slider.scrollBy({
+            left: direction * scrollAmount,
+            behavior: "smooth",
+        });
+    }
+
+    let slider = document.querySelector(".lab-selector-slider");
+
+    // Hide scrollbar
+    slider.style.scrollbarWidth = "none"; // Firefox
+    slider.style.msOverflowStyle = "none"; // IE/Edge
+
+    // For Chrome, Safari
+    let style = document.createElement("style");
+    style.innerHTML =
+        ".lab-selector-slider::-webkit-scrollbar { display: none; }";
+    document.head.appendChild(style);
+
+    function selectLab(labId) {
+        // Remove 'selected' class from all lab cards
+        const labCards = document.querySelectorAll(".lab-selector-card");
+        labCards.forEach((card) => card.classList.remove("selected"));
+
+        // Add 'selected' class to the clicked lab card
+        const selectedCard = document.querySelector(
+            `.lab-selector-card[data-lab-id="${labId}"]`
+        );
+        selectedCard.classList.add("selected");
+
+        // Optional: Scroll the selected card into view
+        selectedCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+</script>
+
+</html>

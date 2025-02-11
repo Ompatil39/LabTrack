@@ -115,14 +115,14 @@
             </div>
             <!-- CARDs VIEW END -->
             <!-- Table View -->
-            <div class="items">
+            <div class="items margin-bottom">
                 <div class="sub-heading">
-                    <span>Lab Device Inventory</span>
+                    <span>Lab Devices Inventory</span>
                 </div>
-                
+
                 <div class="header1">
                     <div class="filters">
-                        <input type="text" id="search" placeholder="Search using ID, Name...">
+                        <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
                         <select id="labFilter">
                             <option value="">All Labs</option>
                             <option value="Lab A">Lab A</option>
@@ -146,167 +146,199 @@
                     </div>
                 </div>
                 <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(5)">Last Grievance <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1001</td>
-                                    <td>Dell Monitor</td>
-                                    <td>Monitor</td>
-                                    <td>Lab A</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-07-15</td>
-                                    <td>Working fine</td>
-                                    <td class="actions-menu" onclick="toggleMenu(this)">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                        <div class="actions-dropdown">
-                                            <button>
-                                                <i class="fas fa-edit icon-color"></i>
-                                                Edit
-                                            </button>
-                                            <button>
-                                                <i class="fas fa-trash-alt icon-color"></i>
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>1002</td>
-                                    <td>HP Printer</td>
-                                    <td>Printer</td>
-                                    <td>Lab B</td>
-                                    <td><span class="status status-repair">In Repair</span></td>
-                                    <td>2024-06-10</td>
-                                    <td>Paper jam issue</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1003</td>
-                                    <td>Logitech Mouse</td>
-                                    <td>Mouse</td>
-                                    <td>Lab C</td>
-                                    <td><span class="status status-faulty">Faulty</span></td>
-                                    <td>2024-05-05</td>
-                                    <td>Left click not working</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1003</td>
-                                    <td>Logitech Mouse</td>
-                                    <td>Mouse</td>
-                                    <td>Lab C</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-05-05</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1004</td>
-                                    <td>Dell Keyboard</td>
-                                    <td>Keyboard</td>
-                                    <td>Lab A</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-06-12</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1005</td>
-                                    <td>HP Monitor</td>
-                                    <td>Monitor</td>
-                                    <td>Lab B</td>
-                                    <td><span class="status status-repair">Repair</span></td>
-                                    <td>2024-04-20</td>
-                                    <td>Screen flickering</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1006</td>
-                                    <td>Logitech Mouse</td>
-                                    <td>Mouse</td>
-                                    <td>Lab C</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-07-01</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1007</td>
-                                    <td>Dell Monitor</td>
-                                    <td>Monitor</td>
-                                    <td>Lab D</td>
-                                    <td><span class="status status-faulty">Faulty</span></td>
-                                    <td>2024-03-15</td>
-                                    <td>Dead pixels</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1008</td>
-                                    <td>HP Keyboard</td>
-                                    <td>Keyboard</td>
-                                    <td>Lab A</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-08-22</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1009</td>
-                                    <td>Dell Monitor</td>
-                                    <td>Monitor</td>
-                                    <td>Lab B</td>
-                                    <td><span class="status status-repair">Repair</span></td>
-                                    <td>2024-02-10</td>
-                                    <td>Power button not working</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1010</td>
-                                    <td>Logitech Mouse</td>
-                                    <td>Mouse</td>
-                                    <td>Lab C</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-09-05</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1011</td>
-                                    <td>HP Monitor</td>
-                                    <td>Monitor</td>
-                                    <td>Lab D</td>
-                                    <td><span class="status status-repair">Repair</span></td>
-                                    <td>2024-01-30</td>
-                                    <td>Blurred display</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>1012</td>
-                                    <td>Dell Keyboard</td>
-                                    <td>Keyboard</td>
-                                    <td>Lab A</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>2024-10-18</td>
-                                    <td>N/A</td>
-                                    <td><i class="fas fa-ellipsis-h"></i></td>
-                                </tr>
-                        
-                            </tbody>
-                        </table>
-                </div>                 
-                
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(4)">PC <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(5)">Status <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(6)">Remarks <i class="fas fa-sort"></i></th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1001</td>
+                                <td>Dell Monitor</td>
+                                <td>Monitor</td>
+                                <td>Lab A</td>
+                                <td>PC-01</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>Working fine</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1002</td>
+                                <td>HP Printer</td>
+                                <td>Printer</td>
+                                <td>Lab B</td>
+                                <td>PC-05</td>
+                                <td><span class="status status-repair">In Repair</span></td>
+                                <td>Paper jam issue</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1003</td>
+                                <td>Logitech Mouse</td>
+                                <td>Mouse</td>
+                                <td>Lab C</td>
+                                <td>PC-08</td>
+                                <td><span class="status status-faulty">Faulty</span></td>
+                                <td>Left click not working</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1004</td>
+                                <td>Dell Keyboard</td>
+                                <td>Keyboard</td>
+                                <td>Lab A</td>
+                                <td>PC-03</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>N/A</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1005</td>
+                                <td>HP Monitor</td>
+                                <td>Monitor</td>
+                                <td>Lab B</td>
+                                <td>PC-07</td>
+                                <td><span class="status status-repair">Repair</span></td>
+                                <td>Screen flickering</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1006</td>
+                                <td>Logitech Mouse</td>
+                                <td>Mouse</td>
+                                <td>Lab C</td>
+                                <td>PC-10</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>N/A</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1007</td>
+                                <td>Dell Monitor</td>
+                                <td>Monitor</td>
+                                <td>Lab D</td>
+                                <td>PC-12</td>
+                                <td><span class="status status-faulty">Faulty</span></td>
+                                <td>Dead pixels</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1008</td>
+                                <td>HP Keyboard</td>
+                                <td>Keyboard</td>
+                                <td>Lab A</td>
+                                <td>PC-04</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>N/A</td>
+                                <td class="actions-menu" onclick="toggleMenu(this)">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="actions-dropdown">
+                                        <button>
+                                            <i class="fas fa-edit icon-color"></i>
+                                            Edit
+                                        </button>
+                                        <button>
+                                            <i class="fas fa-trash-alt icon-color"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="pagination">
                     <a href="#">Previous</a>
                     <a href="#">1</a>
@@ -316,6 +348,148 @@
                 </div>
             </div>
             <!-- TABLE VIEW END -->
+            <!-- TABLE 2 -->
+            <div class="items">
+                <div class="sub-heading">
+                    <span>Spare Parts</span>
+                </div>
+                <div class="table-container">
+                    <table id="partsTable" class="display">
+                        <thead>
+                            <tr>
+                                <th>Part ID</th>
+                                <th>Part Name</th>
+                                <th>Quantity</th>
+                                <th>Category</th>
+                                <th>Vendor</th>
+                                <th>Purchase Date</th>
+                                <th>Price (INR)</th>
+                                <th>Status</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SP-001</td>
+                                <td>8GB DDR4 RAM</td>
+                                <td>15</td>
+                                <td>Hardware</td>
+                                <td>TechSupplies Inc</td>
+                                <td>2023-09-15</td>
+                                <td>₹3,486</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-002</td>
+                                <td>500GB SSD</td>
+                                <td>8</td>
+                                <td>Storage</td>
+                                <td>StorageMasters</td>
+                                <td>2023-10-01</td>
+                                <td>₹5,603</td>
+                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-003</td>
+                                <td>USB-C Hub</td>
+                                <td>25</td>
+                                <td>Peripherals</td>
+                                <td>ConnectTech</td>
+                                <td>2023-08-22</td>
+                                <td>₹2,489</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-004</td>
+                                <td>WiFi Adapter</td>
+                                <td>3</td>
+                                <td>Networking</td>
+                                <td>NetGear Pro</td>
+                                <td>2023-11-05</td>
+                                <td>₹1,572</td>
+                                <td><span class="status out-of-stock">Out of Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-005</td>
+                                <td>Keyboard (Wired)</td>
+                                <td>12</td>
+                                <td>Peripherals</td>
+                                <td>InputMasters</td>
+                                <td>2023-10-18</td>
+                                <td>₹2,074</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-006</td>
+                                <td>24" Monitor</td>
+                                <td>5</td>
+                                <td>Display</td>
+                                <td>DisplayTech</td>
+                                <td>2023-09-30</td>
+                                <td>₹13,197</td>
+                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-007</td>
+                                <td>CPU Cooler</td>
+                                <td>7</td>
+                                <td>Cooling</td>
+                                <td>CoolMaster</td>
+                                <td>2023-11-12</td>
+                                <td>₹3,735</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-008</td>
+                                <td>HDMI Cables</td>
+                                <td>35</td>
+                                <td>Cables</td>
+                                <td>ConnectTech</td>
+                                <td>2023-07-14</td>
+                                <td>₹746</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-009</td>
+                                <td>Power Supply 650W</td>
+                                <td>4</td>
+                                <td>Power</td>
+                                <td>PowerEdge</td>
+                                <td>2023-10-29</td>
+                                <td>₹7,469</td>
+                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>SP-010</td>
+                                <td>Webcam 1080p</td>
+                                <td>9</td>
+                                <td>Peripherals</td>
+                                <td>CamTech</td>
+                                <td>2023-11-08</td>
+                                <td>₹4,146</td>
+                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <a href="#">Previous</a>
+                        <a href="#">1</a>
+                        <a href="#">2</a>
+                        <a href="#">3</a>
+                        <a href="#">Next</a>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- CONTENT END  -->
     </div>
@@ -385,22 +559,22 @@
     }
 
     function toggleMenu(element) {
-            // Close all other menus
-            document.querySelectorAll('.actions-menu').forEach(menu => {
-                if (menu !== element) menu.classList.remove('active');
-            });
-            // Toggle current menu
-            element.classList.toggle('active');
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.actions-menu')) {
-                document.querySelectorAll('.actions-menu').forEach(menu => {
-                    menu.classList.remove('active');
-                });
-            }
+        // Close all other menus
+        document.querySelectorAll('.actions-menu').forEach(menu => {
+            if (menu !== element) menu.classList.remove('active');
         });
-</script>
+        // Toggle current menu
+        element.classList.toggle('active');
+    }
 
+    // Close menu when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.actions-menu')) {
+            document.querySelectorAll('.actions-menu').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+    });
+
+</script>
 </html>

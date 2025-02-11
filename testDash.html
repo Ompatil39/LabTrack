@@ -1,361 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- 
-  .filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: var(--padding);
-  border-radius: var(--border-radius);
-}
 
-.filters input{
-  margin-right: auto;
-}
-
-.filters input,
-.filters select {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  color: var(--main-text-color);
-  transition: all 0.3s ease;
-  outline: none;
-  background: var(--sidebar-bg-color);
-  cursor: pointer;
-}
-
-
-/* .filters input:hover,
-.filters select:hover {
-  background-color: var(--hover-bg-color);
-} */
-/* Focus Styles */
-.filters input:focus,
-.filters select:focus {
-  background-color: white;
-}
-
-/* Active Styles */
-.filters input:active,
-.filters select:active {
-  transform: translateY(0);
-}
-
-.filters select option {
-  border: none;
-  background-color: white; 
-  color: var(--main-text-color); 
-  padding: 8px;
-}
-
-.filters select option:hover {
-  background-color: #ae1111 !important; 
-  /* color: var(--main-text-color) ;  */
-}
--->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Management Table</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <title>LabTrack - Lab Detail</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     :root {
       --main-bg-color: #f8f9fa;
-      --sidebar-bg-color: #ffffff;
       --card-bg-color: #ffffff;
       --main-text-color: #2c3e50;
       --secondary-text-color: #7f8c8d;
       --primary-accent: #3498db;
       --secondary-accent: #2ecc71;
-      --warning-accent: #e74c3c;
-      --hover-bg-color: #ecf0f1;
-      --active-bg-color: #3498db;
       --border-color: #e0e0e0;
       --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      --padding: 1rem;
-      --border-radius: 0.625rem;
+      --border-radius: 8px;
+      --padding: 1.25rem;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: var(--main-bg-color);
-      margin: 0;
-      padding: var(--padding);
-      color: var(--main-text-color);
-    }
-
-    .filters {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-
-    .filters input,
-    .filters select {
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      background-color: var(--card-bg-color);
-      color: var(--main-text-color);
-    }
-
-    .filters input {
-      flex: 1;
-      max-width: 300px;
-    }
-
-    .table-container {
-      background-color: var(--card-bg-color);
+    .lab-detail-card {
+      background: var(--card-bg-color);
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
-      overflow-x: auto;
-      padding: var(--padding);
-    }
-
-    table {
+      margin: 20px 0;
       width: 100%;
-      border-collapse: collapse;
+      max-width: 800px;
+      display: flex;
     }
 
-    th,
-    td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
+    .card-left {
+      padding: var(--padding);
+      border-right: 1px solid var(--border-color);
+      width: 60%;
     }
 
-    th {
-      background-color: var(--sidebar-bg-color);
+    .card-right {
+      padding: var(--padding);
+      width: 40%;
+    }
+
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .lab-title {
+      margin: 0;
       color: var(--main-text-color);
-      font-weight: 600;
-      cursor: pointer;
-      position: relative;
+      font-size: 1.5rem;
     }
 
-    th:hover {
-      background-color: var(--hover-bg-color);
+    .lab-status {
+      background: var(--secondary-accent);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
     }
 
-    th i {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--secondary-text-color);
-      opacity: 0.5;
-      font-size: 12px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    td {
-      color: var(--secondary-text-color);
-    }
-
-    tr:hover {
-      background-color: var(--hover-bg-color);
-    }
-
-    .status {
-      display: inline-block;
-      padding: 4px 8px;
+    .stat-item {
+      padding: 1rem;
+      background: var(--main-bg-color);
       border-radius: var(--border-radius);
-      font-size: 12px;
-      font-weight: 500;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--secondary-text-color);
+      font-size: 0.9rem;
+    }
+
+    .detail-item {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .detail-icon {
+      color: var(--primary-accent);
+      width: 24px;
+      text-align: center;
+    }
+
+    .staff-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .staff-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+
+    .action-bar {
+      border-top: 1px solid var(--border-color);
+      padding: var(--padding);
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-accent);
       color: white;
     }
 
-    .status-active {
-      background-color: var(--secondary-accent);
-    }
-
-    .status-in-repair {
-      background-color: var(--warning-accent);
-    }
-
-    .status-faulty {
-      background-color: var(--warning-accent);
-    }
-
-    .status-decommissioned {
-      background-color: var(--secondary-text-color);
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .actions i {
-      cursor: pointer;
-      color: var(--primary-accent);
-    }
-
-    .actions i:hover {
-      color: var(--active-bg-color);
+    .btn-secondary {
+      background: var(--main-bg-color);
+      color: var(--main-text-color);
+      border: 1px solid var(--border-color);
     }
   </style>
 </head>
 
 <body>
-  <div class="filters">
-    <input type="text" id="search" placeholder="Search using ID, Name...">
-    <select id="labFilter">
-      <option value="">All Labs</option>
-      <option value="Lab A">Lab A</option>
-      <option value="Lab B">Lab B</option>
-      <option value="Lab C">Lab C</option>
-    </select>
-    <select id="statusFilter">
-      <option value="">All Statuses</option>
-      <option value="Active">Active</option>
-      <option value="In Repair">In Repair</option>
-      <option value="Faulty">Faulty</option>
-      <option value="Decommissioned">Decommissioned</option>
-    </select>
-    <select id="categoryFilter">
-      <option value="">All Categories</option>
-      <option value="PC">PC</option>
-      <option value="Printer">Printer</option>
-      <option value="Mouse">Mouse</option>
-      <option value="Keyboard">Keyboard</option>
-    </select>
-  </div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(5)">Last Maintenance <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(6)">Next Maintenance <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable(7)">Remarks <i class="fas fa-sort"></i></th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>001</td>
-          <td>Dell Monitor</td>
-          <td>Monitor</td>
-          <td>Lab A</td>
-          <td><span class="status status-active">Active</span></td>
-          <td>2023-01-15</td>
-          <td>2023-07-15</td>
-          <td>No issues</td>
-          <td class="actions">
-            <i class="fas fa-edit" title="Edit"></i>
-            <i class="fas fa-trash" title="Delete"></i>
-            <i class="fas fa-info-circle" title="View Details"></i>
-          </td>
-        </tr>
-        <tr>
-          <td>002</td>
-          <td>HP Printer</td>
-          <td>Printer</td>
-          <td>Lab B</td>
-          <td><span class="status status-in-repair">In Repair</span></td>
-          <td>2022-12-10</td>
-          <td>2023-06-10</td>
-          <td>Paper jam issue</td>
-          <td class="actions">
-            <i class="fas fa-edit" title="Edit"></i>
-            <i class="fas fa-trash" title="Delete"></i>
-            <i class="fas fa-info-circle" title="View Details"></i>
-          </td>
-        </tr>
-        <tr>
-          <td>003</td>
-          <td>Logitech Mouse</td>
-          <td>Mouse</td>
-          <td>Lab C</td>
-          <td><span class="status status-faulty">Faulty</span></td>
-          <td>2023-03-20</td>
-          <td>2023-09-20</td>
-          <td>Left click not working</td>
-          <td class="actions">
-            <i class="fas fa-edit" title="Edit"></i>
-            <i class="fas fa-trash" title="Delete"></i>
-            <i class="fas fa-info-circle" title="View Details"></i>
-          </td>
-        </tr>
-        <tr>
-          <td>004</td>
-          <td>Apple Keyboard</td>
-          <td>Keyboard</td>
-          <td>Lab A</td>
-          <td><span class="status status-decommissioned">Decommissioned</span></td>
-          <td>2021-05-05</td>
-          <td>N/A</td>
-          <td>Replaced with new model</td>
-          <td class="actions">
-            <i class="fas fa-edit" title="Edit"></i>
-            <i class="fas fa-trash" title="Delete"></i>
-            <i class="fas fa-info-circle" title="View Details"></i>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="lab-detail-card">
+    <div class="card-left">
+      <div class="lab-header">
+        <h2 class="lab-title">COA101 - Lab 1</h2>
+        <span class="lab-status">Operational</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">32</div>
+          <div class="stat-label">Workstations</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">Availability</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">2</div>
+          <div class="stat-label">Active Issues</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Peripherals</div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-map-marker-alt detail-icon"></i>
+        <div>
+          <div>Building C - Room 310</div>
+          <small class="stat-label">Last accessed 2h ago</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-right">
+      <div class="detail-item">
+        <i class="fas fa-tools detail-icon"></i>
+        <div>
+          <div>Next Maintenance</div>
+          <div class="stat-value">Dec 15, 2023</div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-users detail-icon"></i>
+        <div>
+          <div>Assigned Staff</div>
+          <ul class="staff-list">
+            <li class="staff-item">
+              <i class="fas fa-user"></i>
+              John Smith (Manager)
+            </li>
+            <li class="staff-item">
+              <i class="fas fa-user"></i>
+              Sarah Johnson (Tech)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    function sortTable(columnIndex) {
-      const table = document.querySelector('table');
-      const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-
-      rows.sort((a, b) => {
-        const aValue = a.cells[columnIndex].textContent.trim();
-        const bValue = b.cells[columnIndex].textContent.trim();
-        return aValue.localeCompare(bValue, undefined, { numeric: true });
-      });
-
-      // Clear the table body
-      while (tbody.firstChild) {
-        tbody.removeChild(tbody.firstChild);
-      }
-
-      // Append sorted rows
-      rows.forEach(row => tbody.appendChild(row));
-    }
-
-    // Filter functionality
-    document.getElementById('search').addEventListener('input', filterTable);
-    document.getElementById('labFilter').addEventListener('change', filterTable);
-    document.getElementById('statusFilter').addEventListener('change', filterTable);
-    document.getElementById('categoryFilter').addEventListener('change', filterTable);
-
-    function filterTable() {
-      const searchValue = document.getElementById('search').value.toLowerCase();
-      const labFilter = document.getElementById('labFilter').value;
-      const statusFilter = document.getElementById('statusFilter').value;
-      const categoryFilter = document.getElementById('categoryFilter').value;
-
-      const rows = document.querySelectorAll('tbody tr');
-
-      rows.forEach(row => {
-        const deviceName = row.cells[1].textContent.toLowerCase();
-        const lab = row.cells[3].textContent;
-        const status = row.cells[4].textContent;
-        const category = row.cells[2].textContent;
-
-        const matchesSearch = deviceName.includes(searchValue);
-        const matchesLab = labFilter === '' || lab === labFilter;
-        const matchesStatus = statusFilter === '' || status === statusFilter;
-        const matchesCategory = categoryFilter === '' || category === categoryFilter;
-
-        if (matchesSearch && matchesLab && matchesStatus && matchesCategory) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    }
-  </script>
+  <div class="action-bar">
+    <button class="btn btn-secondary">
+      <i class="fas fa-history"></i> View Logs
+    </button>
+    <button class="btn btn-primary">
+      <i class="fas fa-edit"></i> Edit Lab
+    </button>
+  </div>
 </body>
 
 </html>
