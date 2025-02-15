@@ -11,6 +11,12 @@
   --hover-bg-color: #ecf0f1;
   --active-bg-color: #3498db;
   --border-color: #e0e0e0;
+
+  --success-rgb: 46, 204, 113; 
+  --warning-yellow: #f1c40f; 
+  --warning-yellow-rgb: 241, 196, 15;
+  --danger-rgb: 231, 76, 60; 
+
   --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --padding: 1rem;
   --border-radius: 0.625rem;
@@ -37,7 +43,11 @@ body {
   overflow-x: hidden;
 }
 
-h1,h2,h3,h4,h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   margin: 0 !important;
 }
 
@@ -370,10 +380,10 @@ hr.solid {
 }
 
 .lab-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  border-color: var(--primary-accent);
-
+  /* transform: translateY(-5px); */
+  /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+  /* border-color: var(--primary-accent); */
+  background-color: 	rgba(236, 240, 241, 0.200);
   .stat i {
     color: var(--primary-accent);
   }
@@ -411,7 +421,7 @@ hr.solid {
 }
 
 .highlight1 {
-  color: #2ecc71;
+  color: #2ecc71 ;
   background-color: #e9f9f0;
 }
 
@@ -450,18 +460,50 @@ hr.solid {
 .view-lab-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--primary-accent);
+  /* background-color: var(--primary-accent); */
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border: none;
   border: none;
   border-radius: var(--border-radius);
   color: white;
   font-size: 1rem;
+  letter-spacing: 1px;
   font-weight: 700 !important;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.view-lab-button i {
+  display: none;
+  transition: transform 0.3s ease;
 }
 
 .view-lab-button:hover {
-  background-color: #2980b9;
+  /* background-color: #2980b9; */
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px) scale(1.01);
+  /* transform: translateY(-2px); */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.view-lab-button:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.view-lab-button:hover i {
+  display: inline-block;
+  transform: translateX(3px);
+  transition: transform 0.3s ease;
+}
+
+.view-lab-button:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px) scale(1.01);
 }
 
 /* Floating Action Button (FAB) */
@@ -1117,26 +1159,156 @@ select option:hover {
   margin-top: 1.5rem;
 }
 
-
-
 /* ---------------------------------------LAB DETAILS CSS ----------------------------------------*/
 /* ---------------------------------------------------------------------------------------------- */
-.detail-card{
+
+/* Global Card Styles */
+.lab-cards {
+  --card-padding: 1.5rem;
+  --card-radius: 0.5rem;
+}
+
+.detail-card {
+  background: var(--card-bg-color);
+  border-radius: var(--card-radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--card-padding);
+}
+
+/* Header Section */
+.card-header {
   display: flex;
-  flex-direction: row;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
-.title{
-  width: 100%;
-  display: inline-flex;
+
+.card-title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--main-text-color);
+}
+
+.location {
+  margin-left: auto;
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-text-color);
 }
-.lab-status{
-  font-size: 1.1rem !important;
-  margin-right: 1px !important;
-  margin: 0 2rem;
-  /* margin-left: auto; */
+
+.location i {
+  color: var(--primary-accent);
 }
+
+
+/* Divider */
+.card-divider {
+  border: 0;
+  border-top: 2px solid var(--border-color);
+  margin-top: 0.5rem !important;
+  margin: 1.5rem 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.stat-card {
+  background: var(--main-bg-color);
+  padding: 1rem;
+  border-radius: var(--card-radius);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  color: var(--primary-accent);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
+}
+
+/* Grievance Section */
+.grievance-summary {
+  margin-top: 1.5rem;
+}
+
+.grievance-stats {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.grievance-stat {
+  flex: 1;
+  min-width: 120px;
+  padding: 1rem;
+  border-radius: var(--card-radius);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.grievance-stat .stat-value {
+  font-size: 1.4rem;
+}
+
+.stat-icon {
+  font-size: 1.2rem;
+}
+
+/* Status Colors */
+.resolved {
+  background: rgba(var(--success-rgb), 0.1);
+}
+
+.in-progress {
+  background: rgba(var(--warning-yellow-rgb), 0.1);
+}
+
+.pending {
+  background: rgba(var(--danger-rgb), 0.1);
+}
+
+.resolved .stat-icon {
+  color: var(--secondary-accent);
+}
+
+.in-progress .stat-icon {
+  color: var(--warning-yellow);
+}
+
+.pending .stat-icon {
+  color: var(--warning-accent);
+}
+
+/* Hover and Active States */
+.stat-card:hover {
+  background: var(--hover-bg-color);
+}
+
+.status-chip.active {
+  background: var(--active-bg-color);
+  color: white;
+}
+/* Grievance summary END */
+
+
 /* ---------------------------------------------------------------------------------------------- */
 /* ---------------------------------------- Media Queries --------------------------------------- */
 @media (max-width: 768px) {

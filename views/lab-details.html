@@ -53,7 +53,7 @@
                 <li class="active">
                     <a href="labs.html">
                         <i class="fa-solid fa-network-wired"></i>
-                        Labs
+                        <span>Lab Details</span>
                     </a>
                 </li>
                 <li>
@@ -90,16 +90,68 @@
             </div>
 
             <!-- CONTENT START BELOW HEADER -->
-            <div class="items">
+            <!-- LAB SUMMARY CARD -->
+            <section class="lab-cards">
                 <div class="detail-card">
-                    <div class="title">
-                        <h2>Lab 1 - COA101</h2> 
-                        <span class="highlight1 lab-status status-chip">
+                    <header class="card-header">
+                        <h2 class="card-title font-number">Lab 1 - COA101</h2>
+                        <span class="status-chip lab-status highlight1">
                             <i class="fas fa-check-circle"></i> Active
                         </span>
-                    </div>
+                        <div class="location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>First Floor - Room A</span>
+                        </div>
+                    </header>
+
+                    <hr class="card-divider">
+
+                    <section class="lab-summary">
+                        <h3 class="section-title">Computer Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value font-number">25</div>
+                                <div class="stat-label">Total PC</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value font-number">20</div>
+                                <div class="stat-label">Available PC</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value font-number">104</div>
+                                <div class="stat-label">Total Devices</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value font-number">80</div>
+                                <div class="stat-label">Available Devices</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="grievance-summary">
+                        <h3 class="section-title">Grievance Overview</h3>
+                        <div class="grievance-stats">
+                            <div class="grievance-stat resolved">
+                                <span class="stat-value font-number">7</span>
+                                <i class="fas fa-check-circle stat-icon"></i>
+                                <span class="stat-label">Resolved</span>
+                            </div>
+                            <div class="grievance-stat in-progress">
+                                <span class="stat-value font-number">3</span>
+                                <i class="fa-solid fa-spinner stat-icon"></i>
+                                <span class="stat-label">In Progress</span>
+                            </div>
+                            <div class="grievance-stat pending">
+                                <span class="stat-value font-number">5</span>
+                                <i class="fas fa-exclamation-circle stat-icon"></i>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
-            </div>
+                <!-- LAB SUMMARY CARD END -->
+            </section>
         </div>
     </div>
 </body>
