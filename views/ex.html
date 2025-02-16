@@ -1,300 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 1 Dashboard - Modern UI</title>
+    <title>Laboratory Management System</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://kit.fontawesome.com/0319a73572.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Modern Color Scheme */
         :root {
-            --primary: #2A2F35;
-            --secondary: #3A3F47;
-            --accent: #00D1B2;
-            --text: #F8F9FA;
-            --success: #48C774;
-            --warning: #FFDD57;
-            --danger: #FF3860;
-            --glass: rgba(255, 255, 255, 0.05);
+            --main-bg-color: #f8f9fa;
+            --sidebar-bg-color: #ffffff;
+            --card-bg-color: #ffffff;
+            --main-text-color: #2c3e50;
+            --secondary-text-color: #7f8c8d;
+            --primary-accent: #3498db;
+            --secondary-accent: #2ecc71;
+            --warning-accent: #e74c3c;
+            --hover-bg-color: #ecf0f1;
+            --border-color: #e0e0e0;
+            --box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --padding: 1rem;
+            --border-radius: 0.75rem;
         }
 
         * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background: var(--primary);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 2rem;
-            min-height: 100vh;
+            background: var(--main-bg-color);
+            color: var(--main-text-color);
         }
 
-        /* Lab Header */
-        .lab-header {
-            background: var(--secondary);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+        .lab-management-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
-        .lab-title {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+        .stepper {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .status-chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            background: var(--success);
-            color: var(--primary);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
-            margin: 2rem 0;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
         }
 
-        .stat-card {
-            background: var(--glass);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s;
+        .stepper-item {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            background: var(--card-bg-color);
+            position: relative;
+            font-weight: 500;
+            color: var(--secondary-text-color);
+            transition: all 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-2px);
+        .stepper-item.active {
+            color: var(--primary-accent);
+            background: rgba(52, 152, 219, 0.1);
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent);
+        .form-wrapper {
+            background: var(--card-bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
         }
 
-        /* Device Table */
-        .device-table-container {
-            background: var(--secondary);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        .form-section {
+            margin-bottom: 2.5rem;
         }
 
-        .device-table {
-            width: 100%;
-            border-collapse: collapse;
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
         }
 
-        .device-table th,
-        .device-table td {
-            padding: 1.25rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .device-table th {
-            background: var(--glass);
+        .section-title {
+            font-size: 1.5rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--main-text-color);
         }
 
-        .status-indicator {
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--main-text-color);
+        }
+
+        .input-label span {
+            color: var(--warning-accent);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--sidebar-bg-color);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        .device-form {
+            background: var(--hover-bg-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: currentColor;
+        .btn-primary {
+            background: var(--primary-accent);
+            color: white;
         }
 
-        /* Maintenance Timeline */
-        .timeline {
-            border-left: 2px solid var(--accent);
-            margin: 2rem 0;
-            padding-left: 2rem;
+        .btn-secondary {
+            background: var(--secondary-text-color);
+            color: white;
         }
 
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: var(--secondary);
-            border-radius: 0.5rem;
+        .btn-success {
+            background: var(--secondary-accent);
+            color: white;
         }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -2.35rem;
-            top: 1rem;
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
+        .btn-danger {
+            background: var(--warning-accent);
+            color: white;
         }
 
-        /* Modern Tabs */
-        .tab-container {
-            position: relative;
-            margin: 2rem 0;
-        }
-
-        .tab-nav {
-            display: flex;
-            gap: 1rem;
-            border-bottom: 2px solid var(--glass);
-        }
-
-        .tab-button {
-            padding: 1rem 2rem;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-weight: 600;
-            cursor: pointer;
-            position: relative;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .tab-button.active {
-            opacity: 1;
-        }
-
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--accent);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .device-table th,
-            .device-table td {
-                padding: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .btn:hover {
+            filter: brightness(0.95);
         }
     </style>
 </head>
+
 <body>
-    <header class="lab-header">
-        <h1 class="lab-title">
-            Lab 1 - CS101
-            <span class="status-chip">Active</span>
-        </h1>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Devices</div>
-                <div class="stat-value">45</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">In Use</div>
-                <div class="stat-value">22</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Available</div>
-                <div class="stat-value">20</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Maintenance</div>
-                <div class="stat-value">3</div>
-            </div>
+    <div class="lab-management-container">
+        <div class="stepper">
+            <div class="stepper-item active">1. Lab Details</div>
+            <div class="stepper-item">2. Devices</div>
+            <div class="stepper-item">3. Review</div>
         </div>
-    </header>
 
-    <div class="tab-container">
-        <nav class="tab-nav">
-            <button class="tab-button active">Devices</button>
-            <button class="tab-button">Analytics</button>
-            <button class="tab-button">Maintenance</button>
-            <button class="tab-button">Issues</button>
-        </nav>
+        <div class="form-wrapper">
+            <!-- Lab Details Section -->
+            <div class="form-section" id="lab-details">
+                <div class="section-header">
+                    <h2 class="section-title">Laboratory Information</h2>
+                </div>
 
-        <!-- Devices Tab -->
-        <div class="tab-content">
-            <div class="device-table-container">
-                <table class="device-table">
-                    <thead>
-                        <tr>
-                            <th>Device ID</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Last User</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>    
-                            <td>🖥 PC-001</td>
-                            <td>Desktop</td>
-                            <td>
-                                <span class="status-indicator" style="color: var(--success);">
-                                    <span class="status-dot"></span>
-                                    Available
-                                </span>
-                            </td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>🖨 PRN-01</td>
-                            <td>Printer</td>
-                            <td>
-                                <span class="status-indicator" style="color: var(--danger);">
-                                    <span class="status-dot"></span>
-                                    Maintenance
-                                </span>
-                            </td>
-                            <td>-</td>
-                        </tr>
-                        <!-- Add more rows -->
-                    </tbody>
-                </table>
+                <div class="grid-2col">
+                    <div class="input-group">
+                        <label class="input-label">Lab Name <span>*</span></label>
+                        <input type="text" class="form-input" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Lab Code <span>*</span></label>
+                        <input type="text" class="form-input" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Department <span>*</span></label>
+                        <select class="form-input" required>
+                            <option value="">Select Department</option>
+                            <option>Computer Science</option>
+                            <option>Electrical Engineering</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Establishment Date <span>*</span></label>
+                        <input type="date" class="form-input" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Room Capacity <span>*</span></label>
+                        <input type="number" class="form-input" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Lab In-Charge <span>*</span></label>
+                        <input type="text" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Lab Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Devices Section -->
+            <div class="form-section" id="devices" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Device Management</h2>
+                </div>
+
+                <div id="devicesContainer">
+                    <!-- Device Form Template -->
+                    <div class="device-form" id="deviceTemplate" style="display: none;">
+                        <div class="grid-2col">
+                            <div class="input-group">
+                                <label class="input-label">Device Type <span>*</span></label>
+                                <select class="form-input" required>
+                                    <option value="">Select Type</option>
+                                    <option>Desktop PC</option>
+                                    <option>Laptop</option>
+                                    <option>Printer</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Manufacturer <span>*</span></label>
+                                <input type="text" class="form-input" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Model Number <span>*</span></label>
+                                <input type="text" class="form-input" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Quantity <span>*</span></label>
+                                <input type="number" class="form-input" min="1" value="1" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Specifications</label>
+                                <textarea class="form-input" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-success" onclick="saveDevice(this)">
+                                <i class="fas fa-save"></i> Save Device
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="removeDevice(this)">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="justify-content: flex-end;">
+                    <button type="button" class="btn btn-primary" onclick="addNewDevice()">
+                        <i class="fas fa-plus"></i> Add New Device
+                    </button>
+                </div>
+            </div>
+
+            <!-- Final Submit -->
+            <div class="form-actions" style="justify-content: flex-end; border-top: none;">
+                <button type="button" class="btn btn-primary" id="addLabBtn" style="display: none;">
+                    <i class="fas fa-floppy-disk"></i> Add Laboratory
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Maintenance Section -->
-    <div class="timeline">
-        <div class="timeline-item">
-            <h3>2023-08-15 - Hardware Upgrade</h3>
-            <p>Updated all motherboard firmware</p>
-            <div class="tech-badge">👨💻 Technician: John Smith</div>
-        </div>
-        <div class="timeline-item">
-            <h3>2023-08-10 - Printer Repair</h3>
-            <p>Fixed paper feed mechanism on PRN-01</p>
-            <div class="tech-badge">👩💻 Technician: Sarah Johnson</div>
-        </div>
-    </div>
+    <script>
+        let deviceCount = 1;
+
+        // Add new device form
+        function addNewDevice() {
+            const newDevice = document.getElementById('deviceTemplate').cloneNode(true);
+            newDevice.id = `device-${deviceCount}`;
+            newDevice.style.display = 'block';
+            document.getElementById('devicesContainer').appendChild(newDevice);
+            deviceCount++;
+            document.getElementById('addLabBtn').style.display = 'block';
+        }
+
+        // Save device form
+        function saveDevice(btn) {
+            const deviceForm = btn.closest('.device-form');
+            deviceForm.style.opacity = '0.8';
+            btn.disabled = true;
+            setTimeout(() => {
+                deviceForm.style.opacity = '1';
+                btn.disabled = false;
+            }, 500);
+        }
+
+        // Remove device form
+        function removeDevice(btn) {
+            const deviceForm = btn.closest('.device-form');
+            if (document.querySelectorAll('.device-form').length > 1) {
+                deviceForm.remove();
+            }
+        }
+
+        // Stepper navigation
+        document.querySelectorAll('.stepper-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.form-section').forEach(sec => sec.style.display = 'none');
+                document.querySelectorAll('.stepper-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.form-section')[index].style.display = 'block';
+            });
+        });
+
+        // Initialize first device
+        addNewDevice();
+    </script>
 </body>
+
 </html>

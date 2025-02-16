@@ -57,8 +57,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="maintenance.html">
-                        <i class="fa-solid fa-user-gear"></i> Maintenance
+                    <a href="addLab.html">
+                        <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
                     </a>
                 </li>
                 <li class="active">
@@ -84,7 +84,7 @@
                 </div>
                 <div class="user-info">
                     <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Joxy Inc.
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
                     </span>
                 </div>
             </div>
@@ -377,7 +377,7 @@
                                 <td>TechSupplies Inc</td>
                                 <td>2023-09-15</td>
                                 <td>₹3,486</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class="in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -388,7 +388,7 @@
                                 <td>StorageMasters</td>
                                 <td>2023-10-01</td>
                                 <td>₹5,603</td>
-                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><span class="low-stock">Low Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -399,7 +399,7 @@
                                 <td>ConnectTech</td>
                                 <td>2023-08-22</td>
                                 <td>₹2,489</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class=" in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -410,7 +410,7 @@
                                 <td>NetGear Pro</td>
                                 <td>2023-11-05</td>
                                 <td>₹1,572</td>
-                                <td><span class="status out-of-stock">Out of Stock</span></td>
+                                <td><span class=" out-of-stock">Out of Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -421,7 +421,7 @@
                                 <td>InputMasters</td>
                                 <td>2023-10-18</td>
                                 <td>₹2,074</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class=" in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -432,7 +432,7 @@
                                 <td>DisplayTech</td>
                                 <td>2023-09-30</td>
                                 <td>₹13,197</td>
-                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><span class=" low-stock">Low Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -443,7 +443,7 @@
                                 <td>CoolMaster</td>
                                 <td>2023-11-12</td>
                                 <td>₹3,735</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class=" in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -454,7 +454,7 @@
                                 <td>ConnectTech</td>
                                 <td>2023-07-14</td>
                                 <td>₹746</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class=" in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -465,7 +465,7 @@
                                 <td>PowerEdge</td>
                                 <td>2023-10-29</td>
                                 <td>₹7,469</td>
-                                <td><span class="status low-stock">Low Stock</span></td>
+                                <td><span class=" low-stock">Low Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                             <tr>
@@ -476,7 +476,7 @@
                                 <td>CamTech</td>
                                 <td>2023-11-08</td>
                                 <td>₹4,146</td>
-                                <td><span class="status in-stock">In Stock</span></td>
+                                <td><span class=" in-stock">In Stock</span></td>
                                 <td><button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button></td>
                             </tr>
                         </tbody>
@@ -496,68 +496,6 @@
     </div>
 </body>
 <script>
-    function sortTable(columnIndex) {
-        const table = document.querySelector('table');
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-
-        // Retrieve and toggle sorting order
-        const currentOrder = table.getAttribute(`data-sort-${columnIndex}`) || "desc"; // Default: descending
-        const isAscending = currentOrder === "desc"; // Toggle
-        table.setAttribute(`data-sort-${columnIndex}`, isAscending ? "asc" : "desc");
-
-        rows.sort((a, b) => {
-            const aValue = a.cells[columnIndex].textContent.trim();
-            const bValue = b.cells[columnIndex].textContent.trim();
-
-            // Handle numeric sorting
-            const numA = parseFloat(aValue);
-            const numB = parseFloat(bValue);
-            const isNumeric = !isNaN(numA) && !isNaN(numB);
-
-            if (isNumeric) {
-                return isAscending ? numA - numB : numB - numA;
-            } else {
-                return isAscending
-                    ? aValue.localeCompare(bValue, undefined, { numeric: true })
-                    : bValue.localeCompare(aValue, undefined, { numeric: true });
-            }
-        });
-
-        // Clear and append sorted rows
-        tbody.innerHTML = "";
-        rows.forEach(row => tbody.appendChild(row));
-    }
-
-    // Filter functionality
-    document.getElementById('search').addEventListener('input', filterTable);
-    document.getElementById('labFilter').addEventListener('change', filterTable);
-    document.getElementById('statusFilter').addEventListener('change', filterTable);
-    document.getElementById('categoryFilter').addEventListener('change', filterTable);
-
-    function filterTable() {
-        const searchValue = document.getElementById('search').value.toLowerCase();
-        const labFilter = document.getElementById('labFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
-        const categoryFilter = document.getElementById('categoryFilter').value;
-
-        const rows = document.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            const deviceName = row.cells[1].textContent.toLowerCase();
-            const lab = row.cells[3].textContent;
-            const status = row.cells[4].textContent;
-            const category = row.cells[2].textContent;
-
-            const matchesSearch = deviceName.includes(searchValue);
-            const matchesLab = labFilter === '' || lab === labFilter;
-            const matchesStatus = statusFilter === '' || status === statusFilter;
-            const matchesCategory = categoryFilter === '' || category === categoryFilter;
-
-            row.style.display = matchesSearch && matchesLab && matchesStatus && matchesCategory ? '' : 'none';
-        });
-    }
-
     function toggleMenu(element) {
         // Close all other menus
         document.querySelectorAll('.actions-menu').forEach(menu => {
@@ -566,7 +504,6 @@
         // Toggle current menu
         element.classList.toggle('active');
     }
-
     // Close menu when clicking outside
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.actions-menu')) {
@@ -575,6 +512,5 @@
             });
         }
     });
-
 </script>
 </html>

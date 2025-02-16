@@ -57,8 +57,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="maintenance.html">
-                        <i class="fa-solid fa-user-gear"></i><span>Maintenance</span>
+                    <a href="addLab.html">
+                        <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
                     </a>
                 </li>
                 <li>
@@ -78,13 +78,11 @@
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <!-- User Info Section -->
                 <div class="sub-heading">
                     <span>Lab Management</span>
                 </div>
                 <div class="user-info">
-                    <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Joxy Inc.
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
                     </span>
                 </div>
             </div>
@@ -150,10 +148,663 @@
                     </section>
 
                 </div>
+                <!-- TABBED MENU -->
+                <section class="lab-tabs">
+                    <div class="tabs-container">
+                        <!-- Tab Navigation -->
+                        <nav class="tabs-nav">
+                            <button class="tab-link active" data-tab="pcs">Workstations</button>
+                            <button class="tab-link" data-tab="devices">Devices</button>
+                            <button class="tab-link" data-tab="grievance">Grievance</button>
+                        </nav>
+
+                        <!-- Tab 1 Content  -->
+                        <div class="tab-content active" id="pcs">
+                            <div class="tab-header">
+                                <h3>PC List</h3>
+                            </div>
+                            <div class="header1">
+                                <div class="filters">
+                                    <input class="search-input" type="text" id="search"
+                                        placeholder="Search using ID, Name...">
+                                    
+                                    <select id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="In Repair">In Repair</option>
+                                        <option value="Faulty">Faulty</option>
+                                        <!-- <option value="Decommissioned">Decommissioned</option> -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Device ID</th>
+                                            <th>Device Name</th>
+                                            <th>Category</th>
+                                            <th>PC</th>
+                                            <th>Status</th>
+                                            <th>Remarks</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- 10 Rows -->
+                                        <tr>
+                                            <td>1001</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-01</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>Working fine</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1002</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-02</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1003</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-03</td>
+                                            <td><span class="status status-repair">In Repair</span></td>
+                                            <td>Hardware issue</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1004</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-04</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1005</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-05</td>
+                                            <td><span class="status status-faulty">Faulty</span></td>
+                                            <td>Power supply issue</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1006</td>
+                                            <td>HP PC</td>
+                                            <td>PC</td>
+                                            <td>PC-06</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1007</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-07</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1008</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-08</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1009</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-09</td>
+                                            <td><span class="status status-repair">In Repair</span></td>
+                                            <td>Software issue</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1010</td>
+                                            <td>Lenovo PC</td>
+                                            <td>PC</td>
+                                            <td>PC-10</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <div class="pagination">
+                                <a href="#">Previous</a>
+                                <a href="#">1</a>
+                                <a href="#">2</a>
+                                <a href="#">3</a>
+                                <a href="#">Next</a>
+                            </div>
+                        </div>
+
+
+                        <!-- Tab 2 Content  -->
+                        <div class="tab-content" id="devices">
+                            <div class="tab-header">
+                                <h3>Device Management</h3>
+                            </div>
+
+                            <div class="device-grid">
+                                <div class="device-card">
+                                    <i class="fa-solid fa-desktop"></i>
+                                    <div class="device-info">
+                                        <span class="device-name">Monitor</span>
+                                        <span class="device-status available">Available</span>
+                                    </div>
+                                </div>
+                                <div class="device-card">
+                                    <i class="fa-solid fa-computer-mouse"></i>
+                                    <div class="device-info">
+                                        <span class="device-name">Mouse</span>
+                                        <span class="device-status available">Available</span>
+                                    </div>
+                                </div>
+                                <div class="device-card">
+                                    <i class="fa-solid fa-microchip"></i>
+                                    <div class="device-info">
+                                        <span class="device-name">CPU</span>
+                                        <span class="device-status available">Available</span>
+                                    </div>
+                                </div>
+                                <div class="device-card">
+                                    <i class="fa-solid fa-keyboard"></i>
+                                    <div class="device-info">
+                                        <span class="device-name">Keyboard</span>
+                                        <span class="device-status available">Available</span>
+                                    </div>
+                                </div>
+                                <div class="device-card">
+                                    <i class="fas fa-print"></i>
+                                    <div class="device-info">
+                                        <span class="device-name">Printer</span>
+                                        <span class="device-status available">Available</span>
+                                    </div>
+                                </div>
+                                <!-- Add more device cards -->
+                            </div>
+                            <div class="header1">
+                                <div class="filters">
+                                    <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
+                            
+                                    <select id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="In Repair">In Repair</option>
+                                        <option value="Faulty">Faulty</option>
+                                        <!-- <option value="Decommissioned">Decommissioned</option> -->
+                                    </select>
+                                    <select id="categoryFilter">
+                                        <option value="">All Categories</option>
+                                        <option value="Monitor">Monitor</option>
+                                        <option value="Printer">Printer</option>
+                                        <option value="Mouse">Mouse</option>
+                                        <option value="Keyboard">Keyboard</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Device ID</th>
+                                            <th>Device Name</th>
+                                            <th>Category</th>
+                                            <th>PC</th>
+                                            <th>Status</th>
+                                            <th>Remarks</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1001</td>
+                                            <td>Dell PC</td>
+                                            <td>PC</td>
+                                            <td>PC-01</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>Working fine</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1002</td>
+                                            <td>HP Monitor</td>
+                                            <td>Monitor</td>
+                                            <td>PC-02</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1003</td>
+                                            <td>Logitech Keyboard</td>
+                                            <td>Keyboard</td>
+                                            <td>PC-03</td>
+                                            <td><span class="status status-repair">In Repair</span></td>
+                                            <td>Keys not working</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1004</td>
+                                            <td>HP Mouse</td>
+                                            <td>Mouse</td>
+                                            <td>PC-04</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1005</td>
+                                            <td>Canon Printer</td>
+                                            <td>Printer</td>
+                                            <td>PC-05</td>
+                                            <td><span class="status status-faulty">Faulty</span></td>
+                                            <td>Paper jam</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1006</td>
+                                            <td>Intel CPU</td>
+                                            <td>CPU</td>
+                                            <td>PC-06</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1007</td>
+                                            <td>LG Monitor</td>
+                                            <td>Monitor</td>
+                                            <td>PC-07</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1008</td>
+                                            <td>Razer Keyboard</td>
+                                            <td>Keyboard</td>
+                                            <td>PC-08</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1009</td>
+                                            <td>Logitech Mouse</td>
+                                            <td>Mouse</td>
+                                            <td>PC-09</td>
+                                            <td><span class="status status-repair">In Repair</span></td>
+                                            <td>Sensor issue</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1010</td>
+                                            <td>Brother Printer</td>
+                                            <td>Printer</td>
+                                            <td>PC-10</td>
+                                            <td><span class="status status-active">Active</span></td>
+                                            <td>N/A</td>
+                                            <td class="actions-menu" onclick="toggleMenu(this)">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                                <div class="actions-dropdown">
+                                                    <button><i class="fas fa-edit icon-color"></i> Edit</button>
+                                                    <button><i class="fas fa-trash-alt icon-color"></i> Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <div class="pagination">
+                                <a href="#">Previous</a>
+                                <a href="#">1</a>
+                                <a href="#">2</a>
+                                <a href="#">3</a>
+                                <a href="#">Next</a>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3 Content  -->
+                        <div class="tab-content" id="grievance">
+
+                            <div class="tab-header">
+                                <h3>Grievances</h3>
+                            </div>
+                            <div class="header1 ">
+                                <div class="filters font-rale">
+                                    <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
+                                    <select id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="In Repair">In Repair</option>
+                                        <option value="Faulty">Faulty</option>
+                                        <!-- <option value="Decommissioned">Decommissioned</option> -->
+                                    </select>
+                                    <select id="categoryFilter">
+                                        <option value="">All Categories</option>
+                                        <option value="PC">PC</option>
+                                        <option value="Printer">Printer</option>
+                                        <option value="Mouse">Mouse</option>
+                                        <option value="Keyboard">Keyboard</option>
+                                    </select>
+                                </div>
+                            <table class="grievance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Grievance ID <i class="fas fa-sort"></i></th>
+                                        <th>Student Name <i class="fas fa-sort"></i></th>
+                                        <th>Device/Category <i class="fas fa-sort"></i></th>
+                                        <th>Status <i class="fas fa-sort"></i></th>
+                                        <th>Submission Date <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#GRV001</td>
+                                        <td>John Doe</td>
+                                        <td>Computer 12</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>2024-03-15</td>
+                                        <td>
+                                            <button class="btn-icon view-btn" onclick="openStatusModal()"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon edit-btn"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Add more rows as needed -->
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </section>
+                <!-- TABBED MENU END -->
                 <!-- LAB SUMMARY CARD END -->
+
+                <!-- QUICK Actions -->
+                <div class="items">
+                    <div class="sub-heading">
+                        <span>Quick Actions</span>
+                    </div>
+                    <div class="quick-actions-bar">
+                        <div class="action-group">
+                            <button class="action-item">
+                                <i class="fas fa-plus"></i>
+                                <span>Add New Lab</span>
+                            </button>
+                            <button class="action-item">
+                                <i class="fas fa-boxes"></i>
+                                <span>Inventory</span>
+                            </button>
+                            <button class="action-item">
+                                <i class="fas fa-comment-medical"></i>
+                                <span>Report</span>
+                            </button>
+                            <div class="vertical-divider"></div>
+                            <button class="action-item">
+                                <i class="fas fa-file-export"></i>
+                                <span>Export</span>
+                            </button>
+                            <button class="action-item admin-action">
+                                <i class="fas fa-ban"></i>
+                                <span>Deactivate</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
 </body>
+<script>
+    // Add this script at the end of the body
+    document.querySelectorAll('.tab-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab-link, .tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
 
+            // Add active class to clicked tab and corresponding content
+            e.target.classList.add('active');
+            const tabId = e.target.dataset.tab;
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+     function toggleMenu(element) {
+            // Close all other menus
+            document.querySelectorAll('.actions-menu').forEach(menu => {
+                if (menu !== element) menu.classList.remove('active');
+            });
+            // Toggle current menu
+            element.classList.toggle('active');
+        }
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.actions-menu')) {
+                document.querySelectorAll('.actions-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
+</script>
 </html>

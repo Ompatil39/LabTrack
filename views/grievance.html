@@ -57,8 +57,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="maintenance.html">
-                        <i class="fa-solid fa-user-gear"></i><span>Maintenance</span>
+                    <a href="addLab.html">
+                        <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
                     </a>
                 </li>
                 <li>
@@ -84,7 +84,7 @@
                 </div>
                 <div class="user-info">
                     <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Joxy Inc.
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
                     </span>
                 </div>
             </div>
@@ -324,99 +324,9 @@
                 </table>
             </div>
 
-            <!-- Status Update Modal -->
-            <div class="modal-overlay" id="statusModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Update Grievance Status</h3>
-                        <button class="close-btn" onclick="closeStatusModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="statusForm">
-                            <div class="form-group">
-                                <label>Current Status:</label>
-                                <select class="status-select">
-                                    <option>Pending</option>
-                                    <option>In Progress</option>
-                                    <option>Resolved</option>
-                                    <option>Rejected</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Add Comment:</label>
-                                <textarea class="comment-box" rows="4"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox"> Notify Student via Email
-                                </label>
-                            </div>
-                            <div class="modal-actions">
-                                <button type="button" class="btn-primary">Save Changes</button>
-                                <button type="button" class="btn-secondary" onclick="closeStatusModal()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- CONTENT END  -->
     </div>
     </div>
 </body>
-<script>
-    // Modal Handling
-        function openStatusModal() {
-            document.getElementById('statusModal').style.display = 'flex';
-        }
-
-        function closeStatusModal() {
-            document.getElementById('statusModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function (event) {
-            const modal = document.getElementById('statusModal');
-            if (event.target === modal) {
-                closeStatusModal();
-            }
-        }
-
-    function scrollLabs(direction) {
-        const slider = document.querySelector(".lab-selector-slider");
-        const scrollAmount = 200; // Adjust scroll distance as needed
-        slider.scrollBy({
-            left: direction * scrollAmount,
-            behavior: "smooth",
-        });
-    }
-
-    let slider = document.querySelector(".lab-selector-slider");
-
-    // Hide scrollbar
-    slider.style.scrollbarWidth = "none"; // Firefox
-    slider.style.msOverflowStyle = "none"; // IE/Edge
-
-    // For Chrome, Safari
-    let style = document.createElement("style");
-    style.innerHTML =
-        ".lab-selector-slider::-webkit-scrollbar { display: none; }";
-    document.head.appendChild(style);
-
-    function selectLab(labId) {
-        // Remove 'selected' class from all lab cards
-        const labCards = document.querySelectorAll(".lab-selector-card");
-        labCards.forEach((card) => card.classList.remove("selected"));
-
-        // Add 'selected' class to the clicked lab card
-        const selectedCard = document.querySelector(
-            `.lab-selector-card[data-lab-id="${labId}"]`
-        );
-        selectedCard.classList.add("selected");
-
-        // Optional: Scroll the selected card into view
-        selectedCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-</script>
-
 </html>
