@@ -61,6 +61,11 @@
             <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
           </a>
         </li>
+        <li >
+          <a href="addDevice.html">
+            <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
+          </a>
+        </li>
         <li>
           <a href="inventory.html">
             <i class="fa-solid fa-warehouse"></i> Inventory
@@ -80,7 +85,7 @@
       <div class="header">
         <!-- User Info Section -->
         <div class="sub-heading">
-          <span>Add Lab & Devices</span>
+          <span>Add Lab </span>
         </div>
         <div class="user-info">
           <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
@@ -90,36 +95,41 @@
       </div>
       <!-- CONTENT START of BELOW HEADER -->
       <div class="lab-management-container">
-        <div class="stepper">
-          <div class="stepper-item active">1. Lab Details</div>
-          <div class="stepper-item">2. Devices</div>
-          <div class="stepper-item">3. Review</div>
-        </div>
-
         <div class="form-wrapper">
           <!-- Lab Details Section -->
           <div class="form-section" id="lab-details">
             <div class="section-header">
-              <h2 class="section-title">Laboratory Information</h2>
+              <h2 class="section-title">Register New Lab</h2>
             </div>
 
             <div class="grid-2col">
               <div class="input-group">
                 <label class="input-label">Lab Name <span>*</span></label>
-                <input type="text" class="form-input" required>
+                <input type="text" class="form-input" placeholder="Enter lab name (e.g., Computer Lab A)" required>
               </div>
 
               <div class="input-group">
                 <label class="input-label">Lab Code <span>*</span></label>
-                <input type="text" class="form-input" required>
+                <input type="text" id="labCode" name="labCode" class="no-hover form-input " value="Lab Code will be Auto-Generated" disabled>
               </div>
 
               <div class="input-group">
                 <label class="input-label">Department <span>*</span></label>
                 <select class="form-input" required>
                   <option value="">Select Department</option>
-                  <option>Computer Science</option>
-                  <option>Electrical Engineering</option>
+                  <option>CO - Computer Science</option>
+                  <option>AI - Artificial Intelligence</option>
+                  <option>IT - Information Technology</option>
+                  <option>EE - Electronics Engineering</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Lab In-Charge <span>*</span></label>
+                <select class="form-input" required>
+                  <option value="">Select Lab In-Charge</option>
+                  <option>Admin 1</option>
+                  <option>Admin 2</option>
                 </select>
               </div>
 
@@ -130,141 +140,33 @@
 
               <div class="input-group">
                 <label class="input-label">Room Capacity <span>*</span></label>
-                <input type="number" class="form-input" required>
+                <input type="number" class="form-input" placeholder="Enter total number of PCs in the lab" required>
               </div>
 
               <div class="input-group">
-                <label class="input-label">Lab In-Charge <span>*</span></label>
-                <input type="text" class="form-input" required>
+                <label class="input-label">Building <span>*</span></label>
+                <input type="text" class="form-input" placeholder="Enter building name (e.g., Building A)" required>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Room <span>*</span></label>
+                <input type="text" class="form-input" placeholder="Enter room number" required>
               </div>
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn btn-success">
-                <i class="fas fa-save"></i> Save Lab Details
+              <button type="button" class="btn btn-primary" id="addLabBtn">
+                <i class="fa-solid fa-square-plus"></i> Register Computer Lab
               </button>
             </div>
           </div>
 
-          <!-- MENU 2 -->
-          <!-- Devices Section -->
-          <div class="form-section" id="devices" style="display: none;">
-            <div class="section-header">
-              <h2 class="section-title">Device Management</h2>
-            </div>
-
-            <div id="devicesContainer">
-              <!-- Device Form Template -->
-              <div class="device-form" id="deviceTemplate" style="display: none;">
-                <div class="grid-2col">
-                  <div class="input-group">
-                    <label class="input-label">Device Type <span>*</span></label>
-                    <select class="form-input" required>
-                      <option value="">Select Type</option>
-                      <option>Desktop PC</option>
-                      <option>Laptop</option>
-                      <option>Printer</option>
-                    </select>
-                  </div>
-
-                  <div class="input-group">
-                    <label class="input-label">Manufacturer <span>*</span></label>
-                    <input type="text" class="form-input" required>
-                  </div>
-
-                  <div class="input-group">
-                    <label class="input-label">Model Number <span>*</span></label>
-                    <input type="text" class="form-input" required>
-                  </div>
-
-                  <div class="input-group">
-                    <label class="input-label">Quantity <span>*</span></label>
-                    <input type="number" class="form-input" min="1" value="1" required>
-                  </div>
-
-                  <div class="input-group">
-                    <label class="input-label">Specifications</label>
-                    <textarea class="form-input" rows="3"></textarea>
-                  </div>
-                </div>
-
-                <div class="form-actions">
-                  <button type="button" class="btn btn-success" onclick="saveDevice(this)">
-                    <i class="fas fa-save"></i> Save Device
-                  </button>
-                  <button type="button" class="btn btn-danger" onclick="removeDevice(this)">
-                    <i class="fas fa-trash"></i> Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions" style="justify-content: flex-end;">
-              <button type="button" class="btn btn-primary" onclick="addNewDevice()">
-                <i class="fas fa-plus"></i> Add New Device
-              </button>
-            </div>
-          </div>
-
-          <!-- Final Submit -->
-          <div class="form-actions" style="justify-content: flex-end; border-top: none;">
-            <button type="button" class="btn btn-primary" id="addLabBtn" style="display: none;">
-              <i class="fas fa-floppy-disk"></i> Add Laboratory
-            </button>
-          </div>
         </div>
       </div>
       <!-- CONTENT END of BELOW HEADER  -->
     </div>
     <!-- CONTENT END  -->
 
-    <!-- JS -->
-    <script>
-      let deviceCount = 1;
-
-      // Add new device form
-      function addNewDevice() {
-        const newDevice = document.getElementById('deviceTemplate').cloneNode(true);
-        newDevice.id = `device-${deviceCount}`;
-        newDevice.style.display = 'block';
-        document.getElementById('devicesContainer').appendChild(newDevice);
-        deviceCount++;
-        document.getElementById('addLabBtn').style.display = 'block';
-      }
-
-      // Save device form
-      function saveDevice(btn) {
-        const deviceForm = btn.closest('.device-form');
-        deviceForm.style.opacity = '0.8';
-        btn.disabled = true;
-        setTimeout(() => {
-          deviceForm.style.opacity = '1';
-          btn.disabled = false;
-        }, 500);
-      }
-
-      // Remove device form
-      function removeDevice(btn) {
-        const deviceForm = btn.closest('.device-form');
-        if (document.querySelectorAll('.device-form').length > 1) {
-          deviceForm.remove();
-        }
-      }
-
-      // Stepper navigation
-      document.querySelectorAll('.stepper-item').forEach((item, index) => {
-        item.addEventListener('click', () => {
-          document.querySelectorAll('.form-section').forEach(sec => sec.style.display = 'none');
-          document.querySelectorAll('.stepper-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          document.querySelectorAll('.form-section')[index].style.display = 'block';
-        });
-      });
-
-      // Initialize first device
-      addNewDevice();
-    </script>
-    <!-- JS END -->
   </div>
 </body>
 

@@ -333,8 +333,8 @@ hr.solid {
   height: fit-content;
 }
 
-/* LAB.html  CSS*/
-/* ------------------------ Lab List Styles ------------------------ */
+/* - --------------------------------------------------------------- LAB.html  CSS ------------------------------------- */
+/* -------------------------------------------- Lab List Styles ----------------------------------------------------------- */
 /* Lab Container */
 .lab-container {
   display: grid;
@@ -350,7 +350,7 @@ hr.solid {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1.2rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
+  /* text-align: center; */
   border: 1px solid transparent;
 }
 
@@ -849,7 +849,7 @@ tr:hover {
   background: #e74c3c;
 }
 
-/* Table-Specific Adjustments */
+
 td .status {
   padding: 0.2rem 0.6rem;
   font-size: 0.7rem;
@@ -862,7 +862,7 @@ td .status::before {
   height: 0.4rem;
 }
 
-/* Hover States */
+
 .status:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -888,13 +888,13 @@ td .status::before {
   text-decoration: underline;
 }
 
-/* Header container */
+
 .header1 {
   background-color: transparent;
   padding: 1rem 0;
 }
 
-/* Filters container */
+
 .filters {
   display: flex;
   justify-content: flex-end;
@@ -902,9 +902,9 @@ td .status::before {
   margin: 0 auto;
 }
 
-/* Input and select common styles */
+
 select {
-  width: 12dvw !important;
+  width: 12dvw ;
 }
 input,
 select {
@@ -918,23 +918,23 @@ select {
   transition: all 0.2s ease;
 }
 
-/* Input focus state */
+
 input:focus {
   outline: none;
   border-color: #2196f3;
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
 }
 
-/* Select customization */
+
 select {
-  appearance: none;
+  appearance: none !;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.8rem center;
-  background-size: 1em;
-  padding-right: 2.5rem;
-  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.8rem center !important;
+  background-size: 1em !important;
+  padding-right: 2.5rem !important;
+  cursor: pointer !important;
 }
 
 /* Select hover effect */
@@ -1170,6 +1170,7 @@ select option:hover {
   border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem 1.5rem;
+  margin-top: 1.5rem;
 }
 
 /* Header Section */
@@ -1308,8 +1309,8 @@ select option:hover {
 /* TABS AND ETC */
 /* Tabs Styling */
 .lab-tabs {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
   background-color: #ffffff;
   border-radius: 0.625rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -1523,16 +1524,16 @@ select option:hover {
   }
 }
 
-/* CSS FOR ADD LAB  */
+/* ------------------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------ CSS FOR ADD LAB --------------------------------------------------------------- */
 .lab-management-container {
-  margin: 2rem auto;
-  padding: 0 1rem;
+  padding: 0 0rem;
 }
 
 .stepper {
   display: flex;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   padding: 1rem 0;
 }
 
@@ -1561,12 +1562,12 @@ select option:hover {
   background: #ffffff;
   border-radius: 0.75rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
+  padding: 1.5rem 2rem;
 }
 
-.form-section {
+/* .form-section {
   margin-bottom: 2.5rem;
-}
+} */
 
 .section-header {
   margin-bottom: 2rem;
@@ -1579,15 +1580,26 @@ select option:hover {
   font-weight: 600;
   color: #2c3e50;
 }
+/* FOR LAB DETAIL SUB TITLE ABOVE CARDS */
+/* .section-title1 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+} */
 
 .grid-2col {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
+  padding: 0 0.5rem;
 }
 
 .input-group {
   margin-bottom: 1.5rem;
+}
+.input-group i{
+  position: relative;
+  left: -30px;
 }
 
 .input-label {
@@ -1616,6 +1628,15 @@ select option:hover {
   outline: none;
 }
 
+.no-hover:hover, .no-hover:focus, .no-hover:active {
+    background-color: #f3f3f3 !important; /* Ensures no color change */
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    outline: none !important;
+    cursor: not-allowed !important;
+}
+
+
 .device-form {
   padding: 1.5rem;
   border-radius: 0.75rem;
@@ -1623,17 +1644,19 @@ select option:hover {
 }
 
 .form-actions {
+  /* font-size: 1.5rem; */
   display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
+  justify-content: flex-end;
+  /* margin-top: 2rem; */
   padding-top: 2rem;
   border-top: 1px solid #e0e0e0;
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -1663,6 +1686,16 @@ select option:hover {
 
 .btn:hover {
   filter: brightness(0.95);
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------- CSS FOR ADD Devices Module -------------------------------------------- */
+
+.selectLabDevice{
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* ---------------------------------------------------------------------------------------------- */
