@@ -151,7 +151,8 @@ hr.solid {
 .sidebar .menu li.active a {
   font-size: 1.125rem;
   font-weight: 600;
-  background-color: #3498db;
+  /* background-color: #3498db; */
+  background: linear-gradient(135deg, #2980b9, #3498db);
   color: #ffffff;
 }
 
@@ -644,22 +645,21 @@ hr.solid {
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  .red-hover {
-    color: #e74c3c;
-  }
-  .blue-hover {
-    color: #3498db;
-  }
-  .green-hover {
-    color: #2ecc71;
-  }
-  .yellow-hover {
-    color: #f1c40f;
-  }
+  /* box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); */
+  background-color: rgba(236, 240, 241, 0.2);
 }
-
+.red-hover {
+  color: #e74c3c !important;
+}
+.blue-hover {
+  color: #3498db !important;
+}
+.green-hover {
+  color: #2ecc71 !important;
+}
+.yellow-hover {
+  color: #f1c40f !important;
+}
 .card h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -849,7 +849,6 @@ tr:hover {
   background: #e74c3c;
 }
 
-
 td .status {
   padding: 0.2rem 0.6rem;
   font-size: 0.7rem;
@@ -861,7 +860,6 @@ td .status::before {
   width: 0.4rem;
   height: 0.4rem;
 }
-
 
 .status:hover {
   transform: translateY(-1px);
@@ -888,12 +886,10 @@ td .status::before {
   text-decoration: underline;
 }
 
-
 .header1 {
   background-color: transparent;
   padding: 1rem 0;
 }
-
 
 .filters {
   display: flex;
@@ -902,9 +898,8 @@ td .status::before {
   margin: 0 auto;
 }
 
-
 select {
-  width: 12dvw ;
+  width: 12dvw;
 }
 input,
 select {
@@ -918,13 +913,11 @@ select {
   transition: all 0.2s ease;
 }
 
-
 input:focus {
   outline: none;
   border-color: #2196f3;
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
 }
-
 
 select {
   appearance: none !;
@@ -1551,7 +1544,7 @@ select option:hover {
 
 .stepper-item.active {
   color: #3498db;
-    background: rgba(52, 152, 219, 0.1);
+  background: rgba(52, 152, 219, 0.1);
   /* background: #3498db;
   color: white; */
   font-weight: 700;
@@ -1597,7 +1590,7 @@ select option:hover {
 .input-group {
   margin-bottom: 1.5rem;
 }
-.input-group i{
+.input-group i {
   position: relative;
   left: -30px;
 }
@@ -1628,14 +1621,15 @@ select option:hover {
   outline: none;
 }
 
-.no-hover:hover, .no-hover:focus, .no-hover:active {
-    background-color: #f3f3f3 !important; /* Ensures no color change */
-    border: 1px solid #ccc !important;
-    box-shadow: none !important;
-    outline: none !important;
-    cursor: not-allowed !important;
+.no-hover:hover,
+.no-hover:focus,
+.no-hover:active {
+  background-color: #f3f3f3 !important; /* Ensures no color change */
+  border: 1px solid #ccc !important;
+  box-shadow: none !important;
+  outline: none !important;
+  cursor: not-allowed !important;
 }
-
 
 .device-form {
   padding: 1.5rem;
@@ -1691,11 +1685,11 @@ select option:hover {
 /* ------------------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------- CSS FOR ADD Devices Module -------------------------------------------- */
 
-.selectLabDevice{
-  display: flex;
-  flex-direction: row;
+.selectLabDevice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(400px, 1fr));
   gap: 1rem;
-  flex-wrap: wrap;
+  row-gap: 0rem !important;
 }
 
 /* ---------------------------------------------------------------------------------------------- */

@@ -107,7 +107,7 @@
                             <div class="input-group">
                                 <label class="input-label">Select Lab <span>*</span></label>
                                 <select class="form-input" required>
-                                    <option value="">Select Lab In-Charge</option>
+                                    <option value="">Select Lab</option>
                                     <option>COA101</option>
                                     <option>COB102</option>
                                 </select>
@@ -115,21 +115,32 @@
                             <div class="input-group">
                                 <label class="input-label">Select Device <span>*</span></label>
                                 <select class="form-input" required>
-                                    <option value="">Select Lab In-Charge</option>
+                                    <option value="">Select Device</option>
+                                    <option onclick="showPC()">PC</option>
+                                    <option>Printer</option>
                                     <option>Monitor</option>
                                     <option>Keyboard</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="grid-2col">
                             <div class="input-group">
-                                <label class="input-label">Lab Name <span>*</span></label>
-                                <input type="text" class="form-input"
-                                    placeholder="Enter lab name (e.g., Computer Lab A)" required>
+                                <label class="input-label">Device Name <span>*</span></label>
+                                <input type="text" class="form-input" placeholder="Enter name (e.g., HP PC)" required>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Serial Number </label>
+                                <input type="number" class="form-input" placeholder="Enter Serial Number">
                             </div>
                         </div>
 
+                        <!-- BELOW ARE INPUT BASED ON SELECTED OPTION -->
+                        <!-- 1. FIRST INPUTS FOR PC OPTION -->
+                        <div class="grid-2col" id="pcInput" >
+                        </div>
+                        <!-- 2. SECOND INPUTS FOR PRINTER OPTION -->
+                        <div class="grid-2col" id="pcInput" style="display: none;">
+                            
+                        </div>
+                        <!-- SAVE DEVICE BUTTON AT LAST OF INPUTS -->
                         <div class="form-actions">
                             <button type="button" class="btn btn-primary" id="addLabBtn">
                                 <i class="fas fa-plus-circle"></i> Register Device
