@@ -1525,9 +1525,9 @@ select option:hover {
 
 .stepper {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-bottom: 1rem;
-  padding: 1rem 0;
+  padding-bottom: 1rem;
 }
 
 .stepper-item {
@@ -1535,10 +1535,12 @@ select option:hover {
   text-align: center;
   padding: 1rem;
   border-radius: 0.75rem;
-  background: #ffffff;
+  align-self: center;
+  background: rgba(0, 0, 0, 0.05);
   position: relative;
   font-weight: 500;
   color: #7f8c8d;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -1555,7 +1557,7 @@ select option:hover {
   background: #ffffff;
   border-radius: 0.75rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem 2rem;
+  padding: 1.5rem;
 }
 
 /* .form-section {
@@ -1563,6 +1565,8 @@ select option:hover {
 } */
 
 .section-header {
+  display: flex;
+  align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e0e0e0;
@@ -1580,11 +1584,16 @@ select option:hover {
   color: #2c3e50;
 } */
 
-.grid-2col {
+.grid-2col,
+.grid-3col {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
+  row-gap: 0rem !important;
   padding: 0 0.5rem;
+}
+.grid-3col {
+  grid-template-columns: repeat(2, 1fr) !important;
 }
 
 .input-group {
@@ -1687,11 +1696,50 @@ select option:hover {
 
 .selectLabDevice {
   display: grid;
-  grid-template-columns: repeat(2, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   row-gap: 0rem !important;
+  margin-bottom: 1rem;
 }
 
+.step-content {
+    transition: opacity 0.3s ease;
+    display: none;
+}
+.step-content.active {
+    display: block;
+    opacity: 1;
+}
+
+.copy-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn1 {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary1 {
+  background: #f8f9fa;
+  color: #2c3e50;
+  /* background: rgba(52, 152, 219, 0.1);
+  color: #2c3e50;  */
+  border: 1px solid #95a5a6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary1:hover {
+  background: #ecf0f1;
+  border-color: #7f8c8d;
+}
 /* ---------------------------------------------------------------------------------------------- */
 /* ---------------------------------------- Media Queries --------------------------------------- */
 @media (max-width: 768px) {

@@ -101,7 +101,13 @@
 
                         <div class="section-header">
                             <h2 class="section-title">Register New Devices</h2>
+                            <div class="copy-btn">
+                                <button type="button" class="btn1 btn-secondary1" id="addLabBtn">
+                                    <i class="fa-solid fa-file-import"></i> Copy Last Entry
+                                </button>
+                            </div>
                         </div>
+                        
 
                         <div class="selectLabDevice">
                             <div class="input-group">
@@ -112,33 +118,276 @@
                                     <option>COB102</option>
                                 </select>
                             </div>
-                            <div class="input-group">
+                            <div class="input-group" style="margin-bottom: 0rem !important;">
                                 <label class="input-label">Select Device <span>*</span></label>
                                 <select class="form-input" required>
                                     <option value="">Select Device</option>
                                     <option onclick="showPC()">PC</option>
-                                    <option>Printer</option>
-                                    <option>Monitor</option>
-                                    <option>Keyboard</option>
+                                    <option onclick="showPrinter()">Printer</option>
                                 </select>
                             </div>
-                            <div class="input-group">
-                                <label class="input-label">Device Name <span>*</span></label>
-                                <input type="text" class="form-input" placeholder="Enter name (e.g., HP PC)" required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Serial Number </label>
-                                <input type="number" class="form-input" placeholder="Enter Serial Number">
-                            </div>
+                            
                         </div>
 
                         <!-- BELOW ARE INPUT BASED ON SELECTED OPTION -->
                         <!-- 1. FIRST INPUTS FOR PC OPTION -->
-                        <div class="grid-2col" id="pcInput" >
-                        </div>
-                        <!-- 2. SECOND INPUTS FOR PRINTER OPTION -->
-                        <div class="grid-2col" id="pcInput" style="display: none;">
+                        <div class="pcInput" id="pcInput" style="display: none;">
+                            <div class="stepper">
+                                <div class="stepper-item active">1. PC Details</div>
+                                <div class="stepper-item">2. Monitor</div>
+                                <div class="stepper-item">3. Keyboard</div>
+                                <div class="stepper-item">4. Mouse</div>
+                                <div class="stepper-item">5. CPU</div>
+                                <div class="stepper-item">6. Connectivity</div>
+                            </div>
+                            <!--  PC Details -->
+                            <div class="step-content" id="step-1">
+                                <!-- PC DETAILS -->
+                                <div class="grid-3col">
+                                    <div class="input-group">
+                                        <label class="input-label">PC Name <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter name (e.g., HP PC)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">PC Quantity <span>*</span></label>
+                                        <input type="number" class="form-input" placeholder="Total PCs to add (e.g., 10)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">PC Code </label>
+                                        <input type="text" id="labCode" name="labCode" class="no-hover form-input "
+                                            value="Device Code will be Auto-Generated" disabled>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Serial Number </label>
+                                        <input type="number" class="form-input" placeholder="Enter Serial Number">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Processor <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter processor (e.g. Intel Core i7)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">RAM <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter RAM (e.g. 4GB DDR4)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Storage (HDD/SSD) <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter Storage (e.g. 1TB HDD)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Operating System </label>
+                                        <input type="text" class="form-input" placeholder="Enter Operating System (e.g. Windows 10)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">PC Status <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Status</option>
+                                            <option>Active</option>
+                                            <option>In-Active</option>
+                                            <option>Under Repair</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             
+                            <!-- Monitor -->
+                            <div class="step-content" id="step-2" style="display: none;">
+                                <div class="grid-3col">
+                                    <!-- Monitor -->
+                                    <div class="input-group">
+                                        <label class="input-label">Monitor Brand & Model <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter Monitor Brand & Model (e.g., Dell 22-inch LED)"
+                                            required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Monitor Resolution <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter Resolution (e.g., 1920x1080)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Monitor Serial Number</label>
+                                        <input type="text" class="form-input" placeholder="Enter Serial Number">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Monitor Status <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Status</option>
+                                            <option>Working</option>
+                                            <option>Needs Repair</option>
+                                            <option>Replaced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!--Keyboard -->
+                            <div class="step-content" id="step-3" style="display: none;">
+                                <div class="grid-3col">
+                                    <!-- Keyboard -->
+                                    <div class="input-group">
+                                        <label class="input-label">Keyboard Name</label>
+                                        <input type="text" class="form-input" placeholder="Enter Keyboard Name">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Keyboard Type <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Type</option>
+                                            <option>Wired</option>
+                                            <option>Wireless</option>
+                                            <option>Mechanical</option>
+                                            <option>Membrane</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Keyboard Serial Number</label>
+                                        <input type="text" class="form-input" placeholder="Enter Serial Number">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Keyboard Status <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Status</option>
+                                            <option>Working</option>
+                                            <option>Needs Repair</option>
+                                            <option>Replaced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MOUSE -->
+                            <div class="step-content" id="step-4" style="display: none;">
+                            <div class="grid-3col">
+                                <!-- Mouse -->
+                                <div class="input-group">
+                                    <label class="input-label">Mouse Name</label>
+                                    <input type="text" class="form-input" placeholder="Enter Mouse Name">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Mouse Type <span>*</span></label>
+                                    <select class="form-input" required>
+                                        <option value="">Select Type</option>
+                                        <option>Wired</option>
+                                        <option>Wireless</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Mouse Serial Number</label>
+                                    <input type="text" class="form-input" placeholder="Enter Serial Number">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Mouse Status <span>*</span></label>
+                                    <select class="form-input" required>
+                                        <option value="">Select Status</option>
+                                        <option>Working</option>
+                                        <option>Needs Repair</option>
+                                        <option>Replaced</option>
+                                    </select>
+                                </div>
+                            </div>
+                            </div>
+
+                            <!-- CPU -->
+                            <div class="step-content" id="step-5" style="display: none;">
+                                <div class="grid-3col">
+                                    <!-- CPU Cabinet -->
+                                    <div class="input-group">
+                                        <label class="input-label">CPU Case Model</label>
+                                        <input type="text" class="form-input" placeholder="Enter Case Model (e.g., Cooler Master Mid-Tower)">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">CPU Serial Number</label>
+                                        <input type="text" class="form-input" placeholder="Enter Serial Number">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Power Supply Unit (PSU) <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter PSU (e.g., 450W)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">CPU Status <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Status</option>
+                                            <option>Working</option>
+                                            <option>Needs Repair</option>
+                                            <option>Replaced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Connectivity -->
+                            <div class="step-content" id="step-6" style="display: none;">
+                                <div class="grid-3col">
+                                    <!-- Connectivity -->
+                                    <div class="input-group">
+                                        <label class="input-label">Ethernet MAC Address</label>
+                                        <input type="text" class="form-input" placeholder="Enter MAC Address">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">WiFi Adapter</label>
+                                        <input type="text" class="form-input" placeholder="Enter WiFi Adapter Model (if any)">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">IP Address</label>
+                                        <input type="text" class="form-input" placeholder="Enter IP Address (if static)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. SECOND INPUTS FOR PRINTER OPTION -->
+                         <div class="printerInput" id="printerInput" style="display: none;">
+                            <div class="tab-header" style="color: #7f8c8d !important; font-weight: 500 !important;">
+                                <h4>Printer</h4>
+                            </div>
+                                <div class="grid-2col" >
+                                    <div class="input-group">
+                                        <label class="input-label">Printer Model <span>*</span></label>
+                                        <input type="text" class="form-input" placeholder="Enter Printer Model (e.g. HP LaserJet Pro)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Printer Quantity </label>
+                                        <input type="number" class="form-input" placeholder="Enter Printer Quantity ">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Printer Type <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Printer Type</option>
+                                            <option>Inkjet</option>
+                                            <option>Laser</option>
+                                            <option>Dot Matrix</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Color Capability <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Option</option>
+                                            <option>Color</option>
+                                            <option>Black & White</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Connectivity <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Select Connectivity</option>
+                                            <option>USB</option>
+                                            <option>Network</option>
+                                            <option>Wireless</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Printer Serial Number </label>
+                                        <input type="text" class="form-input" placeholder="Enter Printer Serial Number">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Printer Status <span>*</span></label>
+                                        <select class="form-input" required>
+                                            <option value="">Status</option>
+                                            <option>Active</option>
+                                            <option>In-Active</option>
+                                            <option>Under Repair</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                         </div>
                         </div>
                         <!-- SAVE DEVICE BUTTON AT LAST OF INPUTS -->
                         <div class="form-actions">
@@ -153,8 +402,38 @@
             <!-- CONTENT END of BELOW HEADER  -->
         </div>
         <!-- CONTENT END  -->
-
     </div>
+    <script>
+        document.querySelectorAll('.stepper-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.step-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                document.querySelectorAll('.stepper-item').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                const contentId = `step-${index + 1}`;
+                const activeContent = document.getElementById(contentId);
+                if (activeContent) {
+                    activeContent.style.display = 'block';
+                    item.classList.add('active');
+                }
+            });
+        });
+        document.querySelector('.stepper-item').click();
+
+
+        function showPC() {
+            document.getElementById("pcInput").style.display = "block";
+            document.getElementById("printerInput").style.display = "none";
+        }
+        function showPrinter() {
+                document.getElementById("printerInput").style.display = "block";
+                document.getElementById("pcInput").style.display = "none";
+            }
+    </script>
 </body>
 
 </html>
