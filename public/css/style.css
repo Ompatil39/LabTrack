@@ -27,6 +27,10 @@ h5 {
   margin: 0 !important;
 }
 
+.float-right {
+  margin-left: auto !important;
+}
+
 .blue-left {
   border-left: 6px solid #3498db;
 }
@@ -1665,6 +1669,81 @@ select option:hover {
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------- CSS FOR View Device ------------------------------------ */
+.card-icon {
+  color: #3498db !important;
+}
+
+.view-card {
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.view-header {
+  padding: 0.9rem 1.25rem;
+  background-color: #ffffff;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center ;
+}
+.view-header h2 {
+  font-weight: 600 !important;
+}
+
+.details-header {
+  font-size: 1rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.details-header h3 {
+  font-weight: 500 !important;
+}
+
+.top-icon{
+  position: relative;
+  top: 2px;
+}
+
+.details-content{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 0.5rem;
+}
+
+.detail-label{
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 400 !important;
+  color: #7f8c8d;
+}
+
+.label-value{
+  font-size: 1.1rem;
+  font-weight: 500 !important;
+}
+
+.action-content{
+  margin-left: 8px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btnDetails{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+/* ---------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------- CSS FOR POP UPs ------------------------------------ */
 
 /* DELTE POP UP */
@@ -1789,7 +1868,21 @@ select option:hover {
   background-color: #c0392b;
 }
 
+.btnPopup-edit{
+  background-color: #3498db;
+  color: white;
+}
+.btnPopup-edit:hover{
+  background-color: #2980b9;
+}
 
+.btnPopup-view{
+  background-color: #f1c40f;
+  color: white;
+}
+.btnPopup-view:hover{
+  background-color: #f39c12;
+}
 /* ---------------------------------------------------------------------------------------------- */
 /* ---------------------------------------- Media Queries --------------------------------------- */
 @media (max-width: 768px) {
