@@ -78,6 +78,10 @@ h5 {
   margin-bottom: 1.5rem;
 }
 
+.padding-bottom-1 {
+  padding-bottom: 1rem;
+}
+
 .red-hover {
   color: #e74c3c !important;
 }
@@ -460,6 +464,16 @@ hr.solid {
 .highlight1-red {
   color: #e74c3c;
   background-color: #fdecec;
+}
+
+.highlight-green {
+  color: #2ecc71;
+  background-color: #e9f9f0;
+}
+
+.highlight-yellow {
+  color: #f1c40f;
+  background-color: #fef7e6;
 }
 
 /* Lab Stats */
@@ -1690,7 +1704,7 @@ select option:hover {
   margin-bottom: 1rem;
   display: flex;
   gap: 0.5rem;
-  align-items: center ;
+  align-items: center;
 }
 .view-header h2 {
   font-weight: 600 !important;
@@ -1708,40 +1722,84 @@ select option:hover {
   font-weight: 500 !important;
 }
 
-.top-icon{
+.top-icon {
   position: relative;
   top: 2px;
 }
 
-.details-content{
+.details-content {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   margin-bottom: 0.5rem;
 }
 
-.detail-label{
+.detail-label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 400 !important;
   color: #7f8c8d;
 }
 
-.label-value{
+.label-value {
   font-size: 1.1rem;
   font-weight: 500 !important;
 }
 
-.action-content{
+.action-content {
   margin-left: 8px;
   margin-bottom: 0.5rem;
   display: flex;
   gap: 1rem;
 }
 
-.btnDetails{
+.btnDetails {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------- CSS FOR View Grievance ------------------------------------ */
+.grievance-status {
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.9em;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.grievance-status .grievance-pending {
+  background-color: #fbe9e7;
+  color: #d32f2f;
+}
+
+.grievance-status.greivance-in-progress {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.grievance-status.grievance-resolved {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.grievance-status.grievance-new {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.grievance-description {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #eee;
+}
+
+.grievance-description p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------- CSS FOR POP UPs ------------------------------------ */
@@ -1868,19 +1926,24 @@ select option:hover {
   background-color: #c0392b;
 }
 
-.btnPopup-edit{
+.btnPopup-edit {
   background-color: #3498db;
   color: white;
 }
-.btnPopup-edit:hover{
+.btnPopup-edit:hover {
   background-color: #2980b9;
 }
 
-.btnPopup-view{
+.btnPopup-note{
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btnPopup-view {
   background-color: #f1c40f;
   color: white;
 }
-.btnPopup-view:hover{
+.btnPopup-view:hover {
   background-color: #f39c12;
 }
 /* ---------------------------------------------------------------------------------------------- */
