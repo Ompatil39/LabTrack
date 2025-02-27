@@ -196,20 +196,21 @@
             <div class="view-card">
                 <div class="details-header">
                     <span class="top-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3498db"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-cog">
-                        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                        <path d="m3.2 12.9-.9-.4" />
-                        <path d="m3.2 15.1-.9.4" />
-                        <path d="M4.677 21.5a2 2 0 0 0 1.313.5H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v2.5" />
-                        <path d="m4.9 11.2-.4-.9" />
-                        <path d="m4.9 16.8-.4.9" />
-                        <path d="m7.5 10.3-.4.9" />
-                        <path d="m7.5 17.7-.4-.9" />
-                        <path d="m9.7 12.5-.9.4" />
-                        <path d="m9.7 15.5-.9-.4" />
-                        <circle cx="6" cy="14" r="3" />
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-file-cog">
+                            <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                            <path d="m3.2 12.9-.9-.4" />
+                            <path d="m3.2 15.1-.9.4" />
+                            <path d="M4.677 21.5a2 2 0 0 0 1.313.5H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v2.5" />
+                            <path d="m4.9 11.2-.4-.9" />
+                            <path d="m4.9 16.8-.4.9" />
+                            <path d="m7.5 10.3-.4.9" />
+                            <path d="m7.5 17.7-.4-.9" />
+                            <path d="m9.7 12.5-.9.4" />
+                            <path d="m9.7 15.5-.9-.4" />
+                            <circle cx="6" cy="14" r="3" />
+                        </svg>
                     </span>
                     <h3>Admin/Lab In-Charge Grievance Note</h3>
                 </div>
@@ -245,21 +246,7 @@
                                     <path d="m15 5 4 4" />
                                 </svg>
                             </span>
-                            Edit Status
-                        </button>
-                    </div>
-                    <div class="quick-action">
-                        <button class="btnPopup btnPopup-note btnDetails" id="edit-note-trigger">
-                            <span class="top-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-pencil">
-                                    <path
-                                        d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                    <path d="m15 5 4 4" />
-                                </svg>
-                            </span>
-                            Edit Note
+                            Edit Status & Note
                         </button>
                     </div>
                     <div class="quick-action">
@@ -296,11 +283,13 @@
                     <p class="delete-text">Are you sure you want to delete this grievance ?</p>
                     <div class="item-name" id="item-name">Lenovo PC - GRV-2024-001</div>
 
-                    <p class="delete-warning padding-bottom-1">This action cannot be undone. The grievance will be permanently removed
+                    <p class="delete-warning padding-bottom-1">This action cannot be undone. The grievance will be
+                        permanently removed
                         from
                         the
                         system.</p>
-                    <textarea name="reason" id="" placeholder="Enter the reason here (this will be shared with the student)"
+                    <textarea name="reason" id=""
+                        placeholder="Enter the reason here (this will be shared with the student)"
                         class="form-input"></textarea>
                 </div>
 
@@ -311,31 +300,119 @@
             </div>
         </div>
 
+        <!-- pop up for status change -->
+        <div id="edit-status-modal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon icon-blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            width="20" height="20">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </div>
+                    <h2 class="modal-title">Update Grievance Status</h2>
+                </div>
+
+                <div class="modal-body">
+                    <p class="status-text margin-bottom-half">Update the status for grievance:</p>
+                    <div class="item-name-new-new margin-bottom-half" id="grievance-id">GR-2025-101</div>
+
+                    <div class="status-selection">
+                        <label for="status-select" class="status-label">Select Status</label>
+                        <select id="status-select" class="status-select">
+                            <option value="">Select Status</option>
+                            <option value="submitted">Submitted</option>
+                            <option value="under-review">Under Review</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+
+                    <div class="status-note">
+                        <label for="status-note" class="note-label">Status Note</label>
+                        <textarea id="status-note" class="note-textarea"
+                            placeholder="Add details about this status change... (this will be shared with the student as update)"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btnModal btnModal-secondary" id="cancel-btnModal">Cancel</button>
+                    <button class="btnModal btnModal-primary btnModal-blue" id="save-status-btnModal">Save
+                        Changes</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
+        // Edit Status Modal
+        const editStatusTrigger = document.getElementById('edit-status-trigger');
+        const editStatusModal = document.getElementById('edit-status-modal');
+        const editStatusCloseBtns = document.querySelectorAll('.edit-status-close');
+        const editDoneBtnModal = document.getElementById('save-status-btnModal');
+        const editCancelBtnModal = document.getElementById('cancel-btnModal');
+
+        if (editStatusTrigger && editStatusModal) {
+            editStatusTrigger.addEventListener('click', function () {
+                editStatusModal.style.display = 'flex';
+            });
+
+            editStatusCloseBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    editStatusModal.style.display = 'none';
+                });
+            });
+
+            if (editCancelBtnModal) {
+                editCancelBtnModal.addEventListener('click', function () {
+                    editStatusModal.style.display = 'none';
+                });
+            }
+
+            if (editDoneBtnModal) {
+                editDoneBtnModal.addEventListener('click', function () {
+                    editStatusModal.style.display = 'none';
+                });
+            }
+
+            editStatusModal.addEventListener('click', function (e) {
+                if (e.target === editStatusModal) {
+                    editStatusModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Delete Confirmation Modal
         const deleteBtnPopup = document.getElementById('delete-trigger');
-        const popupDelte = document.getElementById('delete-popup');
+        const popupDelete = document.getElementById('delete-popup');
         const cancelBtnPopup = document.getElementById('cancel-btnPopup');
         const confirmBtnPopup = document.getElementById('confirm-delete-btnPopup');
 
-        deleteBtnPopup.addEventListener('click', function () {
-            popupDelte.style.display = 'flex';
-        });
+        if (deleteBtnPopup && popupDelete) {
+            deleteBtnPopup.addEventListener('click', function () {
+                popupDelete.style.display = 'flex';
+            });
 
-        cancelBtnPopup.addEventListener('click', function () {
-            popupDelte.style.display = 'none';
-        });
-
-        confirmBtnPopup.addEventListener('click', function () {
-            alert('Item deleted successfully!');
-            popupDelte.style.display = 'none';
-        });
-
-        popupDelte.addEventListener('click', function (e) {
-            if (e.target === popupDelte) {
-                popupDelte.style.display = 'none';
+            if (cancelBtnPopup) {
+                cancelBtnPopup.addEventListener('click', function () {
+                    popupDelete.style.display = 'none';
+                });
             }
-        });
+
+            if (confirmBtnPopup) {
+                confirmBtnPopup.addEventListener('click', function () {
+                    alert('Item deleted successfully!');
+                    popupDelete.style.display = 'none';
+                });
+            }
+
+            popupDelete.addEventListener('click', function (e) {
+                if (e.target === popupDelete) {
+                    popupDelete.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 

@@ -61,7 +61,7 @@
             <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
           </a>
         </li>
-        <li >
+        <li>
           <a href="addDevice.html">
             <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
           </a>
@@ -110,7 +110,8 @@
 
               <div class="input-group">
                 <label class="input-label">Lab Code <span>*</span></label>
-                <input type="text" id="labCode" name="labCode" class="no-hover form-input " value="Lab Code will be Auto-Generated" disabled>
+                <input type="text" id="labCode" name="labCode" class="no-hover form-input "
+                  value="Lab Code will be Auto-Generated" disabled>
               </div>
 
               <div class="input-group">
@@ -155,9 +156,10 @@
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn btn-primary" id="addLabBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus">
+              <button type="button" class="btn btn-primary" id="lab-created-trigger" onclick="showConfirmation()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-circle-plus">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M8 12h8" />
                   <path d="M12 8v8" />
@@ -171,8 +173,98 @@
       <!-- CONTENT END of BELOW HEADER  -->
     </div>
     <!-- CONTENT END  -->
+    <!-- POP UP MODAL -->
+    <div id="lab-created-modal" class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-icon icon-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20"
+              height="20">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 class="modal-title">Computer Lab Created</h2>
+        </div>
+
+        <div class="modal-body">
+          <p class="success-text">Your computer lab has been successfully added in the system.</p>
+
+          <div class="item-details">
+            <div class="detail-row">
+              <div class="detail-label-new">Lab Name:</div>
+              <div class="detail-value" id="lab-name">Computer Lab 101</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-new">Lab ID:</div>
+              <div class="detail-value" id="lab-id"><CO-2025-101></CO-2025-101></div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-new">Building:</div>
+              <div class="detail-value" id="lab-building">Science Block</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-new">Capacity:</div>
+              <div class="detail-value" id="lab-capacity">30 stations</div>
+            </div>
+          </div>
+
+          <p class="next-steps">The lab has been added to the Lab Management System. You can add devices to the lab.
+          </p>
+
+          <div class="action-buttons">
+            <div class="action-btnModal" id="add-devices-btnModal" onclick="window.location.href='addDevice.html' ">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
+                height="16">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Devices
+            </div>
+            <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.html' ">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
+                height="16">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Lab
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btnModal btnModal-primary btnModal-blue" id="lab-done-btnModal">Done</button>
+        </div>
+      </div>
+    </div>
 
   </div>
+  <script>
+    const labCreatedTrigger = document.getElementById('lab-created-trigger');
+    const labCreatedModal = document.getElementById('lab-created-modal');
+    const labCreatedCloseBtns = document.querySelectorAll('.lab-created-close');
+    const labDoneBtnModal = document.getElementById('lab-done-btnModal');
+
+    labDoneBtnModal.addEventListener('click', function () {
+      labCreatedModal.style.display = 'none';
+    });
+
+    labCreatedTrigger.addEventListener('click', function () {
+      labCreatedModal.style.display = 'flex';
+    });
+
+    labCreatedCloseBtns.forEach(btn => {
+      btn.addEventListener('click', function () {
+        labCreatedModal.style.display = 'none';
+      });
+    });
+
+    labCreatedModal.addEventListener('click', function (e) {
+      if (e.target === labCreatedModal) {
+        labCreatedModal.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 
 </html>

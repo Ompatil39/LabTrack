@@ -1157,7 +1157,6 @@ select option:hover {
   transition: transform 0.2s ease;
 }
 
-
 .stat-value {
   color: #3498db;
   font-size: 1.8rem;
@@ -1240,7 +1239,6 @@ select option:hover {
 /* .section-title-last{
   margin-bottom: 1.5rem;
 } */
-
 
 /* TABS AND ETC */
 /* Tabs Styling */
@@ -1735,8 +1733,6 @@ select option:hover {
   margin-bottom: 0.5rem;
 }
 
-
-
 .detail-label {
   display: block;
   margin-bottom: 0.5rem;
@@ -1805,6 +1801,255 @@ select option:hover {
   color: #555;
   line-height: 1.6;
 }
+
+/* OTHER POP UP CSS */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Modal container - common to all modals */
+.modal {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  width: 90%;
+  max-width: 400px;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal header */
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.icon-blue {
+  background-color: #e6f7ff;
+  color: #3498db;
+}
+
+.icon-green {
+  background-color: #e6fff0;
+  color: #2ecc71;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Modal body */
+.modal-body {
+  padding: 1.5rem;
+}
+
+.success-text,
+.status-text {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.margin-bottom-half{
+  margin-bottom: 0.5rem !important;
+}
+
+.item-details {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label-new {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #2c3e50;
+}
+
+.next-steps {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-top: 1rem;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.action-btnModal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #ecf0f1;
+  cursor: pointer;
+  flex: 1;
+  text-align: center;
+  color: #2c3e50;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.action-btnModal svg {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.action-btnModal:hover {
+  background-color: #dce6f0;
+}
+
+/* Status selection form elements */
+.item-name-new {
+  font-weight: 600;
+  color: #2c3e50;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.status-selection {
+  margin-bottom: 1.5rem;
+}
+
+.status-label,
+.note-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.status-select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1rem;
+}
+
+.note-textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  min-height: 80px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* Modal footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  gap: 0.75rem;
+}
+
+/* Button styles */
+.btnModal {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.btnModal-secondary {
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  border: 1px solid #e0e0e0;
+}
+
+.btnModal-secondary:hover {
+  background-color: #ecf0f1;
+}
+
+.btnModal-primary {
+  color: white;
+}
+
+.btnModal-primary:hover {
+  opacity: 0.9;
+}
+
+.btnModal-blue {
+  background-color: #3498db;
+}
+
+.btnModal-green {
+  background-color: #2ecc71;
+}
+
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------- CSS FOR POP UPs ------------------------------------ */
 
@@ -1938,7 +2183,7 @@ select option:hover {
   background-color: #2980b9;
 }
 
-.btnPopup-note{
+.btnPopup-note {
   background-color: #2ecc71;
   color: white;
 }
