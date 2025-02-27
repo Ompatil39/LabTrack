@@ -97,7 +97,7 @@
             <section class="lab-cards">
                 <div class="detail-card">
                     <header class="card-header">
-                        <h2 class="card-title font-number">Lab 1 - COA101</h2>
+                        <h2 class="card-title font-number">CO-2025-101</h2>
                         <span class="status-chip lab-status highlight1">
                             <i class="fas fa-check-circle"></i> Active
                         </span>
@@ -110,7 +110,7 @@
                     <hr class="card-divider">
 
                     <section class="lab-summary">
-                        <h3 class="section-title1">Computer Overview</h3>
+                        <h3 class="section-title1">Lab Overview</h3>
                         <div class="stats-grid">
                             <div class="stat-card">
                                 <div class="stat-value font-number">25</div>
@@ -131,7 +131,7 @@
                         </div>
                     </section>
 
-                    <section class="grievance-summary">
+                    <section class="grievance-summary margin-bottom">
                         <h3 class="section-title1">Grievance Overview</h3>
                         <div class="grievance-stats">
                             <div class="grievance-stat resolved">
@@ -150,6 +150,42 @@
                                 <span class="stat-label">Pending</span>
                             </div>
                         </div>
+                    </section>
+
+                    <section class="general-summary">
+                        <h3 class="section-title1" style="margin-bottom: 1rem !important;">Lab Details</h3>
+                        <div class="details-content">
+                            <div class="input-group">
+                                <label class="detail-label">Lab Name</label>
+                                <div class="label-value">Computer Lab A</div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="detail-label">Lab Code</label>
+                                <div class="label-value">CO-2025-101</div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="detail-label">Department</label>
+                                <div class="label-value">CO - Computer Science</div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="detail-label">Lab In-Charge</label>
+                                <div class="label-value">Admin 1</div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="detail-label">Establishment Date</label>
+                                <div class="label-value">January 15, 2020</div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="detail-label">Room Capacity</label>
+                                <div class="label-value">30</div>
+                            </div>
+                        </div>
+
                     </section>
 
                 </div>
@@ -205,14 +241,15 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>Working fine</td>
                                             <td>
+
                                                 <a href="viewDevice.html" class="none">
-                                                    <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
                                                 </a>
-                                                
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -226,10 +263,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -243,10 +283,13 @@
                                             <td>Hardware issue</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -260,10 +303,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -277,10 +323,13 @@
                                             <td>Power supply issue</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -294,10 +343,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -311,10 +363,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -328,10 +383,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -345,10 +403,13 @@
                                             <td>Software issue</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -362,10 +423,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -472,10 +536,13 @@
                                             <td>Working fine</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -489,10 +556,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -506,10 +576,13 @@
                                             <td>Keys not working</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -523,10 +596,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -540,10 +616,13 @@
                                             <td>Paper jam</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -557,10 +636,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -574,10 +656,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -591,10 +676,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -608,10 +696,13 @@
                                             <td>Sensor issue</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -625,10 +716,13 @@
                                             <td>N/A</td>
                                             <td>
                                                 <a href="viewDevice.html" class="none">
-                                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
                                                 </a>
-                                                <button class="btn-icon edit-btn"><i
-                                                        class="fa-solid fa-pen"></i></button>
+                                                <a href="editDevice.html" class="none">
+                                                    <button class="btn-icon edit-btn"><i
+                                                            class="fa-solid fa-pen"></i></button>
+                                                </a>
                                                 <button class="btn-icon delete-btn" id="delete-trigger"><i
                                                         class="fa-solid fa-trash"></i></button>
                                             </td>
@@ -672,161 +766,181 @@
                                     </select>
                                 </div>
                                 <table class="grievance-table">
-                    <thead>
-                        <tr>
-                            <th>Grievance ID <i class="fas fa-sort"></i></th>
-                            <th>Student Name <i class="fas fa-sort"></i></th>
-                            <th>Device/Category <i class="fas fa-sort"></i></th>
-                            <th>Status <i class="fas fa-sort"></i></th>
-                            <th>Submission Date <i class="fas fa-sort"></i></th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#GRV001</td>
-                            <td>Xyx</td>
-                            <td>Computer 12</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-15</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV002</td>
-                            <td>Xyx</td>
-                            <td>Computer 13</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-16</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV003</td>
-                            <td>Xyx</td>
-                            <td>Computer 14</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-17</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV004</td>
-                            <td>Xyx</td>
-                            <td>Computer 15</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-18</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV005</td>
-                            <td>Xyx</td>
-                            <td>Computer 16</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-19</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV006</td>
-                            <td>Xyx</td>
-                            <td>Computer 17</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-20</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV007</td>
-                            <td>Xyx</td>
-                            <td>Printer 1</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-21</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV008</td>
-                            <td>Xyx</td>
-                            <td>Keyboard 2</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-22</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV009</td>
-                            <td>Xyx</td>
-                            <td>Mouse 3</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-23</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV010</td>
-                            <td>Xyx</td>
-                            <td>Monitor 4</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-24</td>
-                            <td>
-                                <a href="viewGrievance.html" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
-                                <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    <thead>
+                                        <tr>
+                                            <th>Grievance ID <i class="fas fa-sort"></i></th>
+                                            <th>Student Name <i class="fas fa-sort"></i></th>
+                                            <th>Device/Category <i class="fas fa-sort"></i></th>
+                                            <th>Status <i class="fas fa-sort"></i></th>
+                                            <th>Submission Date <i class="fas fa-sort"></i></th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#GRV001</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 12</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-15</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <a href="viewGrievance.html" class="none">
+                                                        <button class="btn-icon view-btn"><i
+                                                                class="fas fa-eye"></i></button>
+                                                    </a>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV002</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 13</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-16</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV003</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 14</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-17</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV004</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 15</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-18</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV005</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 16</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-19</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV006</td>
+                                            <td>Xyx</td>
+                                            <td>Computer 17</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-20</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV007</td>
+                                            <td>Xyx</td>
+                                            <td>Printer 1</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-21</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV008</td>
+                                            <td>Xyx</td>
+                                            <td>Keyboard 2</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-22</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV009</td>
+                                            <td>Xyx</td>
+                                            <td>Mouse 3</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-23</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#GRV010</td>
+                                            <td>Xyx</td>
+                                            <td>Monitor 4</td>
+                                            <td><span class="status-badge pending">Pending</span></td>
+                                            <td>2024-03-24</td>
+                                            <td>
+                                                <a href="viewGrievance.html" class="none">
+                                                    <button class="btn-icon view-btn"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </a>
+                                                <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i>
+                                                    <button class="btn-icon delete-btn"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
                             </div>
                         </div>
@@ -848,20 +962,24 @@
                                     <span>Add New Lab</span>
                                 </button>
                             </a>
+                            <a href="editLab.html" class="none">
+                                <button class="action-item">
+                                    <i class="fas fa-pen"></i>
+                                    <span>Edit Lab</span>
+                                </button>
+                            </a>
+                            <a href="inventory.html" class="none">
+                                <button class="action-item">
+                                    <i class="fas fa-boxes"></i>
+                                    <span>Inventory</span>
+                                </button>
+                            </a>
 
-                            <button class="action-item">
-                                <i class="fas fa-boxes"></i>
-                                <span>Inventory</span>
-                            </button>
-                            <button class="action-item">
-                                <i class="fas fa-comment-medical"></i>
-                                <span>Report</span>
-                            </button>
                             <div class="vertical-divider"></div>
-                            <button class="action-item">
+                            <!-- <button class="action-item">
                                 <i class="fas fa-file-export"></i>
                                 <span>Export</span>
-                            </button>
+                            </button> -->
                             <button class="action-item admin-action">
                                 <i class="fas fa-ban"></i>
                                 <span>Deactivate</span>

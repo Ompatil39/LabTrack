@@ -75,7 +75,7 @@ h5 {
 }
 
 .margin-bottom {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem !important;
 }
 
 .padding-bottom-1 {
@@ -1157,9 +1157,6 @@ select option:hover {
   transition: transform 0.2s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-2px);
-}
 
 .stat-value {
   color: #3498db;
@@ -1239,6 +1236,11 @@ select option:hover {
   color: white;
 }
 /* Grievance summary END */
+
+/* .section-title-last{
+  margin-bottom: 1.5rem;
+} */
+
 
 /* TABS AND ETC */
 /* Tabs Styling */
@@ -1732,6 +1734,8 @@ select option:hover {
   grid-template-columns: repeat(3, 1fr);
   margin-bottom: 0.5rem;
 }
+
+
 
 .detail-label {
   display: block;
