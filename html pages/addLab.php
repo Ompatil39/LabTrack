@@ -1,3 +1,80 @@
+<?php
+include 'db.php'; // Database connection
+
+// Fetch lab options
+$query = "SELECT username FROM users";
+$result = $conn->query($query);
+$labIncharges = [];
+while ($row = $result->fetch_assoc()) {
+  $labIncharges[] = ucfirst($row['username']);
+}
+
+// Initialize variables
+$success = false;
+$error = "";
+$lab_details = [];
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $labName = $_POST['lab_name'];
+  $department = $_POST['department'];
+  $labIncharge = $_POST['lab_incharge'];
+  $estDate = $_POST['est_date'];
+  $labStatus = $_POST['lab_status'];
+  $roomCapacity = $_POST['room_capacity'];
+  $building = $_POST['building'];
+  $room = $_POST['room'];
+
+  function generateLabCode($dept, $estDate, $conn)
+  {
+    // Extract the year from the establishment date
+    $year = date('Y', strtotime($estDate));
+
+    // Get the department short form (first two characters in uppercase)
+    $deptShort = strtoupper(substr($dept, 0, 2));
+
+    // Query to find the last lab code for the same department and year
+    $query = "SELECT lab_id FROM labs WHERE lab_id LIKE '$deptShort-$year-%' ORDER BY lab_id DESC LIMIT 1";
+    $result = $conn->query($query);
+
+    if ($result->num_rows > 0) {
+      // If labs exist for the same department and year, increment the serial number
+      $lastLabCode = $result->fetch_assoc()['lab_id'];
+      $lastSerial = (int) substr($lastLabCode, -3); // Extract the last 3 digits
+      $newSerial = $lastSerial + 1;
+    } else {
+      // If no labs exist for the same department and year, start with 101
+      $newSerial = 101;
+    }
+
+    // Format the serial number to 3 digits (e.g., 101, 102, ..., 999)
+    $serial = str_pad($newSerial, 3, '0', STR_PAD_LEFT);
+
+    // Generate the lab code
+    $labCode = "$deptShort-$year-$serial";
+    return $labCode;
+  }
+
+  $labCode = generateLabCode($department, $estDate, $conn);
+
+  // Insert into database
+  $stmt = $conn->prepare("INSERT INTO labs (lab_id, lab_name, department, lab_incharge, establishment_date, status, room_capacity, building, room_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("ssssssiss", $labCode, $labName, $department, $labIncharge, $estDate, $labStatus, $roomCapacity, $building, $room);
+
+  if ($stmt->execute()) {
+    $success = true;
+    $lab_details = [
+      'lab_name' => $labName,
+      'lab_id' => $labCode,
+      'building' => $building,
+      'room_capacity' => $roomCapacity
+    ];
+  } else {
+    $error = "Failed to add lab. Please try again.";
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -102,166 +179,177 @@
               <h2 class="section-title">Register New Lab</h2>
             </div>
 
-            <div class="grid-2col">
-              <div class="input-group">
-                <label class="input-label">Lab Name <span>*</span></label>
-                <input type="text" class="form-input" placeholder="Enter lab name (e.g., Computer Lab A)" required>
+            <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+              <div class="grid-2col">
+                <div class="input-group">
+                  <label class="input-label">Lab Name <span>*</span></label>
+                  <input type="text" name="lab_name" class="form-input" placeholder="Enter lab name (e.g., Computer Lab A)" required>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Lab Code <span>*</span></label>
+                  <input type="text" id="labCode" name="labCode" class="no-hover form-input "
+                    value="Lab Code will be Auto-Generated" disabled>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Department <span>*</span></label>
+                  <select name="department" class="form-input" required>
+                    <option value="">Select Department</option>
+                    <option value="CO">CO - Computer Science</option>
+                    <option value="AI">AI - Artificial Intelligence</option>
+                    <option value="IT">IT - Information Technology</option>
+                    <option value="EE">EE - Electronics Engineering</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Lab In-Charge <span>*</span></label>
+                  <select name="lab_incharge" class="form-input" required>
+                    <option value="">Select Lab In-Charge</option>
+                    <?php foreach ($labIncharges as $incharge): ?>
+                      <option value="<?= htmlspecialchars($incharge) ?>"><?= htmlspecialchars($incharge) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Establishment Date <span>*</span></label>
+                  <input type="date" name="est_date" class="form-input" required>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Lab Status <span>*</span></label>
+                  <select name="lab_status" class="form-input" required>
+                    <option value="">Select Lab Status</option>
+                    <option value="Active">Active</option>
+                    <option value="InActive">InActive</option>
+                    <option value="In Repair">In Repair</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Room Capacity <span>*</span></label>
+                  <input type="number" name="room_capacity" class="form-input" placeholder="Enter total number of PCs in the lab" required>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Building <span>*</span></label>
+                  <input type="text" name="building" class="form-input" placeholder="Enter building name (e.g., Building A)" required>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Room <span>*</span></label>
+                  <input type="text" name="room" class="form-input" placeholder="Enter room number" required>
+                </div>
               </div>
 
-              <div class="input-group">
-                <label class="input-label">Lab Code <span>*</span></label>
-                <input type="text" id="labCode" name="labCode" class="no-hover form-input "
-                  value="Lab Code will be Auto-Generated" disabled>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-circle-plus">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 12h8" />
+                    <path d="M12 8v8" />
+                  </svg> Add Lab
+                </button>
               </div>
-
-              <div class="input-group">
-                <label class="input-label">Department <span>*</span></label>
-                <select class="form-input" required>
-                  <option value="">Select Department</option>
-                  <option>CO - Computer Science</option>
-                  <option>AI - Artificial Intelligence</option>
-                  <option>IT - Information Technology</option>
-                  <option>EE - Electronics Engineering</option>
-                </select>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">Lab In-Charge <span>*</span></label>
-                <select class="form-input" required>
-                  <option value="">Select Lab In-Charge</option>
-                  <option>Admin 1</option>
-                  <option>Admin 2</option>
-                </select>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">Establishment Date <span>*</span></label>
-                <input type="date" class="form-input" required>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">Room Capacity <span>*</span></label>
-                <input type="number" class="form-input" placeholder="Enter total number of PCs in the lab" required>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">Building <span>*</span></label>
-                <input type="text" class="form-input" placeholder="Enter building name (e.g., Building A)" required>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">Room <span>*</span></label>
-                <input type="text" class="form-input" placeholder="Enter room number" required>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn btn-primary" id="lab-created-trigger" onclick="showConfirmation()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="lucide lucide-circle-plus">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M8 12h8" />
-                  <path d="M12 8v8" />
-                </svg> Add Lab
-              </button>
-            </div>
+            </form>
           </div>
-
         </div>
       </div>
       <!-- CONTENT END of BELOW HEADER  -->
     </div>
     <!-- CONTENT END  -->
     <!-- POP UP MODAL -->
-    <div id="lab-created-modal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-icon icon-blue">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20"
-              height="20">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 class="modal-title">Computer Lab Created</h2>
-        </div>
-
-        <div class="modal-body">
-          <p class="success-text">Your computer lab has been successfully added in the system.</p>
-
-          <div class="item-details">
-            <div class="detail-row">
-              <div class="detail-label-new">Lab Name:</div>
-              <div class="detail-value" id="lab-name">Computer Lab 101</div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-label-new">Lab ID:</div>
-              <div class="detail-value" id="lab-id"><CO-2025-101></CO-2025-101></div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-label-new">Building:</div>
-              <div class="detail-value" id="lab-building">Science Block</div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-label-new">Capacity:</div>
-              <div class="detail-value" id="lab-capacity">30 stations</div>
-            </div>
-          </div>
-
-          <p class="next-steps">The lab has been added to the Lab Management System. You can add devices to the lab.
-          </p>
-
-          <div class="action-buttons">
-            <div class="action-btnModal" id="add-devices-btnModal" onclick="window.location.href='addDevice.php' ">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
-                height="16">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    <?php if (isset($success) && $success): ?>
+      <div id="lab-created-modal" class="modal-overlay" style="display: flex;">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-icon icon-blue">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20"
+                height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              Add Devices
             </div>
-            <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php' ">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
-                height="16">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              View Lab
+            <h2 class="modal-title">Computer Lab Created</h2>
+          </div>
+
+          <div class="modal-body">
+            <p class="success-text">Your computer lab has been successfully added in the system.</p>
+
+            <div class="item-details">
+              <div class="detail-row">
+                <div class="detail-label-new">Lab Name:</div>
+                <div class="detail-value" id="lab-name"><?= $lab_details['lab_name'] ?></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label-new">Lab ID:</div>
+                <div class="detail-value" id="lab-id"><?= $lab_details['lab_id'] ?></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label-new">Building:</div>
+                <div class="detail-value" id="lab-building"><?= $lab_details['building'] ?></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label-new">Capacity:</div>
+                <div class="detail-value" id="lab-capacity"><?= $lab_details['room_capacity'] ?> stations</div>
+              </div>
+            </div>
+
+            <p class="next-steps">The lab has been added to the Lab Management System. You can add devices to the lab.</p>
+
+            <div class="action-buttons">
+              <div class="action-btnModal" id="add-devices-btnModal" onclick="window.location.href='addDevice.php'">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
+                  height="16">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add Devices
+              </div>
+              <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php'">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
+                  height="16">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                View Lab
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <button class="btnModal btnModal-primary btnModal-blue" id="lab-done-btnModal">Done</button>
+          <div class="modal-footer">
+            <button class="btnModal btnModal-primary btnModal-blue" id="lab-done-btnModal" onclick="window.location.reload()">Done</button>
+          </div>
         </div>
       </div>
-    </div>
-
+    <?php endif; ?>
   </div>
+
   <script>
-    const labCreatedTrigger = document.getElementById('lab-created-trigger');
-    const labCreatedModal = document.getElementById('lab-created-modal');
-    const labCreatedCloseBtns = document.querySelectorAll('.lab-created-close');
-    const labDoneBtnModal = document.getElementById('lab-done-btnModal');
-
-    labDoneBtnModal.addEventListener('click', function () {
-      labCreatedModal.style.display = 'none';
-    });
-
-    labCreatedTrigger.addEventListener('click', function () {
-      labCreatedModal.style.display = 'flex';
-    });
-
-    labCreatedCloseBtns.forEach(btn => {
-      btn.addEventListener('click', function () {
-        labCreatedModal.style.display = 'none';
-      });
-    });
-
-    labCreatedModal.addEventListener('click', function (e) {
-      if (e.target === labCreatedModal) {
-        labCreatedModal.style.display = 'none';
+    // JavaScript is now only for the 'Done' button in the success modal
+    document.addEventListener('DOMContentLoaded', function() {
+      const labDoneBtnModal = document.getElementById('lab-done-btnModal');
+      const labCreatedModal = document.getElementById('lab-created-modal');
+      
+      if (labDoneBtnModal) {
+        labDoneBtnModal.addEventListener('click', function () {
+          if (labCreatedModal) {
+            labCreatedModal.style.display = 'none';
+          }
+        });
+      }
+      
+      // Close modal when clicking outside
+      if (labCreatedModal) {
+        labCreatedModal.addEventListener('click', function (e) {
+          if (e.target === labCreatedModal) {
+            labCreatedModal.style.display = 'none';
+          }
+        });
       }
     });
   </script>
