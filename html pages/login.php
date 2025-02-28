@@ -314,19 +314,9 @@
                 <i class="fa-brands fa-watchman-monitoring"></i>
                 <div class="logo-login-text">LabTrack</div>
             </div>
-
             <h1 class="welcome-text">Welcome Back</h1>
             <p class="description">Access your lab management dashboard to monitor device status, handle grievance
                 requests, and resolve student grievances.</p>
-
-            <!-- <div class="copyright">© 2025 LabTrack. All rights reserved.</div> -->
-
-            <!-- <div class="student-grievance">
-                <button class="grievance-btn">
-                    <i class="fas fa-comment-alt"></i>
-                    Student Grievance
-                </button>
-            </div> -->
         </div>
 
         <div class="right-panel">
