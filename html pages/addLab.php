@@ -46,33 +46,33 @@
         <li class="menu-title">Menu</li>
         <!-- Dashboard Link -->
         <li>
-          <a href="index.html">
+          <a href="index.php">
             <i class="fa-solid fa-chart-pie"></i> Dashboard
           </a>
         </li>
         <li>
-          <a href="labs.html">
+          <a href="labs.php">
             <i class="fa-solid fa-network-wired"></i>
             Labs
           </a>
         </li>
         <li class="active">
-          <a href="addLab.html">
+          <a href="addLab.php">
             <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
           </a>
         </li>
         <li>
-          <a href="addDevice.html">
+          <a href="addDevice.php">
             <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
           </a>
         </li>
         <li>
-          <a href="inventory.html">
+          <a href="inventory.php">
             <i class="fa-solid fa-warehouse"></i> Inventory
           </a>
         </li>
         <li>
-          <a href="grievance.html">
+          <a href="grievance.php">
             <i class="fa-solid fa-paper-plane"></i> Grievance
           </a>
         </li>
@@ -212,14 +212,14 @@
           </p>
 
           <div class="action-buttons">
-            <div class="action-btnModal" id="add-devices-btnModal" onclick="window.location.href='addDevice.html' ">
+            <div class="action-btnModal" id="add-devices-btnModal" onclick="window.location.href='addDevice.php' ">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
                 height="16">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Add Devices
             </div>
-            <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.html' ">
+            <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php' ">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
                 height="16">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

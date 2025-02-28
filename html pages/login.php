@@ -351,13 +351,13 @@
                     </div>
                 </div>
 
-                <button class="sign-in-btn">Sign In</button>
+                <button class="sign-in-btn" onclick="window.location.href='index.php' ">Sign In</button>
 
                 <div class="divider">
                     <div class="divider-line"></div>
                 </div>
 
-                <div class="student-grievance">
+                <div class="student-grievance" >
                     <button class="grievance-button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

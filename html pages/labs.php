@@ -46,31 +46,31 @@
         <li class="menu-title">Menu</li>
         <!-- Dashboard Link -->
         <li>
-          <a href="index.html">
+          <a href="index.php">
             <i class="fa-solid fa-chart-pie"></i> Dashboard
           </a>
         </li>
         <li class="active">
-          <a href="labs.html">
+          <a href="labs.php">
             <i class="fa-solid fa-network-wired"></i>
             <span>Labs</span>
           </a>
         </li>
         <li>
-          <a href="addLab.html">
+          <a href="addLab.php">
             <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
           </a>
         </li>
         <li>
-          <a href="addDevice.html">
+          <a href="addDevice.php">
             <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
           </a>
         </li>
         <li>
-          <a href="inventory.html"> <i class="fa-solid fa-warehouse"></i> Inventory </a>
+          <a href="inventory.php"> <i class="fa-solid fa-warehouse"></i> Inventory </a>
         </li>
         <li>
-          <a href="grievance.html"> <i class="fa-solid fa-paper-plane"></i> Grievance </a>
+          <a href="grievance.php"> <i class="fa-solid fa-paper-plane"></i> Grievance </a>
         </li>
       </ul>
     </div>
@@ -92,7 +92,7 @@
       <!-- LABS -->
       <div class="lab-container">
         <!-- Lab Card 1 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>CO-A-101</h4>
             <div class="status-chip">
@@ -117,7 +117,7 @@
         </a>
       
         <!-- Lab Card 2 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>CO-B-102</h4>
             <div class="status-chip">
@@ -142,7 +142,7 @@
         </a>
       
         <!-- Lab Card 3 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>CO-C-103</h4>
             <div class="status-chip">
@@ -167,7 +167,7 @@
         </a>
       
         <!-- Lab Card 4 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>ME-A-101</h4>
             <div class="status-chip">
@@ -192,7 +192,7 @@
         </a>
       
         <!-- Lab Card 5 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>EE-B-102</h4>
             <div class="status-chip">
@@ -217,7 +217,7 @@
         </a>
       
         <!-- Lab Card 6 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>CS-C-103</h4>
             <div class="status-chip">
@@ -242,7 +242,7 @@
         </a>
       
         <!-- Lab Card 7 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>IT-D-104</h4>
             <div class="status-chip">
@@ -267,7 +267,7 @@
         </a>
       
         <!-- Lab Card 8 -->
-        <a href="lab-details.html" class="lab-card none">
+        <a href="lab-details.php" class="lab-card none">
           <div class="lab-header">
             <h4>EC-E-105</h4>
             <div class="status-chip">
@@ -293,7 +293,7 @@
       </div>
       <!-- Lab container end -->
       <!-- Floating Action Button -->
-      <a href="addLab.html" class="fab font-number">
+      <a href="addLab.php" class="fab font-number">
         <i class="fas fa-plus"></i> Add New Lab
       </a>
     </div>

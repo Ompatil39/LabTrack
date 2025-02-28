@@ -46,33 +46,33 @@
                 <li class="menu-title">Menu</li>
                 <!-- Dashboard Link -->
                 <li>
-                    <a href="index.html">
+                    <a href="index.php">
                         <i class="fa-solid fa-chart-pie"></i> Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="labs.html">
+                    <a href="labs.php">
                         <i class="fa-solid fa-network-wired"></i>
                         Labs
                     </a>
                 </li>
                 <li>
-                    <a href="addLab.html">
+                    <a href="addLab.php">
                         <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
                     </a>
                 </li>
                 <li>
-                    <a href="addDevice.html">
+                    <a href="addDevice.php">
                         <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
                     </a>
                 </li>
                 <li>
-                    <a href="inventory.html">
+                    <a href="inventory.php">
                         <i class="fa-solid fa-warehouse"></i> Inventory
                     </a>
                 </li>
                 <li>
-                    <a href="grievance.html">
+                    <a href="grievance.php">
                         <i class="fa-solid fa-paper-plane"></i> Grievance
                     </a>
                 </li>

@@ -46,33 +46,33 @@
                 <li class="menu-title">Menu</li>
                 <!-- Dashboard Link -->
                 <li>
-                    <a href="index.html">
+                    <a href="index.php">
                         <i class="fa-solid fa-chart-pie"></i> Dashboard
                     </a>
                 </li>
                 <li class="active">
-                    <a href="labs.html">
+                    <a href="labs.php">
                         <i class="fa-solid fa-network-wired"></i>
                         <span>Lab Details</span>
                     </a>
                 </li>
                 <li>
-                    <a href="addLab.html">
+                    <a href="addLab.php">
                         <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
                     </a>
                 </li>
                 <li>
-                    <a href="addDevice.html">
+                    <a href="addDevice.php">
                         <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
                     </a>
                 </li>
                 <li>
-                    <a href="inventory.html">
+                    <a href="inventory.php">
                         <i class="fa-solid fa-warehouse"></i> Inventory
                     </a>
                 </li>
                 <li>
-                    <a href="grievance.html">
+                    <a href="grievance.php">
                         <i class="fa-solid fa-paper-plane"></i> Grievance
                     </a>
                 </li>
@@ -242,11 +242,11 @@
                                             <td>Working fine</td>
                                             <td>
 
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -262,11 +262,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -282,11 +282,11 @@
                                             <td><span class="status status-repair">In Repair</span></td>
                                             <td>Hardware issue</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -302,11 +302,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -322,11 +322,11 @@
                                             <td><span class="status status-faulty">Faulty</span></td>
                                             <td>Power supply issue</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -342,11 +342,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -362,11 +362,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -382,11 +382,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -402,11 +402,11 @@
                                             <td><span class="status status-repair">In Repair</span></td>
                                             <td>Software issue</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -422,11 +422,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -535,11 +535,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>Working fine</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -555,11 +555,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -575,11 +575,11 @@
                                             <td><span class="status status-repair">In Repair</span></td>
                                             <td>Keys not working</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -595,11 +595,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -615,11 +615,11 @@
                                             <td><span class="status status-faulty">Faulty</span></td>
                                             <td>Paper jam</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -635,11 +635,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -655,11 +655,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -675,11 +675,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -695,11 +695,11 @@
                                             <td><span class="status status-repair">In Repair</span></td>
                                             <td>Sensor issue</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -715,11 +715,11 @@
                                             <td><span class="status status-active">Active</span></td>
                                             <td>N/A</td>
                                             <td>
-                                                <a href="viewDevice.html" class="none">
+                                                <a href="viewDevice.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
-                                                <a href="editDevice.html" class="none">
+                                                <a href="editDevice.php" class="none">
                                                     <button class="btn-icon edit-btn"><i
                                                             class="fa-solid fa-pen"></i></button>
                                                 </a>
@@ -784,8 +784,8 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-15</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
-                                                    <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
+                                                    <a href="viewGrievance.php" class="none">
                                                         <button class="btn-icon view-btn"><i
                                                                 class="fas fa-eye"></i></button>
                                                     </a>
@@ -802,7 +802,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-16</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -818,7 +818,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-17</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -834,7 +834,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-18</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -850,7 +850,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-19</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -866,7 +866,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-20</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -882,7 +882,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-21</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -898,7 +898,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-22</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -914,7 +914,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-23</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -930,7 +930,7 @@
                                             <td><span class="status-badge pending">Pending</span></td>
                                             <td>2024-03-24</td>
                                             <td>
-                                                <a href="viewGrievance.html" class="none">
+                                                <a href="viewGrievance.php" class="none">
                                                     <button class="btn-icon view-btn"><i
                                                             class="fas fa-eye"></i></button>
                                                 </a>
@@ -956,19 +956,19 @@
                     <div class="quick-actions-bar">
                         <div class="action-group">
 
-                            <a href="addLab.html" class="none">
+                            <a href="addLab.php" class="none">
                                 <button class="action-item">
                                     <i class="fas fa-plus"></i>
                                     <span>Add New Lab</span>
                                 </button>
                             </a>
-                            <a href="editLab.html" class="none">
+                            <a href="editLab.php" class="none">
                                 <button class="action-item">
                                     <i class="fas fa-pen"></i>
                                     <span>Edit Lab</span>
                                 </button>
                             </a>
-                            <a href="inventory.html" class="none">
+                            <a href="inventory.php" class="none">
                                 <button class="action-item">
                                     <i class="fas fa-boxes"></i>
                                     <span>Inventory</span>
