@@ -1,8 +1,8 @@
 <?php
 session_start();
-    if (isset($_SESSION["logged_in"]) !== true) {
-      header("Location: login.php");
-    }
+if (isset($_SESSION["logged_in"]) !== true) {
+  header("Location: login.php");
+}
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +84,7 @@ session_start();
         </li>
       </ul>
       <div class="log-out">
-        <a href="login.php" class="none">
+        <a href="logout.php" class="none">
           <span>
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </span>

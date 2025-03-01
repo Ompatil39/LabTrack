@@ -173,11 +173,10 @@
                                 <td><span class="status status-active">Active</span></td>
                                 <td>Working fine</td>
                                 <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <a href="viewDevice.php" class="none">
-                                            <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                        </a>
+                                    <a href="viewDevice.php?device_id=123" class="none">
+                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
                                     </a>
+
                                     <a href="editDevice.php" class="none">
                                         <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
                                     </a>
@@ -531,7 +530,7 @@
         element.classList.toggle('active');
     }
     // Close menu when clicking outside
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         if (!e.target.closest('.actions-menu')) {
             document.querySelectorAll('.actions-menu').forEach(menu => {
                 menu.classList.remove('active');
@@ -545,20 +544,20 @@
     const cancelBtnPopup = document.getElementById('cancel-btnPopup');
     const confirmBtnPopup = document.getElementById('confirm-delete-btnPopup');
 
-    deleteBtnPopup.addEventListener('click', function () {
+    deleteBtnPopup.addEventListener('click', function() {
         popupDelte.style.display = 'flex';
     });
 
-    cancelBtnPopup.addEventListener('click', function () {
+    cancelBtnPopup.addEventListener('click', function() {
         popupDelte.style.display = 'none';
     });
 
-    confirmBtnPopup.addEventListener('click', function () {
+    confirmBtnPopup.addEventListener('click', function() {
         alert('Item deleted successfully!');
         popupDelte.style.display = 'none';
     });
 
-    popupDelte.addEventListener('click', function (e) {
+    popupDelte.addEventListener('click', function(e) {
         if (e.target === popupDelte) {
             popupDelte.style.display = 'none';
         }

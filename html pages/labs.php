@@ -1,3 +1,36 @@
+<?php
+session_start();
+if (isset($_SESSION["logged_in"]) !== true) {
+  header("Location: login.php");
+}
+include 'db.php';
+
+// First, get all labs
+$labsQuery = "SELECT * FROM labs";
+$labsResult = mysqli_query($conn, $labsQuery);
+$labs = mysqli_fetch_all($labsResult, MYSQLI_ASSOC);
+mysqli_free_result($labsResult);
+
+// For each lab, count devices and devices under repair
+foreach ($labs as &$lab) {
+
+  // Count total devices in this lab
+  $deviceCountQuery = "SELECT COUNT(*) as total FROM devices WHERE lab_id = '{$lab['lab_id']}'";
+  $deviceResult = mysqli_query($conn, $deviceCountQuery);
+  $deviceCount = mysqli_fetch_assoc($deviceResult);
+  $lab['total_devices'] = $deviceCount['total'];
+  mysqli_free_result($deviceResult);
+
+  // Count devices under repair in this lab
+  $repairCountQuery = "SELECT COUNT(*) as repair_count FROM devices 
+                         WHERE lab_id = '{$lab['lab_id']}' AND status = 'Under Repair'";
+  $repairResult = mysqli_query($conn, $repairCountQuery);
+  $repairCount = mysqli_fetch_assoc($repairResult);
+  $lab['under_repair_count'] = $repairCount['repair_count'];
+  mysqli_free_result($repairResult);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,205 +124,45 @@
       </div>
       <!-- LABS -->
       <div class="lab-container">
-        <!-- Lab Card 1 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>CO-A-101</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">40</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">8</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button font-number">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 2 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>CO-B-102</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">50</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">12</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 3 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>CO-C-103</h4>
-            <div class="status-chip">
-              <span class="highlight1-red">
-                <i class="fas fa-times-circle"></i> In Repair
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">30</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">5</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 4 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>ME-A-101</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">45</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">3</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 5 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>EE-B-102</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">25</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">6</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 6 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>CS-C-103</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">60</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">10</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 7 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>IT-D-104</h4>
-            <div class="status-chip">
-              <span class="highlight1-red">
-                <i class="fas fa-times-circle"></i> In Repair
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">35</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">7</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
-      
-        <!-- Lab Card 8 -->
-        <a href="lab-details.php" class="lab-card none">
-          <div class="lab-header">
-            <h4>EC-E-105</h4>
-            <div class="status-chip">
-              <span class="highlight1">
-                <i class="fas fa-check-circle"></i> Active
-              </span>
-            </div>
-          </div>
-          <div class="lab-stats">
-            <div class="stat">
-              <span class="stat-value">55</span>
-              <span class="stat-label">Devices</span>
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat">
-              <span class="stat-value">4</span>
-              <span class="stat-label">Under Maintenance</span>
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-          </div>
-          <button class="view-lab-button">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
-        </a>
+        <?php if (empty($labs)): ?>
+          <p>No labs found in the database.</p>
+        <?php else: ?>
+          <?php foreach ($labs as $lab): ?>
+            <a href="lab-details.php?id=<?php echo htmlspecialchars($lab['lab_id']); ?>" class="lab-card none">
+              <div class="lab-header">
+                <h4><?php echo htmlspecialchars($lab['lab_id']); ?></h4>
+                <div class="status-chip">
+                  <?php if ($lab['status'] == 'Active'): ?>
+                    <span class="highlight1">
+                      <i class="fas fa-check-circle"></i> Active
+                    </span>
+                  <?php elseif ($lab['status'] == 'In Repair'): ?>
+                    <span class="highlight1-red">
+                      <i class="fas fa-times-circle"></i> In Repair
+                    </span>
+                  <?php else: ?>
+                    <span class="highlight1-yellow">
+                      <i class="fas fa-exclamation-circle"></i> InActive
+                    </span>
+                  <?php endif; ?>
+                </div>
+              </div>
+              <div class="lab-stats">
+                <div class="stat">
+                  <span class="stat-value"><?php echo (int)$lab['total_devices']; ?></span>
+                  <span class="stat-label">Devices</span>
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="stat">
+                  <span class="stat-value"><?php echo (int)$lab['under_repair_count']; ?></span>
+                  <span class="stat-label">Under Repair</span>
+                  <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+              </div>
+              <button class="view-lab-button font-number">View Lab &nbsp;<i class="fa-solid fa-angles-right"></i></button>
+            </a>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </div>
       <!-- Lab container end -->
       <!-- Floating Action Button -->
