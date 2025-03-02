@@ -1,5 +1,9 @@
 <?php
-include 'db.php'; // Database connection
+session_start();
+if (isset($_SESSION["logged_in"]) !== true) {
+  header("Location: login.php");
+}
+include 'db.php';
 
 // Fetch lab options
 $query = "SELECT username FROM users";
@@ -308,7 +312,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </svg>
                 Add Devices
               </div>
-              <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php'">
+              <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php?lab_id=<?= $lab_details['lab_id'] ?>'">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
                   height="16">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -334,18 +338,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     document.addEventListener('DOMContentLoaded', function() {
       const labDoneBtnModal = document.getElementById('lab-done-btnModal');
       const labCreatedModal = document.getElementById('lab-created-modal');
-      
+
       if (labDoneBtnModal) {
-        labDoneBtnModal.addEventListener('click', function () {
+        labDoneBtnModal.addEventListener('click', function() {
           if (labCreatedModal) {
             labCreatedModal.style.display = 'none';
           }
         });
       }
-      
+
       // Close modal when clicking outside
       if (labCreatedModal) {
-        labCreatedModal.addEventListener('click', function (e) {
+        labCreatedModal.addEventListener('click', function(e) {
           if (e.target === labCreatedModal) {
             labCreatedModal.style.display = 'none';
           }
