@@ -1,3 +1,77 @@
+<?php
+session_start();
+if (isset($_SESSION["logged_in"]) !== true) {
+    header("Location: login.php");
+}
+include 'db.php';
+
+// Pagination parameters
+$items_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $items_per_page;
+
+// Get filter parameters from GET (for URL persistence)
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$lab_filter = isset($_GET['lab']) ? $conn->real_escape_string($_GET['lab']) : '';
+$status_filter = isset($_GET['status']) ? $conn->real_escape_string($_GET['status']) : '';
+$category_filter = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : '';
+
+// Build the WHERE clause for filtering
+$where = "WHERE 1=1"; // Base condition that’s always true
+if (!empty($search)) {
+    $where .= " AND (d.device_id LIKE '%$search%' OR d.device_name LIKE '%$search%')";
+}
+if (!empty($lab_filter)) {
+    $where .= " AND l.lab_name = '$lab_filter'";
+}
+if (!empty($status_filter)) {
+    $where .= " AND d.status = '$status_filter'";
+}
+if (!empty($category_filter)) {
+    $where .= " AND d.device_type = '$category_filter'";
+}
+
+// Get total counts for cards
+$total_labs = $conn->query("SELECT COUNT(*) as count FROM labs")->fetch_assoc()['count'];
+$total_devices = $conn->query("SELECT COUNT(*) as count FROM devices")->fetch_assoc()['count'];
+$in_repair = $conn->query("SELECT COUNT(*) as count FROM devices WHERE status = 'In Repair'")->fetch_assoc()['count'];
+$faulty_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE status = 'Faulty'")->fetch_assoc()['count'];
+
+// Get total items for pagination
+$total_items = $conn->query("SELECT COUNT(*) as count FROM devices d LEFT JOIN labs l ON d.lab_id = l.lab_id $where")->fetch_assoc()['count'];
+
+// Function to generate pagination links
+function generatePagination($total_items, $items_per_page, $current_page, $base_url)
+{
+    $total_pages = ceil($total_items / $items_per_page);
+    $pagination = '<div class="pagination">';
+
+    $params = $_GET;
+    unset($params['page']); // Remove page parameter to rebuild it
+
+    if ($current_page > 1) {
+        $params['page'] = $current_page - 1;
+        $pagination .= '<a href="' . $base_url . '?' . http_build_query($params) . '" class="pagination-link">Previous</a>';
+    }
+
+    for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
+        $params['page'] = $i;
+        $pagination .= '<a href="' . $base_url . '?' . http_build_query($params) . '"';
+        if ($i == $current_page) $pagination .= ' class="pagination-link active"';
+        else $pagination .= ' class="pagination-link"';
+        $pagination .= '>' . $i . '</a>';
+    }
+
+    if ($current_page < $total_pages) {
+        $params['page'] = $current_page + 1;
+        $pagination .= '<a href="' . $base_url . '?' . http_build_query($params) . '" class="pagination-link">Next</a>';
+    }
+
+    $pagination .= '</div>';
+    return $pagination;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,12 +82,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
         integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-    <!-- Include Sparkline Plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
-
     <link rel="stylesheet" href="../public/css/style.css" />
     <script src="https://kit.fontawesome.com/0319a73572.js" crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
@@ -44,81 +114,62 @@
             <hr class="solid" />
             <ul class="menu">
                 <li class="menu-title">Menu</li>
-                <!-- Dashboard Link -->
                 <li>
-                    <a href="index.php">
-                        <i class="fa-solid fa-chart-pie"></i> Dashboard
-                    </a>
+                    <a href="index.php"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
                 </li>
                 <li>
-                    <a href="labs.php">
-                        <i class="fa-solid fa-network-wired"></i>
-                        Labs
-                    </a>
+                    <a href="labs.php"><i class="fa-solid fa-network-wired"></i> Labs</a>
                 </li>
                 <li>
-                    <a href="addLab.php">
-                        <i class="fa-solid fa-plus"></i></i><span>Add Lab</span>
-                    </a>
+                    <a href="addLab.php"><i class="fa-solid fa-plus"></i> <span>Add Lab</span></a>
                 </li>
                 <li>
-                    <a href="addDevice.php">
-                        <i class="fa-solid fa-plus"></i></i><span>Add Devices</span>
-                    </a>
+                    <a href="addDevice.php"><i class="fa-solid fa-plus"></i> <span>Add Devices</span></a>
                 </li>
                 <li class="active">
-                    <a href="inventory.php">
-                        <i class="fa-solid fa-warehouse"></i> <span>Inventory</span>
-                    </a>
+                    <a href="inventory.php"><i class="fa-solid fa-warehouse"></i> <span>Inventory</span></a>
                 </li>
                 <li>
-                    <a href="grievance.php">
-                        <i class="fa-solid fa-paper-plane"></i> Grievance
-                    </a>
+                    <a href="grievance.php"><i class="fa-solid fa-paper-plane"></i> Grievance</a>
                 </li>
             </ul>
         </div>
 
         <!-- Main Content Area -->
         <div class="main-content">
-            <!-- Header -->
             <div class="header">
-                <!-- User Info Section -->
                 <div class="sub-heading">
                     <span>Inventory Management</span>
                 </div>
                 <div class="user-info">
-                    <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
-                    </span>
+                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator</span>
                 </div>
             </div>
 
-            <!-- CONTENT START BELOW HEADER -->
             <!-- Card View -->
             <div class="card-view">
                 <div class="card blue-top">
                     <h3>Total Labs</h3>
-                    <p class="font-number">8</p>
+                    <p class="font-number"><?php echo $total_labs; ?></p>
                     <i class="fa-solid fa-server blue-hover"></i>
                 </div>
                 <div class="card green-top">
                     <h3>Total Devices</h3>
-                    <p class="font-number">160</p>
+                    <p class="font-number"><?php echo $total_devices; ?></p>
                     <i class="fa-solid fa-computer green-hover"></i>
                 </div>
                 <div class="card yellow-top">
                     <h3>In Repair</h3>
-                    <p class="font-number">30</p>
+                    <p class="font-number"><?php echo $in_repair; ?></p>
                     <i class="fas fa-tools yellow-hover"></i>
                 </div>
                 <div class="card red-top">
                     <h3>Faulty Devices</h3>
-                    <p class="font-number">40</p>
+                    <p class="font-number"><?php echo $faulty_devices; ?></p>
                     <i class="fas fa-triangle-exclamation red-hover"></i>
                 </div>
             </div>
-            <!-- CARDs VIEW END -->
+
             <!-- Table View -->
             <div class="items margin-bottom">
                 <div class="sub-heading">
@@ -127,374 +178,94 @@
 
                 <div class="header1">
                     <div class="filters">
-                        <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
-                        <select id="labFilter">
-                            <option value="">All Labs</option>
-                            <option value="Lab A">Lab A</option>
-                            <option value="Lab B">Lab B</option>
-                            <option value="Lab C">Lab C</option>
-                        </select>
-                        <select id="statusFilter">
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="In Repair">In Repair</option>
-                            <option value="Faulty">Faulty</option>
-                        </select>
-                        <select id="categoryFilter">
-                            <option value="">All Categories</option>
-                            <option value="PC">PC</option>
-                            <option value="Printer">Printer</option>
-                            <option value="Mouse">Mouse</option>
-                            <option value="Keyboard">Keyboard</option>
-                        </select>
+                        <form id="filterForm" method="GET" action="inventory.php">
+                            <input class="search-input" type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search using ID, Name..." style="margin-right: auto;">
+                            <select id="labFilter" name="lab" class="float-right">
+                                <option value="">All Labs</option>
+                                <?php
+                                $labs = $conn->query("SELECT DISTINCT lab_name FROM labs ORDER BY lab_name");
+                                while ($lab = $labs->fetch_assoc()) {
+                                    $selected = ($lab_filter === $lab['lab_name']) ? 'selected' : '';
+                                    echo "<option value='" . htmlspecialchars($lab['lab_name']) . "' $selected>" . htmlspecialchars($lab['lab_name']) . "</option>";
+                                }
+                                ?>
+                            </select>
+                            <select id="statusFilter" name="status">
+                                <option value="">All Status</option>
+                                <option value="Active" <?php echo $status_filter === 'Active' ? 'selected' : ''; ?>>Active</option>
+                                <option value="In Repair" <?php echo $status_filter === 'In Repair' ? 'selected' : ''; ?>>In Repair</option>
+                                <option value="Faulty" <?php echo $status_filter === 'Faulty' ? 'selected' : ''; ?>>Faulty</option>
+                            </select>
+                            <select id="categoryFilter" name="category">
+                                <option value="">All Categories</option>
+                                <option value="PC" <?php echo $category_filter === 'PC' ? 'selected' : ''; ?>>PC</option>
+                                <option value="Printer" <?php echo $category_filter === 'Printer' ? 'selected' : ''; ?>>Printer</option>
+                                <option value="Mouse" <?php echo $category_filter === 'Mouse' ? 'selected' : ''; ?>>Mouse</option>
+                                <option value="Keyboard" <?php echo $category_filter === 'Keyboard' ? 'selected' : ''; ?>>Keyboard</option>
+                            </select>
+                        </form>
                     </div>
                 </div>
+
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th onclick="sortTable(0)">Device ID <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(1)">Device Name <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(2)">Category <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(3)">Lab <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(4)">PC <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(5)">Status <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(6)">Remarks <i class="fas fa-sort"></i></th>
+                                <th>Device ID <i class="fas fa-sort"></i></th>
+                                <th>Device Name <i class="fas fa-sort"></i></th>
+                                <th>Category <i class="fas fa-sort"></i></th>
+                                <th>Lab <i class="fas fa-sort"></i></th>
+                                <th>PC <i class="fas fa-sort"></i></th>
+                                <th>Status <i class="fas fa-sort"></i></th>
+                                <th>Remarks <i class="fas fa-sort"></i></th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1001</td>
-                                <td>Dell Monitor</td>
-                                <td>Monitor</td>
-                                <td>Lab A</td>
-                                <td>PC-01</td>
-                                <td><span class="status status-active">Active</span></td>
-                                <td>Working fine</td>
-                                <td>
-                                    <a href="viewDevice.php?device_id=123" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
+                            <?php
+                            $sql = "SELECT d.device_id, d.device_name, d.device_type, l.lab_name, 
+                    COALESCE(p.pc_id, 'N/A') as pc_id, d.status, 'Working' as remarks
+                    FROM devices d
+                    LEFT JOIN labs l ON d.lab_id = l.lab_id
+                    LEFT JOIN pc_details p ON d.device_id = p.device_id
+                    $where
+                    LIMIT $offset, $items_per_page";
+                            $result = $conn->query($sql);
 
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1002</td>
-                                <td>HP Printer</td>
-                                <td>Printer</td>
-                                <td>Lab B</td>
-                                <td>PC-05</td>
-                                <td><span class="status status-repair">In Repair</span></td>
-                                <td>Paper jam issue</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1003</td>
-                                <td>Logitech Mouse</td>
-                                <td>Mouse</td>
-                                <td>Lab C</td>
-                                <td>PC-08</td>
-                                <td><span class="status status-faulty">Faulty</span></td>
-                                <td>Left click not working</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1004</td>
-                                <td>Dell Keyboard</td>
-                                <td>Keyboard</td>
-                                <td>Lab A</td>
-                                <td>PC-03</td>
-                                <td><span class="status status-active">Active</span></td>
-                                <td>N/A</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1005</td>
-                                <td>HP Monitor</td>
-                                <td>Monitor</td>
-                                <td>Lab B</td>
-                                <td>PC-07</td>
-                                <td><span class="status status-repair">Repair</span></td>
-                                <td>Screen flickering</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1006</td>
-                                <td>Logitech Mouse</td>
-                                <td>Mouse</td>
-                                <td>Lab C</td>
-                                <td>PC-10</td>
-                                <td><span class="status status-active">Active</span></td>
-                                <td>N/A</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1007</td>
-                                <td>Dell Monitor</td>
-                                <td>Monitor</td>
-                                <td>Lab D</td>
-                                <td>PC-12</td>
-                                <td><span class="status status-faulty">Faulty</span></td>
-                                <td>Dead pixels</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1008</td>
-                                <td>HP Keyboard</td>
-                                <td>Keyboard</td>
-                                <td>Lab A</td>
-                                <td>PC-04</td>
-                                <td><span class="status status-active">Active</span></td>
-                                <td>N/A</td>
-                                <td>
-                                    <a href="viewDevice.php" class="none">
-                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                    </a>
-                                    <a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a>
-                                    <button class="btn-icon delete-btn" id="delete-trigger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
+                            if ($result && $result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['device_id']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['device_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['device_type']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['lab_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['pc_id']) . "</td>";
+                                    echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
+                                    echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
+                                    echo "<td>
+                            <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
+                                <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
+                            </a>
+                            <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
+                                <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
+                            </a>
+                            <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
+                          </td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='8'>No devices found</td></tr>";
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination">
-                    <a href="#">Previous</a>
-                    <a href="#">1</a>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#">Next</a>
-                </div>
-            </div>
-            <!-- TABLE VIEW END -->
-            <!-- TABLE 2 -->
-            <div class="items">
-                <div class="sub-heading">
-                    <span>Spare Parts</span>
-                </div>
-                <div class="table-container">
-                    <table id="partsTable" class="display">
-                        <thead>
-                            <tr>
-                                <th>Part ID</th>
-                                <th>Part Name</th>
-                                <th>Quantity</th>
-                                <th>Category</th>
-                                <th>Vendor</th>
-                                <th>Purchase Date</th>
-                                <th>Price (INR)</th>
-                                <th>Status</th>
-                                <th>Edit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>SP-001</td>
-                                <td>8GB DDR4 RAM</td>
-                                <td>15</td>
-                                <td>Hardware</td>
-                                <td>TechSupplies Inc</td>
-                                <td>2023-09-15</td>
-                                <td>₹3,486</td>
-                                <td><span class="in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-002</td>
-                                <td>500GB SSD</td>
-                                <td>8</td>
-                                <td>Storage</td>
-                                <td>StorageMasters</td>
-                                <td>2023-10-01</td>
-                                <td>₹5,603</td>
-                                <td><span class="low-stock">Low Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-003</td>
-                                <td>USB-C Hub</td>
-                                <td>25</td>
-                                <td>Peripherals</td>
-                                <td>ConnectTech</td>
-                                <td>2023-08-22</td>
-                                <td>₹2,489</td>
-                                <td><span class=" in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-004</td>
-                                <td>WiFi Adapter</td>
-                                <td>3</td>
-                                <td>Networking</td>
-                                <td>NetGear Pro</td>
-                                <td>2023-11-05</td>
-                                <td>₹1,572</td>
-                                <td><span class=" out-of-stock">Out of Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-005</td>
-                                <td>Keyboard (Wired)</td>
-                                <td>12</td>
-                                <td>Peripherals</td>
-                                <td>InputMasters</td>
-                                <td>2023-10-18</td>
-                                <td>₹2,074</td>
-                                <td><span class=" in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-006</td>
-                                <td>24" Monitor</td>
-                                <td>5</td>
-                                <td>Display</td>
-                                <td>DisplayTech</td>
-                                <td>2023-09-30</td>
-                                <td>₹13,197</td>
-                                <td><span class=" low-stock">Low Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-007</td>
-                                <td>CPU Cooler</td>
-                                <td>7</td>
-                                <td>Cooling</td>
-                                <td>CoolMaster</td>
-                                <td>2023-11-12</td>
-                                <td>₹3,735</td>
-                                <td><span class=" in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-008</td>
-                                <td>HDMI Cables</td>
-                                <td>35</td>
-                                <td>Cables</td>
-                                <td>ConnectTech</td>
-                                <td>2023-07-14</td>
-                                <td>₹746</td>
-                                <td><span class=" in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-009</td>
-                                <td>Power Supply 650W</td>
-                                <td>4</td>
-                                <td>Power</td>
-                                <td>PowerEdge</td>
-                                <td>2023-10-29</td>
-                                <td>₹7,469</td>
-                                <td><span class=" low-stock">Low Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                            <tr>
-                                <td>SP-010</td>
-                                <td>Webcam 1080p</td>
-                                <td>9</td>
-                                <td>Peripherals</td>
-                                <td>CamTech</td>
-                                <td>2023-11-08</td>
-                                <td>₹4,146</td>
-                                <td><span class=" in-stock">In Stock</span></td>
-                                <td><a href="editDevice.php" class="none">
-                                        <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                    </a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="pagination">
-                        <a href="#">Previous</a>
-                        <a href="#">1</a>
-                        <a href="#">2</a>
-                        <a href="#">3</a>
-                        <a href="#">Next</a>
-                    </div>
-                </div>
+                <?php echo generatePagination($total_items, $items_per_page, $page, "inventory.php"); ?>
             </div>
         </div>
-        <!-- CONTENT END  -->
     </div>
-    <!-- POP UP FOR DELTE -->
+
+    <!-- Delete Confirmation Modal -->
     <div id="delete-popup" class="popupDelte-up-overlay">
         <div class="popupDelte">
             <div class="popupDelte-header">
@@ -503,14 +274,11 @@
                 </div>
                 <h2 class="popupDelte-title">Confirm Deletion</h2>
             </div>
-
             <div class="popupDelte-body">
                 <p class="delete-text">Are you sure you want to delete <span id="item-type">this device</span>?</p>
-                <div class="item-name" id="item-name">Abc Device (Lab 000)</div>
-                <p class="delete-warning">This action cannot be undone. The item will be permanently removed from the
-                    system.</p>
+                <div class="item-name" id="item-name"></div>
+                <p class="delete-warning">This action cannot be undone. The item will be permanently removed from the system.</p>
             </div>
-
             <div class="popupDelte-footer">
                 <button class="btnPopup btnPopup-cancel" id="cancel-btnPopup">Cancel</button>
                 <button class="btnPopup btnPopup-delete" id="confirm-delete-btnPopup">Delete</button>
@@ -518,50 +286,109 @@
         </div>
     </div>
 
-    </div>
-</body>
-<script>
-    function toggleMenu(element) {
-        // Close all other menus
-        document.querySelectorAll('.actions-menu').forEach(menu => {
-            if (menu !== element) menu.classList.remove('active');
-        });
-        // Toggle current menu
-        element.classList.toggle('active');
-    }
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.actions-menu')) {
-            document.querySelectorAll('.actions-menu').forEach(menu => {
-                menu.classList.remove('active');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter handling
+            const filterForm = document.getElementById('filterForm');
+            const filterInputs = filterForm.querySelectorAll('input, select');
+            filterInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    filterForm.submit(); // Submit form on filter change
+                });
             });
-        }
-    });
 
-    // POP UP DELETE CONFIRMATION
-    const deleteBtnPopup = document.getElementById('delete-trigger');
-    const popupDelte = document.getElementById('delete-popup');
-    const cancelBtnPopup = document.getElementById('cancel-btnPopup');
-    const confirmBtnPopup = document.getElementById('confirm-delete-btnPopup');
+            // Pagination handling to prevent jumping to top
+            document.querySelectorAll('.pagination-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default anchor behavior
+                    const href = this.getAttribute('href');
+                    const currentScroll = window.scrollY; // Store current scroll position
 
-    deleteBtnPopup.addEventListener('click', function() {
-        popupDelte.style.display = 'flex';
-    });
+                    // Store scroll position before navigation
+                    sessionStorage.setItem('scrollPos', currentScroll);
 
-    cancelBtnPopup.addEventListener('click', function() {
-        popupDelte.style.display = 'none';
-    });
+                    // Navigate to new page
+                    window.location.href = href;
+                });
+            });
 
-    confirmBtnPopup.addEventListener('click', function() {
-        alert('Item deleted successfully!');
-        popupDelte.style.display = 'none';
-    });
+            // Restore scroll position on page load
+            const scrollPos = sessionStorage.getItem('scrollPos');
+            if (scrollPos) {
+                window.scrollTo(0, parseInt(scrollPos));
+                sessionStorage.removeItem('scrollPos');
+            }
 
-    popupDelte.addEventListener('click', function(e) {
-        if (e.target === popupDelte) {
-            popupDelte.style.display = 'none';
-        }
-    });
-</script>
+            // Delete popup functionality
+            const deleteButtons = document.querySelectorAll('.delete-trigger');
+            const deletePopup = document.getElementById('delete-popup');
+            const cancelBtn = document.getElementById('cancel-btnPopup');
+            const confirmBtn = document.getElementById('confirm-delete-btnPopup');
+            const itemNameElement = document.getElementById('item-name');
+            let currentDeviceId = '';
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentDeviceId = this.getAttribute('data-id');
+                    const deviceName = this.getAttribute('data-name');
+                    itemNameElement.textContent = deviceName + " (ID: " + currentDeviceId + ")";
+                    deletePopup.style.display = 'flex';
+                });
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                deletePopup.style.display = 'none';
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                confirmBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('device_id', currentDeviceId);
+
+                fetch('deleteDevice.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message || 'Device deleted successfully!');
+                            // Find the row by searching for the device ID in the first <td>
+                            const deviceRow = document.querySelector(`tr td:first-child:contains("${currentDeviceId}")`)?.parentElement;
+                            if (deviceRow) {
+                                deviceRow.remove();
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert('Error: ' + (data.message || 'Unknown error occurred'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        alert('An error occurred while deleting the device: ' + error.message);
+                    })
+                    .finally(() => {
+                        confirmBtn.innerHTML = 'Delete';
+                        confirmBtn.disabled = false;
+                        deletePopup.style.display = 'none';
+                    });
+            });
+
+            deletePopup.addEventListener('click', function(e) {
+                if (e.target === deletePopup) {
+                    deletePopup.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
 
 </html>

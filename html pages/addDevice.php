@@ -523,11 +523,11 @@ $showModal = ($messageType === 'success' && $deviceDetails !== null);
                             </div>
                             <div class="input-group">
                                 <label class="input-label">Select Lab <span>*</span></label>
-                                <select name="lab_id" class="form-input" required>
+                                <select class="form-input" id="labSelect" required>
                                     <option value="">Select Lab</option>
                                     <?php foreach ($labs as $lab): ?>
-                                        <option value="<?php echo $lab['lab_id']; ?>"><?php echo $lab['lab_name']  . ' : ' . 
-                                                                                         $lab['lab_id']; ?></option>
+                                        <option value="<?php echo $lab['lab_id']; ?>"><?php echo $lab['lab_name']  . ' : ' .
+                                                                                            $lab['lab_id']; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

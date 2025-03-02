@@ -441,14 +441,14 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                                         echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
                                                         echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
                                                         echo "<td>
-                                    <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
-                                        <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
-                                    </a>
-                                    <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
-                                        <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
-                                    </a>
-                                    <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
-                                  </td>";
+        <a href='viewDevice.php?deviceid=" . $row['device_id'] . "' class='none'>
+            <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
+        </a>
+        <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
+            <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
+        </a>
+        <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
+      </td>";
                                                         echo "</tr>";
                                                     }
                                                 } else {
@@ -701,23 +701,29 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                             method: 'POST',
                             body: formData
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success) {
-                                alert(data.message);
-                                const deviceRow = document.querySelector(`tr[data-device-id="${currentDeviceId}"]`);
-                                if (deviceRow) {
+                                alert(data.message || 'Device deleted successfully!');
+                                // Use jQuery to find and remove the row
+                                const deviceRow = $(`tr td:first-child:contains("${currentDeviceId}")`).parent('tr');
+                                if (deviceRow.length) {
                                     deviceRow.remove();
                                 } else {
                                     location.reload();
                                 }
                             } else {
-                                alert('Error: ' + data.message);
+                                alert('Error: ' + (data.message || 'Unknown error occurred'));
                             }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while deleting the device.');
+                            console.error('Fetch Error:', error);
+                            alert('An error occurred while deleting the device: ' + error.message);
                         })
                         .finally(() => {
                             confirmBtn.innerHTML = 'Delete';

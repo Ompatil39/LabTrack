@@ -1170,7 +1170,7 @@ td .status {
 
 .filters {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1rem;
   margin: 0 auto;
 }
@@ -1295,7 +1295,7 @@ select option:hover {
 }
 
 .search-input {
-  margin-right: auto;
+  margin-right: auto !important;
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
