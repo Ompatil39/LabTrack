@@ -93,6 +93,27 @@ CREATE TABLE `printers` (
   `serial_number` varchar(100)
 );
 
+
+CREATE TABLE `grievances` (
+  `grievance_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `submitted_by` VARCHAR(100) NOT NULL,
+  `stud_enrollment` VARCHAR(20) NOT NULL,
+  `class` VARCHAR(10) NOT NULL, -- Format: CO-5I
+  `lab_id` VARCHAR(20) NOT NULL,
+  `device_id` VARCHAR(20),
+  `device_category` ENUM('PC', 'Printer', 'Mouse', 'Keyboard', 'Monitor', 'CPU') NOT NULL,
+  `device_name` VARCHAR(100),
+  `submission_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `status` ENUM('Submitted', 'In Progress', 'Under Review', 'Resolved', 'Closed') DEFAULT 'Submitted',
+  `stud_email` VARCHAR(100) NOT NULL,
+  `grievance_desc` TEXT NOT NULL,
+  `admin_note` TEXT,
+  
+  FOREIGN KEY (`lab_id`) REFERENCES `labs`(`lab_id`),
+  FOREIGN KEY (`device_id`) REFERENCES `devices`(`device_id`)
+);
+
+
 ALTER TABLE `devices` ADD FOREIGN KEY (`lab_id`) REFERENCES `labs` (`lab_id`);
 
 ALTER TABLE `pc_details` ADD FOREIGN KEY (`device_id`) REFERENCES `devices` (`device_id`);
