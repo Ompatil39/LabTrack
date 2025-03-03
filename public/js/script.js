@@ -65,8 +65,7 @@ const maintenanceChart = new Chart(ctx, {
         backgroundColor: function (context) {
           const chart = context.chart;
           const { ctx, chartArea } = chart;
-          if (!chartArea) return "#3498db"; // Ensure chart area exists
-          // Create gradient inside the chart context
+          if (!chartArea) return "#3498db"; 
           const gradient = ctx.createLinearGradient(
             0,
             chartArea.top,
