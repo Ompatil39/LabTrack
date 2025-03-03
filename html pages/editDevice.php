@@ -427,6 +427,7 @@
             document.getElementById("pcInput").style.display = "block";
             document.getElementById("printerInput").style.display = "none";
         }
+
         function showPrinter() {
             document.getElementById("printerInput").style.display = "block";
             document.getElementById("pcInput").style.display = "none";

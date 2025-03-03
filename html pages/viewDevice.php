@@ -49,30 +49,30 @@ switch ($device_data['device_type']) {
                         WHERE p.device_id = ?";
         break;
     case 'Monitor':
-        $detail_query = "SELECT m.brand_model, m.resolution, m.serial_number, m.status
-                        FROM monitors m
-                        WHERE m.device_id = ?";
+        $detail_query = "SELECT brand_model, resolution, serial_number, status
+                        FROM monitors 
+                        WHERE device_id = ?";
         break;
     case 'Keyboard':
-        $detail_query = "SELECT k.keyboard_name, k.keyboard_type, k.serial_number, k.status
-                        FROM keyboards k
-                        WHERE k.device_id = ?";
+        $detail_query = "SELECT keyboard_name, keyboard_type, serial_number, status
+                        FROM keyboards 
+                        WHERE device_id = ?";
         break;
     case 'Mouse':
-        $detail_query = "SELECT m.mouse_name, m.mouse_type, m.serial_number, m.status
-                        FROM mice m
-                        WHERE m.device_id = ?";
+        $detail_query = "SELECT mouse_name, mouse_type, serial_number, status
+                        FROM mice 
+                        WHERE device_id = ?";
         break;
     case 'CPU':
-        $detail_query = "SELECT c.case_model, c.serial_number, c.power_supply, c.status
-                        FROM cpus c
-                        WHERE c.device_id = ?";
+        $detail_query = "SELECT case_model, serial_number, power_supply, status
+                        FROM cpus 
+                        WHERE device_id = ?";
         break;
     case 'Printer':
-        $detail_query = "SELECT p.printer_model, p.printer_type, p.color_capability, 
-                               p.connectivity, p.serial_number
-                        FROM printers p
-                        WHERE p.device_id = ?";
+        $detail_query = "SELECT printer_model, printer_type, color_capability, 
+                               connectivity, serial_number
+                        FROM printers 
+                        WHERE device_id = ?";
         break;
     default:
         $detail_query = "";

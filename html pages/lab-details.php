@@ -441,7 +441,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                                         echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
                                                         echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
                                                         echo "<td>
-        <a href='viewDevice.php?deviceid=" . $row['device_id'] . "' class='none'>
+        <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
             <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
         </a>
         <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
