@@ -193,8 +193,8 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                             <select id="statusFilter" name="status">
                                 <option value="">All Status</option>
                                 <option value="Active" <?php echo $status_filter === 'Active' ? 'selected' : ''; ?>>Active</option>
-                                <option value="In Repair" <?php echo $status_filter === 'In Repair' ? 'selected' : ''; ?>>In Repair</option>
-                                <option value="Faulty" <?php echo $status_filter === 'Faulty' ? 'selected' : ''; ?>>Faulty</option>
+                                <option value="In Repair" <?php echo $status_filter === 'Under Repair' ? 'selected' : ''; ?>>Under Repair</option>
+                                <option value="Faulty" <?php echo $status_filter === 'InActive' ? 'selected' : ''; ?>>InActive</option>
                             </select>
                             <select id="categoryFilter" name="category">
                                 <option value="">All Categories</option>

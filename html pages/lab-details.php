@@ -100,6 +100,8 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
 // Get total counts for pagination
 $total_pcs = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type = 'PC'")->fetch_assoc()['count'];
 $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type != 'PC'")->fetch_assoc()['count'];
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,23 +1,27 @@
 <?php
 session_start();
-include 'db.php'; // Include the database connection file
-
+include 'db.php';
 $error = '';
+
+$password = "admin123";
+$hashed_password = password_hash($password, PASSWORD_BCRYPT);
+// echo $hashed_password;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
     if (!empty($username) && !empty($password)) {
-        
+
         $stmt = $conn->prepare("SELECT user_id, username, password, user_type FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
+
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
- 
+
             if (password_verify($password, $user['password'])) {
 
                 $_SESSION['user_id'] = $user['user_id'];
@@ -27,13 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 header("Location: index.php");
                 exit();
-            } 
-            else {
+            } else {
                 $error = "Invalid username or password.";
             }
-
-        } 
-        else {
+        } else {
             $error = "Invalid username or password.";
         }
 
@@ -42,10 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Please fill in both fields.";
     }
 }
+$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </style>
 </head>
+
 <body>
     <div class="container-login">
         <div class="left-panel">
@@ -90,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        <i class="fas fa-eye icon"></i>
+                        <!-- <i class="fas fa-lock icon"></i> Changed to lock icon -->
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-25%); color: #7f8c8d; cursor: pointer;"></i>
                     </div>
 
                     <div class="remember-forgot">
@@ -107,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div class="student-grievance">
-                    <button class="grievance-button">
+                    <button class="grievance-button" onclick="window.location.href = 'submitGrievance.php'; return false;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                         </svg>
@@ -117,5 +122,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
+
 </html>

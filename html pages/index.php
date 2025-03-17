@@ -51,6 +51,9 @@ $grievance_status = fetchArray($conn, "SELECT status, COUNT(*) as count FROM gri
 $device_status_for_chart = fetchArray($conn, "SELECT status, COUNT(*) as count FROM devices GROUP BY status", "Device Status for Chart");
 $pending_grievances_by_category = fetchArray($conn, "SELECT device_category, COUNT(*) as count FROM grievances WHERE status IN ('Submitted', 'In Progress', 'Under Review') GROUP BY device_category", "Pending Grievances by Category");
 $avg_grievance_time = fetchArray($conn, "SELECT device_type, COUNT(*) as count FROM devices WHERE status = 'In Repair' GROUP BY device_type LIMIT 4", "Average Grievance Time");
+
+$conn->close();
+
 ?>
 
 <!DOCTYPE html>

@@ -33,27 +33,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   {
     // Extract the year from the establishment date
     $year = date('Y', strtotime($estDate));
-
     // Get the department short form (first two characters in uppercase)
     $deptShort = strtoupper(substr($dept, 0, 2));
-
-    // Query to find the last lab code for the same department and year
-    $query = "SELECT lab_id FROM labs WHERE lab_id LIKE '$deptShort-$year-%' ORDER BY lab_id DESC LIMIT 1";
+    // Query to find the highest serial number across ALL labs
+    $query = "SELECT lab_id FROM labs ORDER BY SUBSTRING(lab_id, -3) DESC LIMIT 1";
     $result = $conn->query($query);
-
     if ($result->num_rows > 0) {
-      // If labs exist for the same department and year, increment the serial number
+      // If labs exist, increment the highest serial number
       $lastLabCode = $result->fetch_assoc()['lab_id'];
       $lastSerial = (int) substr($lastLabCode, -3); // Extract the last 3 digits
       $newSerial = $lastSerial + 1;
     } else {
-      // If no labs exist for the same department and year, start with 101
+      // If no labs exist, start with 101
       $newSerial = 101;
     }
-
     // Format the serial number to 3 digits (e.g., 101, 102, ..., 999)
     $serial = str_pad($newSerial, 3, '0', STR_PAD_LEFT);
-
     // Generate the lab code
     $labCode = "$deptShort-$year-$serial";
     return $labCode;
@@ -77,6 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $error = "Failed to add lab. Please try again.";
   }
 }
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -312,7 +308,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </svg>
                 Add Devices
               </div>
-              <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php?lab_id=<?= $lab_details['lab_id'] ?>'">
+              <div class="action-btnModal" id="view-lab-btnModal" onclick="window.location.href='lab-details.php?id=<?= $lab_details['lab_id'] ?>'">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16"
                   height="16">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

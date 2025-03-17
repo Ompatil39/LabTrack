@@ -377,6 +377,8 @@ $lastCPU = getLastPeripheralData($conn, 'CPU', 'cpus');
 $lastPrinter = getLastPeripheralData($conn, 'Printer', 'printers');
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>

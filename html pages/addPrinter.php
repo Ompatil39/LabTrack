@@ -118,6 +118,8 @@ function getLabName($lab_id, $conn)
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>

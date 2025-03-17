@@ -1,3 +1,139 @@
+<?php
+session_start();
+
+if (isset($_SESSION["logged_in"]) !== true) {
+    header("Location: login.php");
+}
+
+include 'db.php';
+
+// Initialize filter variables
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$lab_filter = isset($_GET['lab']) ? $_GET['lab'] : '';
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$category_filter = isset($_GET['category']) ? $_GET['category'] : '';
+$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'submission_date';
+$sort_order = isset($_GET['order']) ? $_GET['order'] : 'DESC';
+
+// Pagination parameters
+$items_per_page = 10; // Set to 10 rows per page
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $items_per_page;
+
+// Get counts for the card view
+$new_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status = 'Submitted'")->fetch_assoc()['count'];
+$resolved_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status = 'Resolved'")->fetch_assoc()['count'];
+$in_progress_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status IN ('In Progress', 'Under Review')")->fetch_assoc()['count'];
+$unsolved_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status NOT IN ('Resolved', 'Closed')")->fetch_assoc()['count'];
+
+// Build base query with filters
+$base_query = "SELECT g.*, l.lab_name 
+              FROM grievances g
+              LEFT JOIN labs l ON g.lab_id = l.lab_id
+              WHERE 1=1";
+
+$count_query = "SELECT COUNT(*) as total 
+               FROM grievances g
+               LEFT JOIN labs l ON g.lab_id = l.lab_id
+               WHERE 1=1";
+
+if (!empty($search)) {
+    $search_condition = " AND (g.grievance_id LIKE '%$search%' 
+                          OR g.submitted_by LIKE '%$search%' 
+                          OR g.stud_enrollment LIKE '%$search%')";
+    $base_query .= $search_condition;
+    $count_query .= $search_condition;
+}
+
+if (!empty($lab_filter)) {
+    $base_query .= " AND g.lab_id = '$lab_filter'";
+    $count_query .= " AND g.lab_id = '$lab_filter'";
+}
+
+if (!empty($status_filter)) {
+    $base_query .= " AND g.status = '$status_filter'";
+    $count_query .= " AND g.status = '$status_filter'";
+}
+
+if (!empty($category_filter)) {
+    $base_query .= " AND g.device_category = '$category_filter'";
+    $count_query .= " AND g.device_category = '$category_filter'";
+}
+
+// Get total count for pagination
+$count_result = $conn->query($count_query);
+$total_items = $count_result->fetch_assoc()['total'];
+
+// Add sorting and pagination to main query
+$valid_columns = ['grievance_id', 'submitted_by', 'device_category', 'status', 'submission_date'];
+$valid_orders = ['ASC', 'DESC'];
+
+$sort_column = in_array($sort_column, $valid_columns) ? $sort_column : 'submission_date';
+$sort_order = in_array($sort_order, $valid_orders) ? $sort_order : 'DESC';
+
+$base_query .= " ORDER BY $sort_column $sort_order LIMIT $offset, $items_per_page";
+$result = $conn->query($base_query);
+
+// Pagination function
+function generatePagination($total_items, $items_per_page, $current_page, $base_url)
+{
+    $total_pages = ceil($total_items / $items_per_page);
+    $pagination = '<div class="pagination">';
+
+    // Previous link
+    if ($current_page > 1) {
+        $pagination .= '<a href="' . $base_url . '&page=' . ($current_page - 1) . '" class="pagination-link">Previous</a>';
+    }
+
+    // Page numbers
+    for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
+        $pagination .= '<a href="' . $base_url . '&page=' . $i . '"';
+        $pagination .= ($i == $current_page) ? ' class="pagination-link active"' : ' class="pagination-link"';
+        $pagination .= '>' . $i . '</a>';
+    }
+
+    // Next link
+    if ($current_page < $total_pages) {
+        $pagination .= '<a href="' . $base_url . '&page=' . ($current_page + 1) . '" class="pagination-link">Next</a>';
+    }
+
+    $pagination .= '</div>';
+    return $pagination;
+}
+
+// Build base URL for pagination
+$query_params = $_GET;
+unset($query_params['page']);
+$base_url = 'grievance.php?' . http_build_query($query_params);
+$pagination_html = generatePagination($total_items, $items_per_page, $current_page, $base_url);
+
+// Get labs for filter dropdown
+$labs_query = "SELECT lab_id, lab_name FROM labs ORDER BY lab_name";
+$labs_result = $conn->query($labs_query);
+
+// Handle delete grievance
+if (isset($_POST['delete_grievance'])) {
+    $grievance_id = $_POST['grievance_id'];
+    $reason = $_POST['delete_reason'];
+
+    // First update the admin note with the deletion reason
+    $update_query = "UPDATE grievances SET admin_note = CONCAT(IFNULL(admin_note, ''), '\n[DELETION REASON: $reason]') WHERE grievance_id = $grievance_id";
+    $conn->query($update_query);
+
+    // Then delete the grievance
+    $delete_query = "DELETE FROM grievances WHERE grievance_id = $grievance_id";
+    if ($conn->query($delete_query) === TRUE) {
+        $delete_message = "Grievance deleted successfully";
+    } else {
+        $delete_error = "Error deleting grievance: " . $conn->error;
+    }
+
+    // Redirect to avoid resubmission
+    header("Location: grievance.php?deleted=true");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,8 +160,123 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+        /* Filter button styles */
+        .filter-action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-apply {
+            background-color: #0070cc !important;
+            color: white !important;
+        }
+
+        .filter-apply:hover {
+            background-color: #3a5be0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-reset {
+            background-color: #f1f1f1;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+
+        .filter-reset:hover {
+            background-color: #e5e5e5;
+        }
+
+        /* You can add these icons to the buttons */
+        .filter-apply i,
+        .filter-reset i {
+            margin-right: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Additional CSS for status badges */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-submitted {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .status-in-progress {
+            background-color: #ffebcc;
+            color: #cc7000;
+        }
+
+        .status-under-review {
+            background-color: #e6f7ff;
+            color: #0070cc;
+        }
+
+        .status-resolved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background-color: #d9d9d9;
+            color: #555;
+        }
+
+        /* Sort indicators */
+        th {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .sort-active {
+            background-color: #f5f5f5;
+        }
+
+        .sort-asc::after {
+            content: ' ↑';
+            font-size: 0.8em;
+        }
+
+        .sort-desc::after {
+            content: ' ↓';
+            font-size: 0.8em;
+        }
+
+        /* Notification styles */
+        .notification {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .notification-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .notification-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 
 <body>
@@ -82,217 +333,177 @@
                     <span>Grievance Management</span>
                 </div>
                 <div class="user-info">
-                    <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
                     <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
                     </span>
                 </div>
             </div>
 
+            <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 'true'): ?>
+                <div class="notification notification-success">
+                    <i class="fas fa-check-circle"></i> Grievance has been successfully deleted.
+                </div>
+            <?php endif; ?>
+
             <!-- Card View -->
             <div class="card-view">
                 <div class="card blue-top">
                     <h3>New Grievance</h3>
-                    <p class="font-number">8</p>
+                    <p class="font-number"><?php echo $new_count; ?></p>
                     <i class="fa-solid fa-envelope-open-text blue-hover"></i>
                 </div>
                 <div class="card green-top">
                     <h3>Resolved</h3>
-                    <p class="font-number">40</p>
+                    <p class="font-number"><?php echo $resolved_count; ?></p>
                     <i class="fa-solid fa-check-circle green-hover"></i>
                 </div>
                 <div class="card yellow-top">
                     <h3>In Progress</h3>
-                    <p class="font-number">24</p>
+                    <p class="font-number"><?php echo $in_progress_count; ?></p>
                     <i class="fa-solid fa-spinner yellow-hover"></i>
                 </div>
                 <div class="card red-top">
                     <h3>Unsolved Grievance</h3>
-                    <p class="font-number">7</p>
+                    <p class="font-number"><?php echo $unsolved_count; ?></p>
                     <i class="fa-solid fa-exclamation-circle red-hover"></i>
                 </div>
             </div>
 
             <!-- CARDs VIEW END -->
-            <!-- Add after card-view section -->
             <div class="items">
                 <!-- Filters and Search Bar -->
                 <div class="sub-heading">
                     <span>Latest Grievances</span>
                 </div>
-                <div class="header1 ">
-                    <div class="filters font-rale">
-                        <input class="search-input" type="text" id="search" placeholder="Search using ID, Name...">
-                        <select id="labFilter">
+                <div class="header1">
+                    <form action="grievance.php" method="GET" class="filters font-rale">
+                        <input class="search-input" type="text" id="search" name="search" placeholder="Search using ID, Name..." value="<?php echo htmlspecialchars($search); ?>">
+                        <select id="labFilter" name="lab">
                             <option value="">All Labs</option>
-                            <option value="Lab A">Lab A</option>
-                            <option value="Lab B">Lab B</option>
-                            <option value="Lab C">Lab C</option>
+                            <?php while ($lab = $labs_result->fetch_assoc()): ?>
+                                <option value="<?php echo $lab['lab_id']; ?>" <?php echo ($lab_filter == $lab['lab_id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($lab['lab_name']); ?>
+                                </option>
+                            <?php endwhile; ?>
                         </select>
-                        <select id="statusFilter">
+                        <select id="statusFilter" name="status">
                             <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="In Repair">In Repair</option>
-                            <option value="Faulty">Faulty</option>
-                            <!-- <option value="Decommissioned">Decommissioned</option> -->
+                            <option value="Submitted" <?php echo ($status_filter == 'Submitted') ? 'selected' : ''; ?>>Submitted</option>
+                            <option value="In Progress" <?php echo ($status_filter == 'In Progress') ? 'selected' : ''; ?>>In Progress</option>
+                            <option value="Under Review" <?php echo ($status_filter == 'Under Review') ? 'selected' : ''; ?>>Under Review</option>
+                            <option value="Resolved" <?php echo ($status_filter == 'Resolved') ? 'selected' : ''; ?>>Resolved</option>
+                            <option value="Closed" <?php echo ($status_filter == 'Closed') ? 'selected' : ''; ?>>Closed</option>
                         </select>
-                        <select id="categoryFilter">
+                        <select id="categoryFilter" name="category">
                             <option value="">All Categories</option>
-                            <option value="PC">PC</option>
-                            <option value="Printer">Printer</option>
-                            <option value="Mouse">Mouse</option>
-                            <option value="Keyboard">Keyboard</option>
+                            <option value="PC" <?php echo ($category_filter == 'PC') ? 'selected' : ''; ?>>PC</option>
+                            <option value="Printer" <?php echo ($category_filter == 'Printer') ? 'selected' : ''; ?>>Printer</option>
+                            <option value="Mouse" <?php echo ($category_filter == 'Mouse') ? 'selected' : ''; ?>>Mouse</option>
+                            <option value="Keyboard" <?php echo ($category_filter == 'Keyboard') ? 'selected' : ''; ?>>Keyboard</option>
+                            <option value="Monitor" <?php echo ($category_filter == 'Monitor') ? 'selected' : ''; ?>>Monitor</option>
+                            <option value="CPU" <?php echo ($category_filter == 'CPU') ? 'selected' : ''; ?>>CPU</option>
                         </select>
-                    </div>
+                        <button type="submit" class="filter-action-btn filter-apply">
+                            <i class="fas fa-filter"></i> Apply
+                        </button>
+                        <a href="grievance.php" class="filter-action-btn filter-reset none">
+                            <i class="fas fa-undo"></i> Reset
+                        </a>
+                    </form>
                 </div>
-                <!-- <div class="filter-bar">
-                    <div class="search-group">
-                        <input type="text" placeholder="Search by name or ID..." class="search-input">
-                        <select class="filter-select">
-                            <option>All Statuses</option>
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Resolved</option>
-                            <option>Rejected</option>
-                        </select>
-                    </div>
-                    <div class="action-group">
-                        <button class="btn-secondary"><i class="fas fa-download"></i> Export</button>
-                    </div>
-                </div> -->
 
-                <!-- Grievance Table -->
+                <!-- Grievance Table --><!-- Grievance Table -->
                 <table class="grievance-table">
                     <thead>
                         <tr>
-                            <th>Grievance ID <i class="fas fa-sort"></i></th>
-                            <th>Student Name <i class="fas fa-sort"></i></th>
-                            <th>Device/Category <i class="fas fa-sort"></i></th>
-                            <th>Status <i class="fas fa-sort"></i></th>
-                            <th>Submission Date <i class="fas fa-sort"></i></th>
+                            <th class="<?php echo $sort_column == 'grievance_id' ? 'sort-' . strtolower($sort_order) : ''; ?>">
+                                <a class="none" href="grievance.php?sort=grievance_id&order=<?php echo ($sort_column == 'grievance_id' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>">
+                                    Grievance ID
+                                </a>
+                            </th>
+                            <th class="<?php echo $sort_column == 'submitted_by' ? 'sort-' . strtolower($sort_order) : ''; ?>">
+                                <a class="none" href="grievance.php?sort=submitted_by&order=<?php echo ($sort_column == 'submitted_by' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>">
+                                    Student Name
+                                </a>
+                            </th>
+                            <th class="<?php echo $sort_column == 'device_category' ? 'sort-' . strtolower($sort_order) : ''; ?>">
+                                <a class="none" href="grievance.php?sort=device_category&order=<?php echo ($sort_column == 'device_category' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>">
+                                    Device/Category
+                                </a>
+                            </th>
+                            <th class="<?php echo $sort_column == 'status' ? 'sort-' . strtolower($sort_order) : ''; ?>">
+                                <a class="none" href="grievance.php?sort=status&order=<?php echo ($sort_column == 'status' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>">
+                                    Status
+                                </a>
+                            </th>
+                            <th class="<?php echo $sort_column == 'submission_date' ? 'sort-' . strtolower($sort_order) : ''; ?>">
+                                <a href="grievance.php?sort=submission_date&order=<?php echo ($sort_column == 'submission_date' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>" class="none">
+                                    Submission Date
+                                </a>
+                            </th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#GRV001</td>
-                            <td>Xyx</td>
-                            <td>Computer 12</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-15</td>
-                            <td>
-                                <a href="viewGrievance.php" class="none">
-                                    <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                </a>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV002</td>
-                            <td>Xyx</td>
-                            <td>Computer 13</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-16</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV003</td>
-                            <td>Xyx</td>
-                            <td>Computer 14</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-17</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV004</td>
-                            <td>Xyx</td>
-                            <td>Computer 15</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-18</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV005</td>
-                            <td>Xyx</td>
-                            <td>Computer 16</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-19</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV006</td>
-                            <td>Xyx</td>
-                            <td>Computer 17</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-20</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV007</td>
-                            <td>Xyx</td>
-                            <td>Printer 1</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-21</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV008</td>
-                            <td>Xyx</td>
-                            <td>Keyboard 2</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-22</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV009</td>
-                            <td>Xyx</td>
-                            <td>Mouse 3</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-23</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#GRV010</td>
-                            <td>Xyx</td>
-                            <td>Monitor 4</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>2024-03-24</td>
-                            <td>
-                                <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon delete-btn" id="delete-trigger"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                        <?php
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                // Determine status badge class
+                                $status_class = '';
+                                switch ($row['status']) {
+                                    case 'Submitted':
+                                        $status_class = 'status-submitted';
+                                        break;
+                                    case 'In Progress':
+                                        $status_class = 'status-in-progress';
+                                        break;
+                                    case 'Under Review':
+                                        $status_class = 'status-under-review';
+                                        break;
+                                    case 'Resolved':
+                                        $status_class = 'status-resolved';
+                                        break;
+                                    case 'Closed':
+                                        $status_class = 'status-closed';
+                                        break;
+                                }
+                        ?>
+                                <tr>
+                                    <td>#GRV<?php echo str_pad($row['grievance_id'], 3, '0', STR_PAD_LEFT); ?></td>
+                                    <td><?php echo htmlspecialchars($row['submitted_by']); ?> (<?php echo htmlspecialchars($row['stud_enrollment']); ?>)</td>
+                                    <td><?php echo htmlspecialchars($row['device_category']); ?> <?php echo !empty($row['device_name']) ? '- ' . htmlspecialchars($row['device_name']) : ''; ?></td>
+                                    <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
+                                    <td><?php echo date('Y-m-d', strtotime($row['submission_date'])); ?></td>
+                                    <td>
+                                        <a href="viewGrievance.php?id=<?php echo $row['grievance_id']; ?>" class="none">
+                                            <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                        </a>
+                                        <button class="btn-icon delete-btn delete-trigger" data-id="<?php echo $row['grievance_id']; ?>"
+                                            data-name="<?php echo htmlspecialchars($row['device_category'] . ' - #GRV' . str_pad($row['grievance_id'], 3, '0', STR_PAD_LEFT)); ?>">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No grievances found matching your criteria.</td>
+                            </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <?php echo $pagination_html; ?>
+                </div>
             </div>
         </div>
         <!-- CONTENT END  -->
     </div>
 
-    <!-- POP UP FOR DELTE -->
+    <!-- DELETE CONFIRMATION POPUP -->
     <div id="delete-popup" class="popupDelte-up-overlay">
         <div class="popupDelte">
             <div class="popupDelte-header">
@@ -301,20 +512,20 @@
                 </div>
                 <h2 class="popupDelte-title">Confirm Deletion</h2>
             </div>
-    
+
             <div class="popupDelte-body">
-                <p class="delete-text">Are you sure you want to delete this grievance ?</p>
-                <div class="item-name" id="item-name">Lenovo PC - GRV-2024-001</div>
-    
-                <p class="delete-warning padding-bottom-1">This action cannot be undone. The grievance will be
-                    permanently removed
-                    from
-                    the
-                    system.</p>
-                <textarea name="reason" id="" placeholder="Enter the reason here (this will be shared with the student)"
-                    class="form-input"></textarea>
+                <p class="delete-text">Are you sure you want to delete this grievance?</p>
+                <div class="item-name" id="item-name"></div>
+
+                <p class="delete-warning padding-bottom-1">This action cannot be undone. The grievance will be permanently removed from the system.</p>
+
+                <form id="delete-form" method="POST" action="grievance.php">
+                    <input type="hidden" name="grievance_id" id="grievance_id_input">
+                    <input type="hidden" name="delete_grievance" value="1">
+                    <textarea name="delete_reason" placeholder="Enter the reason here (this will be shared with the student)" class="form-input" required></textarea>
+                </form>
             </div>
-    
+
             <div class="popupDelte-footer">
                 <button class="btnPopup btnPopup-cancel" id="cancel-btnPopup">Cancel</button>
                 <button class="btnPopup btnPopup-delete" id="confirm-delete-btnPopup">Delete</button>
@@ -322,33 +533,53 @@
         </div>
     </div>
 
-    </div>
     <script>
-        // POP UP DELETE CONFIRMATION
-        const deleteBtnPopup = document.getElementById('delete-trigger');
+        // Delete popup functionality with dynamic item information
+        const deleteButtons = document.querySelectorAll('.delete-trigger');
         const popupDelte = document.getElementById('delete-popup');
         const cancelBtnPopup = document.getElementById('cancel-btnPopup');
         const confirmBtnPopup = document.getElementById('confirm-delete-btnPopup');
+        const itemNameElement = document.getElementById('item-name');
+        const grievanceIdInput = document.getElementById('grievance_id_input');
+        const deleteForm = document.getElementById('delete-form');
 
-        deleteBtnPopup.addEventListener('click', function () {
-            popupDelte.style.display = 'flex';
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const grievanceId = this.getAttribute('data-id');
+                const grievanceName = this.getAttribute('data-name');
+
+                itemNameElement.textContent = grievanceName;
+                grievanceIdInput.value = grievanceId;
+                popupDelte.style.display = 'flex';
+            });
         });
 
-        cancelBtnPopup.addEventListener('click', function () {
+        cancelBtnPopup.addEventListener('click', function() {
             popupDelte.style.display = 'none';
         });
 
-        confirmBtnPopup.addEventListener('click', function () {
-            alert('Item deleted successfully!');
-            popupDelte.style.display = 'none';
+        confirmBtnPopup.addEventListener('click', function() {
+            deleteForm.submit();
         });
 
-        popupDelte.addEventListener('click', function (e) {
+        popupDelte.addEventListener('click', function(e) {
             if (e.target === popupDelte) {
                 popupDelte.style.display = 'none';
             }
+        });
+
+        // Auto-submit form when filters change
+        const filterSelects = document.querySelectorAll('.filters select');
+        filterSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                this.form.submit();
+            });
         });
     </script>
 </body>
 
 </html>
+<?php
+// Close the database connection
+$conn->close();
+?>
