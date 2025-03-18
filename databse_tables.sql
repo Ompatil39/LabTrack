@@ -20,6 +20,7 @@ CREATE TABLE `users` (
   `user_type` enum('Admin', 'Incharge') NOT NULL,
   `full_name` varchar(100) NOT NULL,
   `contact_number` varchar(20),
+  `org_name` varchar(160),
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

@@ -1,0 +1,367 @@
+.p-u-container {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  overflow-x: hidden;
+}
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+input::placeholder {
+  color: #7f8c8d;
+}
+
+.p-u-profile-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.p-u-profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #3498db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 500;
+  margin-right: 2rem;
+}
+
+.p-u-profile-title {
+  flex-grow: 1;
+}
+
+.p-u-profile-title h1 {
+  margin-bottom: 0.5rem;
+}
+
+.p-u-profile-title p {
+  color: #7f8c8d;
+}
+
+.p-u-profile-badge {
+  background-color: #2ecc71;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.p-u-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.p-u-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.p-u-card-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.p-u-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.p-u-form-group {
+  margin-bottom: 1rem;
+}
+
+.p-u-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.p-u-input[type="text"],
+.p-u-input[type="email"],
+.p-u-input[type="password"],
+.p-u-input[type="tel"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.p-u-input[type="text"]:focus,
+.p-u-input[type="email"]:focus,
+.p-u-input[type="password"]:focus,
+.p-u-input[type="tel"]:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.p-u-input::placeholder {
+  color: #7f8c8d;
+}
+
+.p-u-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p-u-btn:hover {
+  transform: translateY(-1px);
+}
+
+.p-u-btn:active {
+  transform: translateY(0);
+}
+
+.p-u-btn-primary {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.p-u-btn-primary:hover {
+  background-color: #27ae60;
+}
+
+.p-u-btn-warning {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.p-u-btn-warning:hover {
+  background-color: #c0392b;
+}
+
+.p-u-btn-secondary {
+  background-color: #3498db;
+  color: white;
+}
+
+.p-u-btn-secondary:hover {
+  background-color: #2980b9;
+}
+
+.p-u-btn-outline {
+  background-color: transparent;
+  border: 1px solid #e0e0e0;
+  color: #2c3e50;
+}
+
+.p-u-btn-outline:hover {
+  background-color: #ecf0f1;
+}
+
+.p-u-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.p-u-admin-actions {
+  margin-top: 2rem;
+}
+
+.p-u-password-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.p-u-password-fields > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.p-u-user-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* .p-u-user-info > div:nth-child(3) {
+  grid-column: 1 / -1;
+} */
+
+.p-u-edit-toggle {
+  cursor: pointer;
+  color: #3498db;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.p-u-edit-toggle:hover {
+  text-decoration: underline;
+}
+
+.p-u-info-text {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+}
+
+.p-u-last-updated {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.p-u-disabled-input {
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+}
+
+/* Password input container */
+.p-u-password-input-container {
+  position: relative;
+}
+
+.p-u-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7f8c8d;
+}
+
+.p-u-password-requirements {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.p-u-password-validation {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #e74c3c;
+  display: none;
+}
+
+/* Modal Styles */
+.p-u-modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.p-u-modal.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+}
+
+.p-u-modal-content {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.p-u-modal.show .p-u-modal-content {
+  transform: translateY(0);
+}
+
+.p-u-modal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.p-u-modal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #2ecc71;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.p-u-modal-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+.p-u-modal-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.p-u-modal-body {
+  margin-bottom: 1rem;
+}
+
+.p-u-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .p-u-user-info,
+  .p-u-password-fields {
+    grid-template-columns: 1fr;
+  }
+}

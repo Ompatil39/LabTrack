@@ -133,9 +133,9 @@ $conn->close();
     <div class="main-content">
       <div class="header">
         <div class="sub-heading"><span>Overview</span></div>
-        <div class="user-info">
+        <div class="user-info" onclick="window.location.href = 'profileManage.php';">
           <i class="fa-solid fa-circle-user"></i>
-          <span class="font-rale"><?php echo htmlspecialchars($_SESSION['full_name'] ?? 'Administrator'); ?></span>
+          <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
         </div>
       </div>
       <div class="card-container">

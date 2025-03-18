@@ -1,0 +1,155 @@
+.p-container {
+  /* max-width: 1200px; */
+  margin: 0 auto;
+}
+
+.p-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.p-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.p-card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.p-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.p-form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.p-form-column {
+  flex: 1;
+}
+
+label {
+  display: block !important;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  background-color: #f8f9fa;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.p-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.p-button-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.p-button-primary:hover {
+  background-color: #2980b9;
+}
+
+.p-button-outline {
+  background-color: transparent;
+  border: 1px solid #e0e0e0;
+  color: #2c3e50;
+}
+
+.p-button-outline:hover {
+  background-color: var(--hover-bg-color);
+}
+
+.p-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.p-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.p-table th,
+.p-table td {
+  padding: 0.75rem !important;
+  text-align: left !important;
+  color: inherit !important;
+  background-color: inherit !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.p-table th {
+  font-weight: 600 !important;
+  color: #7f8c8d !important; /* secondary-text-color */
+}
+
+
+.p-action-button {
+  padding: 0.35rem 0.75rem;
+  background-color: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.p-action-button:hover {
+  background-color: var(--hover-bg-color);
+}
+
+.p-delete-btn {
+  color: red;
+}
+
+.p-validation-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.p-form-card {
+  margin-top: 2rem;
+  display: none;
+  /* Hidden by default */
+}
+
+.p-form-card.active {
+  display: block;
+  /* Visible when active */
+}

@@ -154,6 +154,11 @@ $conn->close();
           </a>
         </li>
       </ul>
+      <div class="log-out">
+        <a href="logout.php" class="none">
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span> Logout
+        </a>
+      </div>
     </div>
 
     <!-- Main Content Area -->
@@ -164,10 +169,9 @@ $conn->close();
         <div class="sub-heading">
           <span>Add Lab </span>
         </div>
-        <div class="user-info">
-          <!-- <img alt="User Avatar" src="https://placehold.co/30x30" /> -->
-          <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator
-          </span>
+        <div class="user-info" onclick="window.location.href = 'profileManage.php';">
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
         </div>
       </div>
       <!-- CONTENT START of BELOW HEADER -->
