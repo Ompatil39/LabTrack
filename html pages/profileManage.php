@@ -2,8 +2,94 @@
 session_start();
 if (isset($_SESSION["logged_in"]) !== true) {
     header("Location: login.php");
+    exit;
 }
+
 include 'db.php';
+
+// Initialize variables
+$username = $_SESSION['username'] ?? '';
+$message = '';
+$error = '';
+$successType = '';
+
+// Fetch user details from database
+$stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+} else {
+    $error = "User not found";
+}
+
+// Handle profile update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
+    $fullName = trim($_POST['fullName']);
+    $email = trim($_POST['email']);
+    $contactNumber = trim($_POST['contactNumber']);
+    $org = trim($_POST['org']);
+
+    // Validate email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Invalid email format";
+    }
+    // Validate Indian contact number (10 digits, may start with +91)
+    elseif (!empty($contactNumber) && !preg_match('/^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/', $contactNumber)) {
+        $error = "Invalid Indian contact number format";
+    } else {
+        // Update user information
+        $updateStmt = $conn->prepare("UPDATE users SET full_name = ?, email = ?, contact_number = ?, org_name = ? WHERE username = ?");
+        $updateStmt->bind_param("sssss", $fullName, $email, $contactNumber, $org, $username);
+
+        if ($updateStmt->execute()) {
+            $message = "Profile updated successfully";
+            $successType = "profile";
+
+            // Update session variables
+            $_SESSION['full_name'] = $fullName;
+            $_SESSION['email'] = $email;
+
+        } else {
+            $error = "Error updating profile: " . $conn->error;
+        }
+    }
+}
+
+// Handle password update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_password'])) {
+    $currentPassword = $_POST['currentPassword'];
+    $newPassword = $_POST['newPassword'];
+    $confirmPassword = $_POST['confirmPassword'];
+
+    // Validate password
+    if (strlen($newPassword) < 8 || !preg_match('/[0-9]/', $newPassword) || !preg_match('/[a-zA-Z]/', $newPassword)) {
+        $error = "Password must be at least 8 characters and contain both letters and numbers";
+    } elseif ($newPassword !== $confirmPassword) {
+        $error = "New passwords do not match";
+    } else {
+        // Verify current password
+        if (password_verify($currentPassword, $user['password'])) {
+            // Hash new password
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+            // Update password
+            $updatePwdStmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
+            $updatePwdStmt->bind_param("ss", $hashedPassword, $username);
+
+            if ($updatePwdStmt->execute()) {
+                $message = "Password updated successfully";
+                $successType = "password";
+            } else {
+                $error = "Error updating password: " . $conn->error;
+            }
+        } else {
+            $error = "Current password is incorrect";
+        }
+    }
+}
 
 $conn->close();
 ?>
@@ -106,13 +192,19 @@ $conn->close();
             </div>
             <!-- CONTENT START of BELOW HEADER -->
             <div class="p-u-profile-container">
+                <?php if ($error): ?>
+                    <div class="p-u-alert p-u-alert-error">
+                        <?php echo htmlspecialchars($error); ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="p-u-card">
                     <div class="p-u-profile-header">
                         <div class="p-u-profile-title">
-                            <h1>John Doe</h1>
-                            <p>john.doe@example.com</p>
+                            <h1><?php echo htmlspecialchars($user['full_name'] ?? 'User'); ?></h1>
+                            <p><?php echo htmlspecialchars($user['email'] ?? 'email@example.com'); ?></p>
                         </div>
-                        <div class="p-u-profile-badge">Admin</div>
+                        <div class="p-u-profile-badge"><?php echo htmlspecialchars($user['user_type'] ?? 'User'); ?></div>
                     </div>
                 </div>
 
@@ -121,36 +213,33 @@ $conn->close();
                         <h2 class="p-u-card-title">Account Information</h2>
                     </div>
 
-                    <form action="#" method="post">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <div class="p-u-user-info">
                             <div class="p-u-form-group">
                                 <label for="username">Username</label>
-                                <input type="text" id="username" name="username" value="johndoe" class="p-u-disabled-input"
-                                    disabled>
+                                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" class="p-u-disabled-input" disabled>
                                 <div class="p-u-info-text">Username cannot be changed</div>
                             </div>
                             <div class="p-u-form-group">
                                 <label for="fullName">Full Name</label>
-                                <input type="text" id="fullName" name="fullName" value="John Doe"
-                                    placeholder="Enter your full name">
+                                <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" placeholder="Enter your full name">
                             </div>
                             <div class="p-u-form-group">
                                 <label for="org">Organisation</label>
-                                <input type="text" id="org" name="org" value="CSMSS" placeholder="Enter your organisation">
+                                <input type="text" id="org" name="org" value="<?php echo htmlspecialchars($user['org_name'] ?? ''); ?>" placeholder="Enter your organisation">
                             </div>
                             <div class="p-u-form-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" name="email" value="john.doe@example.com"
-                                    placeholder="Enter your email">
+                                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" placeholder="Enter your email">
                             </div>
                             <div class="p-u-form-group">
                                 <label for="contactNumber">Contact Number</label>
-                                <input type="tel" id="contactNumber" name="contactNumber" value="+1 (555) 123-4567"
-                                    placeholder="Enter your contact number">
+                                <input type="tel" id="contactNumber" name="contactNumber" value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>" placeholder="Enter your contact number">
+                                <div class="p-u-info-text">Format: +91 XXXXXXXXXX or 10 digits</div>
                             </div>
                         </div>
                         <div class="p-u-form-actions">
-                            <button type="submit" class="p-u-btn p-u-btn-primary" onclick="showModal('profile-modal'); return false;">
+                            <button type="submit" name="update_profile" class="p-u-btn p-u-btn-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -161,22 +250,20 @@ $conn->close();
                             </button>
                         </div>
                     </form>
-                    <div class="p-u-last-updated">Last updated: February 10, 2024, 2:25 PM</div>
+                    <div class="p-u-last-updated">Last updated: <?php echo date('F d, Y, g:i A', strtotime($user['updated_at'] ?? 'now')); ?></div>
                 </div>
 
                 <div class="p-u-card">
                     <div class="p-u-card-header">
                         <h2 class="p-u-card-title">Password Management</h2>
                     </div>
-                    <form action="#" method="post" id="passwordForm">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="passwordForm">
                         <div class="p-u-password-fields">
                             <div class="p-u-form-group">
                                 <label for="currentPassword">Current Password</label>
                                 <div class="p-u-password-input-container">
-                                    <input type="password" id="currentPassword" name="currentPassword"
-                                        placeholder="Enter your current password">
-                                    <button type="button" class="p-u-password-toggle"
-                                        onclick="togglePasswordVisibility('currentPassword')">
+                                    <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter your current password" required>
+                                    <button type="button" class="p-u-password-toggle" onclick="togglePasswordVisibility('currentPassword')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round" class="p-u-password-eye">
@@ -189,10 +276,8 @@ $conn->close();
                             <div class="p-u-form-group">
                                 <label for="newPassword">New Password</label>
                                 <div class="p-u-password-input-container">
-                                    <input type="password" id="newPassword" name="newPassword"
-                                        placeholder="Enter your new password">
-                                    <button type="button" class="p-u-password-toggle"
-                                        onclick="togglePasswordVisibility('newPassword')">
+                                    <input type="password" id="newPassword" name="newPassword" placeholder="Enter your new password" required>
+                                    <button type="button" class="p-u-password-toggle" onclick="togglePasswordVisibility('newPassword')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round" class="p-u-password-eye">
@@ -208,10 +293,8 @@ $conn->close();
                             <div class="p-u-form-group">
                                 <label for="confirmPassword">Confirm New Password</label>
                                 <div class="p-u-password-input-container">
-                                    <input type="password" id="confirmPassword" name="confirmPassword"
-                                        placeholder="Confirm your new password">
-                                    <button type="button" class="p-u-password-toggle"
-                                        onclick="togglePasswordVisibility('confirmPassword')">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your new password" required>
+                                    <button type="button" class="p-u-password-toggle" onclick="togglePasswordVisibility('confirmPassword')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round" class="p-u-password-eye">
@@ -232,7 +315,7 @@ $conn->close();
                                 </svg>
                                 Cancel
                             </button>
-                            <button type="button" class="p-u-btn p-u-btn-primary" id="updatePasswordBtn">
+                            <button type="submit" name="update_password" class="p-u-btn p-u-btn-primary" id="updatePasswordBtn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -244,27 +327,29 @@ $conn->close();
                     </form>
                 </div>
 
-                <div class="p-u-card p-u-admin-actions">
-                    <div class="p-u-card-header">
-                        <h2 class="p-u-card-title">Admin Controls</h2>
+                <?php if ($user['user_type'] === 'Admin'): ?>
+                    <div class="p-u-card p-u-admin-actions">
+                        <div class="p-u-card-header">
+                            <h2 class="p-u-card-title">Admin Controls</h2>
+                        </div>
+                        <div class="p-u-form-actions" style="justify-content: flex-start;">
+                            <button type="button" class="p-u-btn p-u-btn-secondary" onclick="window.location.href='inchargeManage.php'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                Manage Lab Incharge
+                            </button>
+                        </div>
                     </div>
-                    <div class="p-u-form-actions" style="justify-content: flex-start;">
-                        <button type="button" class="p-u-btn p-u-btn-secondary" onclick="window.location.href='inchargeManage.php'">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                            Manage Lab Incharge
-                        </button>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Success Modal for Profile Update -->
-            <div class="p-u-modal" id="profile-modal">
+            <div class="p-u-modal <?php echo ($successType === 'profile') ? 'show' : ''; ?>" id="profile-modal">
                 <div class="p-u-modal-content">
                     <div class="p-u-modal-header">
                         <div class="p-u-modal-icon">
@@ -288,7 +373,7 @@ $conn->close();
             </div>
 
             <!-- Success Modal for Password Update -->
-            <div class="p-u-modal" id="password-modal">
+            <div class="p-u-modal <?php echo ($successType === 'password') ? 'show' : ''; ?>" id="password-modal">
                 <div class="p-u-modal-content">
                     <div class="p-u-modal-header">
                         <div class="p-u-modal-icon">
@@ -349,7 +434,7 @@ $conn->close();
                     const confirmPasswordInput = document.getElementById('confirmPassword');
                     const passwordValidation = document.getElementById('password-validation');
                     const confirmPasswordValidation = document.getElementById('confirm-password-validation');
-                    const updatePasswordBtn = document.getElementById('updatePasswordBtn');
+                    const passwordForm = document.getElementById('passwordForm');
 
                     function validatePassword() {
                         const password = newPasswordInput.value;
@@ -379,14 +464,36 @@ $conn->close();
                     newPasswordInput.addEventListener('input', validatePassword);
                     confirmPasswordInput.addEventListener('input', validateConfirmPassword);
 
-                    updatePasswordBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-
+                    passwordForm.addEventListener('submit', function(e) {
                         const isPasswordValid = validatePassword();
                         const isConfirmPasswordValid = validateConfirmPassword();
 
-                        if (isPasswordValid && isConfirmPasswordValid) {
-                            showModal('password-modal');
+                        if (!isPasswordValid || !isConfirmPasswordValid) {
+                            e.preventDefault();
+                        }
+                    });
+                });
+
+                // Add client-side validation for email and phone number
+                document.addEventListener('DOMContentLoaded', function() {
+                    const emailInput = document.getElementById('email');
+                    const contactInput = document.getElementById('contactNumber');
+
+                    emailInput.addEventListener('blur', function() {
+                        const email = this.value;
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                        if (email && !emailRegex.test(email)) {
+                            alert('Please enter a valid email address');
+                        }
+                    });
+
+                    contactInput.addEventListener('blur', function() {
+                        const contact = this.value;
+                        const contactRegex = /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/;
+
+                        if (contact && !contactRegex.test(contact)) {
+                            alert('Please enter a valid Indian contact number');
                         }
                     });
                 });
