@@ -217,7 +217,6 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                                 <th>Lab <i class="fas fa-sort"></i></th>
                                 <th>PC <i class="fas fa-sort"></i></th>
                                 <th>Status <i class="fas fa-sort"></i></th>
-                                <th>Remarks <i class="fas fa-sort"></i></th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -241,12 +240,12 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                                     echo "<td>" . htmlspecialchars($row['lab_name']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['pc_id']) . "</td>";
                                     echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
-                                    echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
+
                                     echo "<td>
                             <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
                                 <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                             </a>
-                            <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
+                            <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
                                 <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
                             </a>
                             <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>

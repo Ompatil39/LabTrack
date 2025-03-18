@@ -91,15 +91,15 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
 }
 
 // Example usage:
-// $toEmail = "patilom421@gmail.com";
-// $senderName = "Admin";
-// $messageText = "Your grievance has been reviewed and is being processed.";
-// $grievanceStatus = "In Progress";
-// $grievanceId = "GRV-2025-001";
+$toEmail = "harshtt28@gmail.com";
+$senderName = "Admin";
+$messageText = "Your grievance has been reviewed and is being processed.";
+$grievanceStatus = "In Progress";
+$grievanceId = "GRV-2025-001";
 
-// $result = sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatus, $grievanceId);
-// if ($result) {
-//     echo "Email sent successfully!";
-// } else {
-//     echo "Failed to send email.";
-// }
+$result = sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatus, $grievanceId);
+if ($result) {
+    echo "Email sent successfully!";
+} else {
+    echo "Failed to send email.";
+}

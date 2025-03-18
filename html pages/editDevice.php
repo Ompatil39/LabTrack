@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,7 +32,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
-
 <body>
     <div class="container">
         <!-- Sidebar -->
@@ -401,38 +399,6 @@
         </div>
         <!-- CONTENT END  -->
     </div>
-
-    <script>
-        document.querySelectorAll('.stepper-item').forEach((item, index) => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.step-content').forEach(content => {
-                    content.style.display = 'none';
-                });
-
-                document.querySelectorAll('.stepper-item').forEach(step => {
-                    step.classList.remove('active');
-                });
-
-                const contentId = `step-${index + 1}`;
-                const activeContent = document.getElementById(contentId);
-                if (activeContent) {
-                    activeContent.style.display = 'block';
-                    item.classList.add('active');
-                }
-            });
-        });
-        document.querySelector('.stepper-item').click();
-
-        function showPC() {
-            document.getElementById("pcInput").style.display = "block";
-            document.getElementById("printerInput").style.display = "none";
-        }
-
-        function showPrinter() {
-            document.getElementById("printerInput").style.display = "block";
-            document.getElementById("pcInput").style.display = "none";
-        }
-    </script>
 </body>
 
 </html>

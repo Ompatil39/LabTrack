@@ -1117,10 +1117,13 @@ tr:hover {
   background: #f0f2f5;
   transition: all 0.2s ease;
 }
-
+.statusG-active {
+  background: #f2f8fd !important;
+  color: #3498db !important;
+}
 .status-active {
-  background: #e6f7ee;
   color: #1f9d61;
+  background: #e6f7ee;
 }
 
 .status-repair {
@@ -1325,6 +1328,11 @@ select option:hover {
 .pending {
   background: #ffe3e3;
   color: #cc0000;
+}
+
+.activeG {
+  color: #3498db !important;
+  background: #f2f8fd !important;
 }
 
 .in-progress {
@@ -1743,13 +1751,20 @@ select option:hover {
 .lab-management-container {
   padding: 0 0rem;
 }
-
+.stepper1 {
+  display: flex;
+  /* justify-content: flex-start; */
+  gap: 1rem;
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+}
 .stepper {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
 }
+
 
 .stepper-item {
   flex: 1;
@@ -2048,22 +2063,21 @@ select option:hover {
   display: inline-block;
 }
 
-.grievance-status .grievance-pending {
+.grievance-pending {
   background-color: #fbe9e7;
   color: #d32f2f;
 }
-
-.grievance-status.greivance-in-progress {
+.greivance-in-progress {
   background-color: #fff3e0;
   color: #ef6c00;
 }
 
-.grievance-status.grievance-resolved {
+.grievance-resolved {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
 
-.grievance-status.grievance-new {
+.grievance-new {
   background-color: #e3f2fd;
   color: #1976d2;
 }

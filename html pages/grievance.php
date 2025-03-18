@@ -212,31 +212,6 @@ if (isset($_POST['delete_grievance'])) {
             white-space: nowrap;
         }
 
-        .status-submitted {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-
-        .status-in-progress {
-            background-color: #ffebcc;
-            color: #cc7000;
-        }
-
-        .status-under-review {
-            background-color: #e6f7ff;
-            color: #0070cc;
-        }
-
-        .status-resolved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-closed {
-            background-color: #d9d9d9;
-            color: #555;
-        }
-
         /* Sort indicators */
         th {
             position: relative;
@@ -451,19 +426,19 @@ if (isset($_POST['delete_grievance'])) {
                                 $status_class = '';
                                 switch ($row['status']) {
                                     case 'Submitted':
-                                        $status_class = 'status-submitted';
+                                        $status_class = 'status-active';
                                         break;
                                     case 'In Progress':
-                                        $status_class = 'status-in-progress';
+                                        $status_class = 'in-progress';
                                         break;
                                     case 'Under Review':
-                                        $status_class = 'status-under-review';
+                                        $status_class = 'in-progress';
                                         break;
                                     case 'Resolved':
-                                        $status_class = 'status-resolved';
+                                        $status_class = 'resolved';
                                         break;
                                     case 'Closed':
-                                        $status_class = 'status-closed';
+                                        $status_class = 'pending';
                                         break;
                                 }
                         ?>

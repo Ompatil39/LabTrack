@@ -17,6 +17,7 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
         $mail->Port = 587;
         $mail->SMTPSecure = 'tls';
         $mail->Username = 'patilom421@gmail.com'; // Your Gmail address
+        $mail->Password = 'ubyc kudg pxsl hcix';  // See below for App Password
 
         // Sender and recipient settings
         $mail->setFrom('yourname@gmail.com', $senderName); // Must match Username
@@ -45,7 +46,7 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
                 <p><strong>Message:</strong></p>
                 <p>{$messageText}</p>
                 <div class='footer'>
-                    <p>This is an automated message from the LabTrack System</p>
+                    <p>This is an automated message from the Grievance Management System</p>
                     <p>Please do not reply to this email</p>
                 </div>
             </div>
