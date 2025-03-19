@@ -14,13 +14,13 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Port = 587;
+        $mail->Port = 2525;
         $mail->SMTPSecure = 'tls';
         $mail->Username = 'patilom421@gmail.com'; // Your Gmail address
-        $mail->Password = '';  // See below for App Password
+        $mail->Password = 'ubyc kudg pxsl hcix';  // See below for App Password
 
         // Sender and recipient settings
-        $mail->setFrom('yourname@gmail.com', $senderName); // Must match Username
+        $mail->setFrom('patilom421@gmail.com', $senderName); // Must match Username
         $mail->addAddress($toEmail); // Your real email address
 
         // Email content

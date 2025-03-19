@@ -201,18 +201,22 @@ $conn->close();
                     </a>
                 </li>
             </ul>
+            <div class="log-out">
+                <a href="logout.php" class="none">
+                    <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span> Logout
+                </a>
+            </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <!-- User Info Section -->
-                <div class="sub-heading">
-                    <span>Edit Lab</span>
-                </div>
-                <div class="user-info">
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator</span>
+                <div class="sub-heading"><span>Overview</span></div>
+                <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
+                    <a href="notification.php" class="none"><i class="fa-solid fa-bell" style="color: #3498db; margin-right: 1.1rem;"></i></a>
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
                 </div>
             </div>
 

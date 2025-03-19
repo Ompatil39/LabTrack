@@ -7,7 +7,7 @@ function generateCaptcha()
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $captcha = '';
-    for ($i = 0; $i < 2; $i++) {
+    for ($i = 0; $i < 6; $i++) {
         $captcha .= $characters[rand(0, strlen($characters) - 1)];
     }
     $_SESSION['captcha'] = $captcha;
@@ -16,4 +16,3 @@ function generateCaptcha()
 
 // Generate and return the new CAPTCHA
 echo generateCaptcha();
-?>

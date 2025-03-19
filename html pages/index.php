@@ -44,7 +44,7 @@ $grievance_trend = fetchArray($conn, "SELECT DATE_FORMAT(submission_date, '%b') 
 $grievance_requests = fetchArray($conn, "SELECT labs.lab_name, COUNT(*) as count FROM grievances JOIN labs ON grievances.lab_id = labs.lab_id GROUP BY labs.lab_id, labs.lab_name LIMIT 8", "Grievance Requests");
 $lab_occupancy = fetchArray($conn, "SELECT status, COUNT(*) as count FROM labs GROUP BY status", "Lab Occupancy");
 $device_distribution = fetchArray($conn, "SELECT labs.lab_name, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id GROUP BY labs.lab_id, labs.lab_name LIMIT 8", "Device Distribution");
-$faulty_devices = fetchArray($conn, "SELECT labs.lab_name, devices.device_type, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id WHERE devices.status = 'Faulty' GROUP BY labs.lab_id, devices.device_type LIMIT 16", "Faulty Devices");
+$faulty_devices = fetchArray($conn, "SELECT labs.lab_name, devices.device_type, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id WHERE devices.status = 'InActive' GROUP BY labs.lab_id, devices.device_type LIMIT 16", "InActive Devices");
 
 $grievances_by_category = fetchArray($conn, "SELECT device_category, COUNT(*) as count FROM grievances GROUP BY device_category", "Grievances by Category");
 $grievance_status = fetchArray($conn, "SELECT status, COUNT(*) as count FROM grievances GROUP BY status", "Grievance Status");
@@ -169,7 +169,7 @@ $conn->close();
 
       <div class="ex">
         <div class="items small">
-          <span class="font-rale">Active Devices</span>
+          <span class="font-rale">Device Status</span>
           <div class="chart1"><canvas id="myChart"></canvas></div>
         </div>
         <div class="items large">
@@ -184,7 +184,7 @@ $conn->close();
 
       <div class="ex2">
         <div class="items">
-          <span class="font-rale">Faulty Devices</span>
+          <span class="font-rale">In Active Devices</span>
           <div><canvas id="faultyDevices"></canvas></div>
         </div>
         <div class="items">
@@ -217,10 +217,10 @@ $conn->close();
           <span class="font-rale">Grievances by Category</span>
           <div><canvas id="grievancesByCategory"></canvas></div>
         </div>
-        <div class="items">
+        <!-- <div class="items">
           <span class="font-rale">Average Grievance Time (Hours)</span>
           <div><canvas id="averageGrievanceTime"></canvas></div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -431,7 +431,7 @@ $conn->close();
         type: "bar",
         data: {
           labels: <?php echo json_encode(array_map(function ($item) {
-                    return $item['lab_name'];
+                    return $item['lab_name'] . ' - ' . $item['device_type'];
                   }, $faulty_devices)); ?>,
           datasets: [{
             label: "Faulty Devices Count",

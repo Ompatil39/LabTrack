@@ -71,8 +71,12 @@ if (isset($_POST['toggle_status']) && !empty($lab_id)) {
     }
 }
 
-// Function to generate pagination links
-// Function to generate pagination links with tab parameter
+// Get total grievances count for pagination
+$grievance_count_sql = "SELECT COUNT(*) as total FROM grievances WHERE lab_id = '$lab_id'";
+$grievance_count_result = $conn->query($grievance_count_sql);
+$total_grievances = ($grievance_count_result && $grievance_count_result->num_rows > 0)
+    ? $grievance_count_result->fetch_assoc()['total']
+    : 0;
 function generatePagination($total_items, $items_per_page, $current_page, $base_url, $tab)
 {
     $total_pages = ceil($total_items / $items_per_page);
@@ -182,17 +186,22 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                     </a>
                 </li>
             </ul>
+            <div class="log-out">
+                <a href="logout.php" class="none">
+                    <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span> Logout
+                </a>
+            </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <div class="sub-heading">
-                    <span>Lab Management</span>
-                </div>
-                <div class="user-info">
-                    <i class="fa-solid fa-circle-user"></i><span class="font-rale"> Administrator</span>
+                <div class="sub-heading"><span>Overview</span></div>
+                <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
+                    <a href="notification.php" class="none"><i class="fa-solid fa-bell" style="color: #3498db; margin-right: 1.1rem;"></i></a>
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
                 </div>
             </div>
 
@@ -366,7 +375,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                     <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
                                         <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                                     </a>
-                                    <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
+                                    <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
                                         <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
                                     </a>
                                     <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
@@ -446,7 +455,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
         <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
             <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
         </a>
-        <a href='editDevice.php?id=" . $row['device_id'] . "' class='none'>
+        <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
             <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
         </a>
         <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
@@ -465,7 +474,8 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                             </div>
 
                             <!-- Tab 3 Content - Grievance  -->
-                            <div class="tab-content" id="grievance">
+                            <!-- Grievance tab content -->
+                            <div class="tab-content <?php echo $active_tab === 'grievance' ? 'active' : ''; ?>" id="grievance">
                                 <div class="tab-header">
                                     <h3>Grievances</h3>
                                 </div>
@@ -474,9 +484,11 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                         <input class="search-input" type="text" id="grievanceSearch" placeholder="Search using ID, Name...">
                                         <select id="grievanceStatusFilter">
                                             <option value="">All Status</option>
-                                            <option value="Pending">Pending</option>
+                                            <option value="Submitted">Submitted</option>
                                             <option value="In Progress">In Progress</option>
+                                            <option value="Under Review">Under Review</option>
                                             <option value="Resolved">Resolved</option>
+                                            <option value="Closed">Closed</option>
                                         </select>
                                         <select id="grievanceCategoryFilter">
                                             <option value="">All Categories</option>
@@ -484,37 +496,61 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                             <option value="Printer">Printer</option>
                                             <option value="Mouse">Mouse</option>
                                             <option value="Keyboard">Keyboard</option>
+                                            <option value="Monitor">Monitor</option>
+                                            <option value="CPU">CPU</option>
                                         </select>
                                     </div>
-                                    <table class="grievance-table">
+                                </div>
+                                <div class="table-container">
+                                    <table>
                                         <thead>
                                             <tr>
-                                                <th>Grievance ID <i class="fas fa-sort"></i></th>
-                                                <th>Student Name <i class="fas fa-sort"></i></th>
-                                                <th>Device/Category <i class="fas fa-sort"></i></th>
-                                                <th>Status <i class="fas fa-sort"></i></th>
-                                                <th>Submission Date <i class="fas fa-sort"></i></th>
+                                                <th>Grievance ID</th>
+                                                <th>Student Name</th>
+                                                <th>Enrollment</th>
+                                                <th>Device Category</th>
+                                                <th>Device ID</th>
+                                                <th>Status</th>
+                                                <th>Submission Date</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>#GRV001</td>
-                                                <td>Xyx</td>
-                                                <td>Computer 12</td>
-                                                <td><span class="status-badge pending">Pending</span></td>
-                                                <td>2024-03-15</td>
-                                                <td>
-                                                    <a href="viewGrievance.php" class="none">
-                                                        <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
-                                                    </a>
-                                                    <button class="btn-icon edit-btn"><i class="fa-solid fa-pen"></i></button>
-                                                    <button class="btn-icon delete-btn"><i class="fa-solid fa-trash"></i></button>
-                                                </td>
-                                            </tr>
+                                        <tbody id="grievanceTableBody">
+                                            <?php
+                                            if ($lab_exists) {
+                                                $grievanceSql = "SELECT g.grievance_id, g.submitted_by, g.stud_enrollment, 
+                                       g.device_category, g.device_id, g.status, g.submission_date 
+                                FROM grievances g 
+                                WHERE g.lab_id = '$lab_id' 
+                                LIMIT $offset, $items_per_page";
+                                                $grievanceResult = $conn->query($grievanceSql);
+
+                                                if ($grievanceResult && $grievanceResult->num_rows > 0) {
+                                                    while ($row = $grievanceResult->fetch_assoc()) {
+                                                        echo "<tr>";
+                                                        echo "<td>#GRV" . sprintf('%03d', $row['grievance_id']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['submitted_by']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['stud_enrollment']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_category']) . "</td>";
+                                                        echo "<td>" . ($row['device_id'] ? htmlspecialchars($row['device_id']) : 'N/A') . "</td>";
+                                                        echo "<td><span class='status-badge " . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
+                                                        echo "<td>" . date('Y-m-d', strtotime($row['submission_date'])) . "</td>";
+                                                        echo "<td>
+                                <a href='viewGrievance.php?id=" . $row['grievance_id'] . "' class='none'>
+                                    <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
+                                </a>
+                              </td>";
+                                                        echo "</tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='8'>No grievances found for this lab</td></tr>";
+                                                }
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
+                                <?php echo generatePagination($total_grievances, $items_per_page, $page, "?id=$lab_id", "grievance"); ?>
                             </div>
                         </div>
                     </section>
@@ -744,3 +780,4 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
 </body>
 
 </html>
+<?php $conn->close(); ?>

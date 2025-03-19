@@ -579,7 +579,7 @@ hr.solid {
 
 .ex3 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
   margin-top: 1rem;
 }
@@ -1764,7 +1764,6 @@ select option:hover {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
 }
-
 
 .stepper-item {
   flex: 1;
