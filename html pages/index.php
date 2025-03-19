@@ -431,7 +431,7 @@ $conn->close();
         type: "bar",
         data: {
           labels: <?php echo json_encode(array_map(function ($item) {
-                    return $item['lab_name'] . ' - ' . $item['device_type'];
+                    return $item['lab_name'];
                   }, $faulty_devices)); ?>,
           datasets: [{
             label: "Faulty Devices Count",
