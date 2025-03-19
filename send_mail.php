@@ -17,7 +17,7 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
         $mail->Port = 587;
         $mail->SMTPSecure = 'tls';
         $mail->Username = 'patilom421@gmail.com'; // Your Gmail address
-        $mail->Password = 'ubyc kudg pxsl hcix';  // See below for App Password
+        $mail->Password = '';  // See below for App Password
 
         // Sender and recipient settings
         $mail->setFrom('yourname@gmail.com', $senderName); // Must match Username
