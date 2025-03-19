@@ -445,7 +445,7 @@ mysqli_close($conn);
                         </button>
                     </div>
                     <div class="quick-action">
-                        <button class="btnPopup btnPopup-delete btnDetails" onclick="location.href='raiseGrievance.php?device_id=<?php echo urlencode($device_data['device_id']); ?>'">
+                        <button class="btnPopup btnPopup-delete btnDetails" onclick="location.href='submitGrievance.php?device_id=<?php echo urlencode($device_data['device_id']); ?>'">
                             <span class="top-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="white" stroke-width="2" stroke-linecap="round"

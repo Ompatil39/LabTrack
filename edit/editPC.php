@@ -6,6 +6,9 @@ if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
 }
 
 include '../html pages/db.php';
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
 // Initialize variables
 $message = '';
@@ -20,11 +23,14 @@ if (!empty($id)) {
     $isEditMode = true;
 
     // Fetch device details
-    $query = "SELECT d.*, p.processor, p.ram, p.storage, p.os 
+    $query = "SELECT d.*, p.processor, p.ram, p.storage, p.operating_system, p.ethernet_mac, p.wifi_adapter, p.ip_address 
               FROM devices d 
-              LEFT JOIN pcs p ON d.device_id = p.device_id 
+              LEFT JOIN pc_details p ON d.device_id = p.device_id 
               WHERE d.device_id = ?";
     $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
     $stmt->bind_param("s", $id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -50,11 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
     $processor = trim($_POST['processor'] ?? '');
     $ram = trim($_POST['ram'] ?? '');
     $storage = trim($_POST['storage'] ?? '');
-    $os = trim($_POST['os'] ?? '');
+    $operating_system = trim($_POST['operating_system'] ?? '');
+    $ethernet_mac = trim($_POST['ethernet_mac'] ?? '');
+    $wifi_adapter = trim($_POST['wifi_adapter'] ?? '');
+    $ip_address = trim($_POST['ip_address'] ?? '');
     $status = trim($_POST['pc_status'] ?? '');
     $updated_at = date('Y-m-d H:i:s');
 
-    // Validation (lab_id is not required since it's disabled)
+    // Validation
     $errors = [];
     if (empty($device_name)) $errors[] = "PC name is required";
     if (empty($processor)) $errors[] = "Processor is required";
@@ -67,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
         try {
             $conn->begin_transaction();
 
-            // Update devices table (lab_id is not updated since it's disabled)
+            // Update devices table
             $query = "UPDATE devices SET 
                       device_name = ?, 
                       serial_number = ?, 
@@ -75,25 +84,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                       updated_at = ? 
                       WHERE device_id = ?";
             $stmt = $conn->prepare($query);
+            if ($stmt === false) {
+                die("Prepare failed: " . $conn->error);
+            }
             $stmt->bind_param("sssss", $device_name, $serial_number, $status, $updated_at, $id);
             $stmt->execute();
 
-            // Check if PC record exists and update
-            $checkQuery = "SELECT device_id FROM pcs WHERE device_id = ?";
+            // Check and update pc_details table
+            $checkQuery = "SELECT device_id FROM pc_details WHERE device_id = ?";
             $checkStmt = $conn->prepare($checkQuery);
+            if ($checkStmt === false) {
+                die("Prepare failed: " . $conn->error);
+            }
             $checkStmt->bind_param("s", $id);
             $checkStmt->execute();
             $checkResult = $checkStmt->get_result();
 
             if ($checkResult->num_rows > 0) {
-                $query = "UPDATE pcs SET 
+                $query = "UPDATE pc_details SET 
                           processor = ?, 
                           ram = ?, 
                           storage = ?, 
-                          os = ? 
+                          operating_system = ?,
+                          ethernet_mac = ?,
+                          wifi_adapter = ?,
+                          ip_address = ?
                           WHERE device_id = ?";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("sssss", $processor, $ram, $storage, $os, $id);
+                if ($stmt === false) {
+                    die("Prepare failed: " . $conn->error);
+                }
+                $stmt->bind_param("ssssssss", $processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address, $id);
+                $stmt->execute();
+            } else {
+                // Insert if it doesn't exist
+                $query = "INSERT INTO pc_details (device_id, processor, ram, storage, operating_system, ethernet_mac, wifi_adapter, ip_address)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($query);
+                if ($stmt === false) {
+                    die("Prepare failed: " . $conn->error);
+                }
+                $stmt->bind_param("ssssssss", $id, $processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address);
                 $stmt->execute();
             }
 
@@ -106,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                 'device_id' => $id,
                 'device_name' => $device_name,
                 'device_type' => 'PC',
-                'lab_id' => $device_data['lab_id'], // Retains original lab_id
+                'lab_id' => $device_data['lab_id'],
                 'lab_name' => getLabName($device_data['lab_id'], $conn)
             ];
         } catch (Exception $e) {
@@ -124,6 +155,9 @@ function getLabName($lab_id, $conn)
 {
     $query = "SELECT lab_name FROM labs WHERE lab_id = ?";
     $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
     $stmt->bind_param("s", $lab_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -131,8 +165,6 @@ function getLabName($lab_id, $conn)
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -253,8 +285,8 @@ $conn->close();
                             </div>
                         <?php endif; ?>
 
-                        <?php if ($isEditMode): ?>
-                            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                        <?php if ($isEditMode && $device_data !== null): ?>
+                            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . urlencode($id)); ?>">
                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($device_data['device_id']); ?>">
 
                                 <div class="selectLabDevice" style="margin-bottom: 0rem !important;">
@@ -277,11 +309,6 @@ $conn->close();
                                                 <label class="input-label">PC Name <span>*</span></label>
                                                 <input type="text" name="pc_name" class="form-input"
                                                     value="<?php echo htmlspecialchars($device_data['device_name'] ?? ''); ?>" required>
-                                            </div>
-                                            <div class="input-group">
-                                                <label class="input-label">ID <span>*</span></label>
-                                                <input type="text" class="form-input no-hover"
-                                                    value="<?php echo htmlspecialchars($device_data['device_id']); ?>" disabled>
                                             </div>
                                             <div class="input-group">
                                                 <label class="input-label">PC Code</label>
@@ -310,15 +337,30 @@ $conn->close();
                                             </div>
                                             <div class="input-group">
                                                 <label class="input-label">Operating System</label>
-                                                <input type="text" name="os" class="form-input"
-                                                    value="<?php echo htmlspecialchars($device_data['os'] ?? ''); ?>">
+                                                <input type="text" name="operating_system" class="form-input"
+                                                    value="<?php echo htmlspecialchars($device_data['operating_system'] ?? ''); ?>">
+                                            </div>
+                                            <div class="input-group">
+                                                <label class="input-label">Ethernet MAC</label>
+                                                <input type="text" name="ethernet_mac" class="form-input"
+                                                    value="<?php echo htmlspecialchars($device_data['ethernet_mac'] ?? ''); ?>">
+                                            </div>
+                                            <div class="input-group">
+                                                <label class="input-label">WiFi Adapter</label>
+                                                <input type="text" name="wifi_adapter" class="form-input"
+                                                    value="<?php echo htmlspecialchars($device_data['wifi_adapter'] ?? ''); ?>">
+                                            </div>
+                                            <div class="input-group">
+                                                <label class="input-label">IP Address</label>
+                                                <input type="text" name="ip_address" class="form-input"
+                                                    value="<?php echo htmlspecialchars($device_data['ip_address'] ?? ''); ?>">
                                             </div>
                                             <div class="input-group">
                                                 <label class="input-label">PC Status <span>*</span></label>
                                                 <select name="pc_status" class="form-input" required>
                                                     <option value="">Status</option>
                                                     <option value="Active" <?php echo ($device_data['status'] ?? '') === 'Active' ? 'selected' : ''; ?>>Active</option>
-                                                    <option value="In-Active" <?php echo ($device_data['status'] ?? '') === 'In-Active' ? 'selected' : ''; ?>>In-Active</option>
+                                                    <option value="InActive" <?php echo ($device_data['status'] ?? '') === 'InActive' ? 'selected' : ''; ?>>InActive</option>
                                                     <option value="Under Repair" <?php echo ($device_data['status'] ?? '') === 'Under Repair' ? 'selected' : ''; ?>>Under Repair</option>
                                                 </select>
                                             </div>
@@ -391,17 +433,28 @@ $conn->close();
         const deviceAddedModal = document.getElementById('device-added-modal');
         const deviceAddedDoneBtn = document.getElementById('device-done-btnModal');
 
-        deviceAddedDoneBtn.addEventListener('click', function() {
-            deviceAddedModal.style.display = 'none';
-            window.location.href = '../html pages/inventory.php';
-        });
-
-        deviceAddedModal.addEventListener('click', function(e) {
-            if (e.target === deviceAddedModal) {
+        // Redirect to inventory.php when Done button is clicked
+        if (deviceAddedDoneBtn) {
+            deviceAddedDoneBtn.addEventListener('click', function() {
                 deviceAddedModal.style.display = 'none';
-            }
-        });
+                window.location.href = '../html pages/inventory.php';
+            });
+        }
+
+        // Close modal and redirect if clicked outside
+        if (deviceAddedModal) {
+            deviceAddedModal.addEventListener('click', function(e) {
+                if (e.target === deviceAddedModal) {
+                    deviceAddedModal.style.display = 'none';
+                    window.location.href = '../html pages/inventory.php';
+                }
+            });
+        }
     </script>
 </body>
 
 </html>
+
+<?php
+$conn->close();
+?>
