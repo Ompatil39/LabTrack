@@ -134,7 +134,6 @@ $conn->close();
       <div class="header">
         <div class="sub-heading"><span>Overview</span></div>
         <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
-          <a href="notification.php" class="none"><i class="fa-solid fa-bell" style="color: #3498db; margin-right: 1.1rem;"></i></a>
           <i class="fa-solid fa-circle-user"></i>
           <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
         </div>
@@ -222,6 +221,7 @@ $conn->close();
           <div><canvas id="averageGrievanceTime"></canvas></div>
         </div> -->
       </div>
+      
     </div>
   </div>
 
