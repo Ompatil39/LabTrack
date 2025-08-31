@@ -3,15 +3,13 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php'; // Make sure to install PHPMailer via Composer
+require 'vendor/autoload.php';
 
 function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatus, $grievanceId = null)
 {
     try {
-        // Create a new PHPMailer instance
         $mail = new PHPMailer(true);
 
-        // Server settings
         $mail->isSMTP();
         $mail->Host = 'sandbox.smtp.mailtrap.io';
         $mail->SMTPAuth = true;
@@ -19,15 +17,12 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
         $mail->Username = 'a094408fabcffc';
         $mail->Password = 'bd8fe93e00f329';
 
-        // Sender and recipient settings
         $mail->setFrom('63bb35e694-af085f@inbox.mailtrap.io', $senderName);
         $mail->addAddress($toEmail);
 
-        // Email content
         $mail->isHTML(true);
         $mail->Subject = 'Grievance Status Update' . ($grievanceId ? " - #$grievanceId" : "");
 
-        // Minimalist HTML template
         $emailBody = "
         <!DOCTYPE html>
         <html>
@@ -78,19 +73,16 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
             ($grievanceId ? "Grievance ID: #{$grievanceId}\n" : "") .
             "Message: {$messageText}\n\nThis is an automated message from the LabTrack";
 
-        // Send email
         if ($mail->send()) {
             return true;
         }
         return false;
     } catch (Exception $e) {
-        // In production, you might want to log this error instead of echoing
         echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
         return false;
     }
 }
 
-// Example usage:
 $toEmail = "harshtt28@gmail.com";
 $senderName = "Admin";
 $messageText = "Your grievance has been reviewed and is being processed.";

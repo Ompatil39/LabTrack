@@ -10,20 +10,17 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
     try {
         $mail = new PHPMailer(true);
 
-        // Gmail SMTP settings
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Port = 2525;
         $mail->SMTPSecure = 'tls';
-        $mail->Username = 'patilom421@gmail.com'; // Your Gmail address
-        $mail->Password = '';  // See below for App Password
+        $mail->Username = 'patilom421@gmail.com';
+        $mail->Password = '';
 
-        // Sender and recipient settings
-        $mail->setFrom('patilom421@gmail.com', $senderName); // Must match Username
-        $mail->addAddress($toEmail); // Your real email address
+        $mail->setFrom('patilom421@gmail.com', $senderName);
+        $mail->addAddress($toEmail);
 
-        // Email content
         $mail->isHTML(true);
         $mail->Subject = 'Grievance Status Update' . ($grievanceId ? " - #$grievanceId" : "");
 
@@ -70,15 +67,15 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
 
 // Test 01
 
-// $toEmail = "johndoe@gmail.com"; // Your actual email address
-// $senderName = "Admin";
-// $messageText = "Your grievance has been reviewed and is being processed.";
-// $grievanceStatus = "In Progress";
-// $grievanceId = "GRV-2025-001";
+$toEmail = "johndoe@gmail.com";
+$senderName = "Admin";
+$messageText = "Your grievance has been reviewed and is being processed.";
+$grievanceStatus = "In Progress";
+$grievanceId = "GRV-2025-001";
 
-// $result = sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatus, $grievanceId);
-// if ($result) {
-//     echo "Email sent successfully!";
-// } else {
-//     echo "Failed to send email.";
-// }
+$result = sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatus, $grievanceId);
+if ($result) {
+    echo "Email sent successfully!";
+} else {
+    echo "Failed to send email.";
+}
