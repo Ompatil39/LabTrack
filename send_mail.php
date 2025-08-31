@@ -70,7 +70,7 @@ function sendGrievanceEmail($toEmail, $senderName, $messageText, $grievanceStatu
 
 // Test 01
 
-// $toEmail = "harshtt28@gmail.com"; // Your actual email address
+// $toEmail = "johndoe@gmail.com"; // Your actual email address
 // $senderName = "Admin";
 // $messageText = "Your grievance has been reviewed and is being processed.";
 // $grievanceStatus = "In Progress";
