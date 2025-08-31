@@ -15,28 +15,28 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 
 ## Features
 
-- **Role-Based Access Control**  
+  **Role-Based Access Control**  
   - Admin: Manage labs, devices, grievances, and Lab In-charges.  
   - Lab In-charge: Oversee assigned labs, update device records, and handle grievances.  
 
-- **Dashboard**  
+  **Dashboard**  
   - Displays real-time metrics such as total labs, active devices, resolved grievances, and pending grievances.  
 
-- **Lab Management**  
+  **Lab Management**  
   - Register new labs with auto-generated lab codes.  
   - Assign Lab In-charges and maintain lab details.  
 
-- **Device Management (Inventory)**  
+  **Device Management (Inventory)**  
   - Add and manage devices such as PCs, printers, and peripherals.  
   - Store detailed specifications including monitor, keyboard, mouse, and CPU details.  
   - “Copy Last Entry” option for quick registration of similar devices.  
 
-- **Grievance Management**  
+  **Grievance Management**  
   - Students can submit issues or complaints.  
   - Admins and Lab In-charges can update grievance statuses.  
   - Automatic email notifications sent to students when grievance status changes.  
 
-- **Security**  
+  **Security**  
   - Password hashing, input sanitization, CSRF protection, and prepared statements to prevent SQL injection.  
   - Session-based authentication with role-level access control.  
 
