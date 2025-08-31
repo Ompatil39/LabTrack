@@ -45,20 +45,24 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 
 ## Screenshots
 
-<p align="center">
-  <img src="images/1.png" alt="Login Page" width="48%"/>
-  <img src="images/2.png" alt="Dashboard" width="48%"/>
-</p>
+### Login Page
+<img src="images/1.png" alt="Login Page" width="80%"/>
 
-<p align="center">
-  <img src="images/3.png" alt="Labs Overview" width="48%"/>
-  <img src="images/4.png" alt="Lab Management" width="48%"/>
-</p>
+### Dashboard
+<img src="images/2.png" alt="Dashboard" width="80%"/>
 
-<p align="center">
-  <img src="images/5.png" alt="Device Inventory" width="48%"/>
-  <img src="images/6.png" alt="Grievance Management" width="48%"/>
-</p>
+### Labs Overview
+<img src="images/3.png" alt="Labs Overview" width="80%"/>
+
+### Lab Management
+<img src="images/4.png" alt="Lab Management" width="80%"/>
+
+### Device Inventory
+<img src="images/5.png" alt="Device Inventory" width="80%"/>
+
+### Grievance Management
+<img src="images/6.png" alt="Grievance Management" width="80%"/>
+
 
 ---
 ## Requirements
