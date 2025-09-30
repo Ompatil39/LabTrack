@@ -91,7 +91,7 @@ if (!empty($detail_query)) {
 }
 
 // Close the database connection
-mysqli_close($conn);
+// 
 ?>
 
 <!DOCTYPE html>
@@ -248,6 +248,29 @@ mysqli_close($conn);
                         <label class="detail-label">Status</label>
                         <div class="label-value"><?php echo htmlspecialchars($device_data['status']); ?></div>
                     </div>
+                </div>
+
+                <!-- QR Code Section -->
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
+                    <h4 style="margin-bottom: 1rem; color: #2c3e50;">Device QR Code</h4>
+                    <?php
+                    // Get QR code from database
+                    $qr_query = "SELECT qr_code FROM devices WHERE device_id = ?";
+                    $qr_stmt = mysqli_prepare($conn, $qr_query);
+                    mysqli_stmt_bind_param($qr_stmt, "s", $device_id);
+                    mysqli_stmt_execute($qr_stmt);
+                    $qr_result = mysqli_stmt_get_result($qr_stmt);
+
+                    if ($qr_result && mysqli_num_rows($qr_result) > 0) {
+                        $qr_data = mysqli_fetch_assoc($qr_result);
+                        if (!empty($qr_data['qr_code'])) {
+                            echo '<img src="' . htmlspecialchars($qr_data['qr_code']) . '" alt="Device QR Code" style="max-width: 200px; border: 1px solid #ddd; border-radius: 0.5rem;">';
+                            echo '<p style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">Scan this QR code to quickly access device details</p>';
+                        } else {
+                            echo '<p style="color: #e74c3c;">QR code not available. <button onclick="generateQRCode(\'' . $device_id . '\')" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Generate QR Code</button></p>';
+                        }
+                    }
+                    ?>
                 </div>
             </div>
 
@@ -469,6 +492,34 @@ mysqli_close($conn);
         <!-- CONTENT END  -->
 
     </div>
-</body>
 
+    <script>
+        function generateQRCode(deviceId) {
+            const formData = new FormData();
+            formData.append('action', 'generate_qr');
+            formData.append('device_id', deviceId);
+
+            fetch('qr_generator.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); // Reload to show the new QR code
+                    } else {
+                        alert('Error generating QR code: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error generating QR code');
+                });
+        }
+    </script>
+</body>
+<?php
+// CLOSE DB CONNECTION
+    mysqli_close($conn);
+?>
 </html>

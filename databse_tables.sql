@@ -32,6 +32,7 @@ CREATE TABLE `devices` (
   `device_name` varchar(100) NOT NULL,
   `serial_number` varchar(100),
   `status` enum('Active', 'InActive', 'Under Repair') NOT NULL,
+  `qr_code` text,
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

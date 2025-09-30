@@ -6,6 +6,7 @@ if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
 }
 
 include 'db.php';
+include 'qr_generator.php';
 
 // Function to generate unique device IDs
 function generateDeviceId($type, $conn)
@@ -68,11 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
             // Generate unique device ID
             $device_id = generateDeviceId($device_type, $conn);
 
+            // Generate QR code for printer
+            $printer_qr_code = generateQRCode($device_id, $printer_model, $lab_id);
+
             // Insert into devices table
-            $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("ssssssss", $device_id, $lab_id, $device_type, $printer_model, $serial_number, $status, $created_at, $updated_at);
+            $stmt->bind_param("sssssssss", $device_id, $lab_id, $device_type, $printer_model, $serial_number, $status, $printer_qr_code, $created_at, $updated_at);
             $stmt->execute();
 
             // Insert into printers table

@@ -2633,3 +2633,1050 @@ select option:hover {
   margin-right: 0.625rem;
   font-size: 1.125rem;
 }
+
+/* QR Scanner Styles */
+.scanner-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  /* box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3); */
+}
+
+.scanner-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  /* transform: translateY(-2px); */
+  /* box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4); */
+}
+
+.scanner-btn i {
+  font-size: 1rem;
+}
+
+/* QR Scanner Modal */
+.qr-scanner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.qr-scanner-content {
+  background: white;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.qr-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: #3498db;
+  color: white;
+}
+
+.qr-scanner-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-scanner-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-scanner-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.qr-scanner-body {
+  padding: 1.5rem;
+}
+
+#scanner-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: #000;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+#qr-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.scanner-frame {
+  width: 200px;
+  height: 200px;
+  border: 3px solid #3498db;
+  border-radius: 1rem;
+  position: relative;
+  background: transparent;
+}
+
+.scanner-frame::before,
+.scanner-frame::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #3498db;
+}
+
+.scanner-frame::before {
+  top: -3px;
+  left: -3px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.scanner-frame::after {
+  bottom: -3px;
+  right: -3px;
+  border-left: none;
+  border-top: none;
+}
+
+.scanner-instruction {
+  color: white;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.scanner-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.scanner-control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.scanner-control-btn:hover {
+  background: #e9ecef;
+  border-color: #3498db;
+}
+
+.scanner-control-btn i {
+  font-size: 1.25rem;
+  color: #3498db;
+}
+
+.scanner-control-btn span {
+  font-size: 0.8rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.scanner-status {
+  text-align: center;
+  min-height: 2rem;
+}
+
+.success-message {
+  color: #2ecc71;
+  background: #e8f5e9;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #c8e6c9;
+}
+
+.error-message {
+  color: #e74c3c;
+  background: #ffebee;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ffcdd2;
+}
+
+.warning-message {
+  color: #f39c12;
+  background: #fff3e0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ffcc02;
+}
+
+.info-message {
+  color: #3498db;
+  background: #e3f2fd;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #bbdefb;
+}
+
+/* Mobile responsiveness for QR scanner */
+@media (max-width: 768px) {
+  .qr-scanner-content {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .scanner-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .scanner-control-btn {
+    min-width: 70px;
+    padding: 0.5rem;
+  }
+
+  .scanner-frame {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* ========================================== */
+/* ========== MOBILE RESPONSIVE MEDIA QUERIES ========== */
+/* ========================================== */
+
+/* Mobile Landscape (481px to 767px) */
+@media (max-width: 767px) and (min-width: 481px) {
+  /* Sidebar adjustments */
+  .sidebar {
+    width: 3.5rem;
+    padding: 1rem 0.25rem;
+  }
+
+  .main-content {
+    margin-left: 3.5rem;
+    padding: 0.75rem;
+  }
+
+  /* Header responsive */
+  .header {
+    padding: 0.5rem 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .sub-heading {
+    font-size: 1.1rem;
+  }
+
+  .header .user-info {
+    font-size: 1rem;
+  }
+
+  /* Lab containers */
+  .lab-container {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .lab-card {
+    padding: 1rem;
+  }
+
+  .lab-header h4 {
+    font-size: 1.4rem;
+  }
+
+  /* Grid layouts */
+  .ex,
+  .ex2,
+  .ex3 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .items {
+    padding: 0.75rem 1rem;
+    font-size: 1.2rem;
+  }
+
+  .value {
+    font-size: 1.6rem;
+  }
+
+  /* Filters */
+  .filters {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
+    font-size: 0.85rem;
+  }
+
+  /* Tables */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    font-size: 0.9rem;
+    min-width: 600px;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Form grids */
+  .grid-2col,
+  .grid-3col {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .selectLabDevice {
+    grid-template-columns: 1fr;
+  }
+
+  .details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .grievance-stats {
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Lab selector */
+  .lab-selector-slider {
+    gap: 0.5rem;
+  }
+
+  .lab-selector-card {
+    width: 120px;
+    padding: 0.75rem;
+  }
+
+  .lab-selector-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .lab-selector-card p {
+    font-size: 0.9rem;
+  }
+
+  /* Device grid */
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-card {
+    padding: 1rem;
+  }
+
+  /* Actions */
+  .action-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .action-item {
+    padding: 0.5rem 1rem;
+  }
+
+  /* Modals */
+  .modal {
+    width: 95%;
+    max-width: 350px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .popupDelte {
+    width: 95%;
+    max-width: 350px;
+  }
+
+  .popupDelte-header,
+  .popupDelte-body,
+  .popupDelte-footer {
+    padding: 1rem;
+  }
+
+  /* Forms */
+  .form-wrapper {
+    padding: 1rem;
+  }
+
+  .stepper,
+  .stepper1 {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .stepper-item {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  /* FAB */
+  .fab {
+    bottom: 2rem;
+    right: 1rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Charts */
+  .chart1 {
+    height: 250px !important;
+  }
+
+  .large {
+    grid-column: 1 / -1;
+  }
+
+  /* Login page */
+  .container-login {
+    flex-direction: column;
+    width: 95%;
+    height: auto;
+  }
+
+  .left-panel,
+  .right-panel {
+    padding: 1.5rem;
+  }
+
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .login-form h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Grievance module */
+  .filter-bar {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .search-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-input {
+    min-width: 100%;
+  }
+
+  .grievance-table {
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .btn-icon {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  /* Lab details */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .location {
+    margin-left: 0;
+  }
+
+  .tab-nav {
+    flex-wrap: wrap;
+  }
+
+  .tab-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .search-box {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  /* Form actions */
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Mobile Portrait (320px to 480px) */
+@media (max-width: 480px) {
+  /* Sidebar ultra compact */
+  .sidebar {
+    width: 3rem;
+    padding: 0.75rem 0.125rem;
+  }
+
+  .main-content {
+    margin-left: 3rem;
+    padding: 0.5rem;
+  }
+
+  /* Header compact */
+  .header {
+    padding: 0.5rem 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sub-heading {
+    font-size: 1rem;
+  }
+
+  .header .user-info {
+    font-size: 0.9rem;
+  }
+
+  /* Lab containers compact */
+  .lab-container {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .lab-card {
+    padding: 0.75rem;
+  }
+
+  .lab-header h4 {
+    font-size: 1.2rem;
+  }
+
+  .lab-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  /* Grid layouts single column */
+  .ex,
+  .ex2,
+  .ex3 {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .items {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+  }
+
+  .value {
+    font-size: 1.4rem;
+  }
+
+  .highlight,
+  .highlight-red,
+  .highlight1,
+  .highlight1-red {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.4rem;
+  }
+
+  /* Filters compact */
+  .filters {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  /* Tables compact */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    font-size: 0.8rem;
+    min-width: 500px;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .status {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem;
+  }
+
+  /* Form grids single column */
+  .grid-2col,
+  .grid-3col {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .selectLabDevice {
+    grid-template-columns: 1fr;
+  }
+
+  .details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .grievance-stats {
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Lab selector compact */
+  .lab-selector-slider {
+    gap: 0.25rem;
+  }
+
+  .lab-selector-card {
+    width: 100px;
+    padding: 0.5rem;
+  }
+
+  .lab-selector-card h3 {
+    font-size: 1rem;
+  }
+
+  .lab-selector-card p {
+    font-size: 0.8rem;
+  }
+
+  /* Device grid single column */
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-card {
+    padding: 0.75rem;
+  }
+
+  .device-card i {
+    font-size: 1.2rem;
+  }
+
+  /* Actions compact */
+  .action-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .action-item i {
+    font-size: 1.2rem;
+  }
+
+  /* Modals compact */
+  .modal {
+    width: 95%;
+    max-width: 320px;
+    margin: 1rem;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 0.75rem;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+  }
+
+  .popupDelte {
+    width: 95%;
+    max-width: 320px;
+    margin: 1rem;
+  }
+
+  .popupDelte-header,
+  .popupDelte-body,
+  .popupDelte-footer {
+    padding: 0.75rem;
+  }
+
+  .popupDelte-title {
+    font-size: 1rem;
+  }
+
+  /* Forms compact */
+  .form-wrapper {
+    padding: 0.75rem;
+  }
+
+  .stepper,
+  .stepper1 {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stepper-item {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .input-label {
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* FAB compact */
+  .fab {
+    bottom: 1.5rem;
+    right: 0.75rem;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .fab i {
+    font-size: 1rem;
+  }
+
+  .view-lab-button {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .scanner-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  /* Charts compact */
+  .chart1 {
+    height: 200px !important;
+  }
+
+  .large {
+    grid-column: 1 / -1;
+  }
+
+  /* Login page compact */
+  .container-login {
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .left-panel,
+  .right-panel {
+    padding: 1rem;
+  }
+
+  .welcome-text {
+    font-size: 1.3rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
+  }
+
+  .login-form h2 {
+    font-size: 1.2rem;
+  }
+
+  .form-group input {
+    padding: 0.75rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .sign-in-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Grievance module compact */
+  .filter-bar {
+    gap: 0.5rem;
+  }
+
+  .search-group {
+    gap: 0.25rem;
+  }
+
+  .grievance-table {
+    font-size: 0.75rem;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .btn-icon {
+    font-size: 0.75rem;
+    padding: 0.3rem;
+  }
+
+  /* Lab details compact */
+  .card-header {
+    gap: 0.25rem;
+  }
+
+  .card-title {
+    font-size: 1.4rem;
+  }
+
+  .tab-nav {
+    flex-direction: column;
+  }
+
+  .tab-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .search-box {
+    max-width: 200px;
+  }
+
+  .search-box input {
+    font-size: 0.85rem;
+  }
+
+  /* Form actions compact */
+  .form-actions {
+    gap: 0.5rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  /* QR Scanner compact */
+  .qr-scanner-content {
+    width: 95%;
+    margin: 0.5rem;
+  }
+
+  .qr-scanner-header {
+    padding: 1rem;
+  }
+
+  .qr-scanner-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .qr-scanner-body {
+    padding: 1rem;
+  }
+
+  #scanner-container {
+    height: 250px;
+  }
+
+  .scanner-frame {
+    width: 120px;
+    height: 120px;
+  }
+
+  .scanner-controls {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .scanner-control-btn {
+    min-width: 60px;
+    padding: 0.4rem;
+  }
+
+  .scanner-control-btn i {
+    font-size: 1rem;
+  }
+
+  .scanner-control-btn span {
+    font-size: 0.7rem;
+  }
+
+  .scanner-instruction {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+/* Mobile Utility Classes */
+@media (max-width: 767px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  .mobile-text-center {
+    text-align: center !important;
+  }
+
+  .mobile-padding-small {
+    padding: 0.5rem !important;
+  }
+
+  .mobile-margin-small {
+    margin: 0.5rem !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .sidebar,
+  .fab,
+  .header .user-info,
+  .actions-menu,
+  .btn,
+  .modal-overlay,
+  .popupDelte-up-overlay,
+  .qr-scanner-modal {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .container {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .card,
+  .items,
+  .lab-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

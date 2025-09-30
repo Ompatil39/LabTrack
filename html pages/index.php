@@ -79,6 +79,8 @@ $conn->close();
   <script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js" defer></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" defer></script>
+  <!-- QR Code Scanner Library -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
   <!-- Fallback for Chart.js -->
   <script>
@@ -133,9 +135,19 @@ $conn->close();
     <div class="main-content">
       <div class="header">
         <div class="sub-heading"><span>Overview</span></div>
-        <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
-          <i class="fa-solid fa-circle-user"></i>
-          <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button id="qr-scanner-btn" class="scanner-btn" onclick="openQRScanner()">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>Scan QR</span>
+          </button>
+          <!-- <button onclick="window.location.href = '../update_existing_qr_codes.php';" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+            <i class="fa-solid fa-sync-alt"></i>
+            Update QR Codes
+          </button> -->
+          <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
+            <i class="fa-solid fa-circle-user"></i>
+            <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
+          </div>
         </div>
       </div>
       <div class="card-container">
@@ -221,7 +233,66 @@ $conn->close();
           <div><canvas id="averageGrievanceTime"></canvas></div>
         </div> -->
       </div>
-      
+
+    </div>
+  </div>
+
+  <!-- QR Scanner Modal -->
+  <div id="qr-scanner-modal" class="qr-scanner-modal">
+    <div class="qr-scanner-content">
+      <div class="qr-scanner-header">
+        <h3>Scan Device QR Code</h3>
+        <button class="close-scanner-btn" onclick="closeQRScanner()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="qr-scanner-body">
+        <div id="scanner-container">
+          <video id="qr-video" autoplay playsinline></video>
+          <canvas id="qr-canvas" style="display: none;"></canvas>
+          <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+            <p class="scanner-instruction">Position the QR code within the frame</p>
+          </div>
+        </div>
+        <div class="scanner-controls">
+          <button id="flash-toggle" class="scanner-control-btn" onclick="toggleFlash()">
+            <i class="fa-solid fa-flashlight"></i>
+            <span>Flash</span>
+          </button>
+          <button class="scanner-control-btn" onclick="openManualInput()">
+            <i class="fa-solid fa-keyboard"></i>
+            <span>Manual</span>
+          </button>
+          <button class="scanner-control-btn" onclick="closeQRScanner()">
+            <i class="fa-solid fa-times"></i>
+            <span>Close</span>
+          </button>
+        </div>
+        <div id="scanner-status" class="scanner-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Input Modal -->
+  <div id="manual-input-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-icon icon-blue">
+          <i class="fa-solid fa-keyboard"></i>
+        </div>
+        <h2 class="modal-title">Manual Device Lookup</h2>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label class="input-label">Device ID</label>
+          <input type="text" id="manual-device-id" class="form-input" placeholder="Enter device ID (e.g., PC-2024-0001)">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btnModal btnModal-secondary" onclick="closeManualInput()">Cancel</button>
+        <button class="btnModal btnModal-primary btnModal-blue" onclick="lookupDeviceManually()">Lookup Device</button>
+      </div>
     </div>
   </div>
 
@@ -798,6 +869,227 @@ $conn->close();
         }
       });
     }
+
+    // QR Scanner functionality
+    let qrScanner = null;
+    let stream = null;
+    let flashEnabled = false;
+
+    function openQRScanner() {
+      const modal = document.getElementById('qr-scanner-modal');
+      modal.style.display = 'flex';
+
+      // Initialize scanner
+      initQRScanner();
+    }
+
+    function closeQRScanner() {
+      const modal = document.getElementById('qr-scanner-modal');
+      modal.style.display = 'none';
+
+      // Stop camera
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+
+      // Clear status
+      document.getElementById('scanner-status').innerHTML = '';
+    }
+
+    function initQRScanner() {
+      const video = document.getElementById('qr-video');
+      const status = document.getElementById('scanner-status');
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        status.innerHTML = '<div class="error-message">Camera not supported on this device</div>';
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment', // back camera
+            width: {
+              ideal: 1280
+            },
+            height: {
+              ideal: 720
+            }
+          }
+        })
+        .then(stream => {
+          video.srcObject = stream;
+          video.setAttribute('playsinline', true);
+          video.play();
+          status.innerHTML = '<div class="success-message">Camera ready. Point at QR code to scan.</div>';
+          startQRScanning(); // your QR scanning function
+        })
+        .catch(err => {
+          console.error('Camera error:', err);
+          if (err.name === 'NotAllowedError') {
+            status.innerHTML = '<div class="error-message">Camera permission denied. Please allow camera access.</div>';
+          } else if (err.name === 'NotFoundError') {
+            status.innerHTML = '<div class="error-message">No camera found on this device.</div>';
+          } else {
+            status.innerHTML = '<div class="error-message">Camera error: ' + err.message + '</div>';
+          }
+        });
+    }
+
+
+    function startQRScanning() {
+      const video = document.getElementById('qr-video');
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      const status = document.getElementById('scanner-status');
+
+      function scanFrame() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+          // Use jsQR library to detect QR codes
+          if (typeof jsQR !== 'undefined') {
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "dontInvert",
+            });
+
+            if (code) {
+              // QR code detected!
+              status.innerHTML = '<div class="success-message">QR Code detected! Processing...</div>';
+
+              // Process the QR code data
+              try {
+                const qrData = code.data;
+                console.log('QR Code detected:', qrData);
+
+                // Lookup device using the QR data
+                lookupDevice(qrData);
+
+                // Close scanner after successful scan
+                setTimeout(() => {
+                  closeQRScanner();
+                }, 1000);
+
+                return; // Stop scanning
+              } catch (error) {
+                console.error('Error processing QR code:', error);
+                status.innerHTML = '<div class="error-message">Invalid QR code format</div>';
+              }
+            } else {
+              // No QR code detected, continue scanning
+              status.innerHTML = '<div class="info-message">Scanning... Point camera at QR code</div>';
+            }
+          } else {
+            // Fallback if jsQR is not loaded
+            status.innerHTML = '<div class="warning-message">QR scanner library not loaded</div>';
+          }
+
+          // Continue scanning
+          requestAnimationFrame(scanFrame);
+        } else {
+          requestAnimationFrame(scanFrame);
+        }
+      }
+
+      scanFrame();
+    }
+
+    function toggleFlash() {
+      if (!stream) return;
+
+      const track = stream.getVideoTracks()[0];
+      if (track && track.getCapabilities && track.getCapabilities().torch) {
+        flashEnabled = !flashEnabled;
+        track.applyConstraints({
+          advanced: [{
+            torch: flashEnabled
+          }]
+        }).then(() => {
+          const flashBtn = document.getElementById('flash-toggle');
+          flashBtn.innerHTML = flashEnabled ?
+            '<i class="fa-solid fa-flashlight"></i><span>Flash Off</span>' :
+            '<i class="fa-solid fa-flashlight"></i><span>Flash</span>';
+        }).catch(error => {
+          console.error('Flash toggle error:', error);
+        });
+      } else {
+        document.getElementById('scanner-status').innerHTML = '<div class="warning-message">Flash not supported on this device</div>';
+      }
+    }
+
+    function openManualInput() {
+      closeQRScanner();
+      document.getElementById('manual-input-modal').style.display = 'flex';
+    }
+
+    function closeManualInput() {
+      document.getElementById('manual-input-modal').style.display = 'none';
+      document.getElementById('manual-device-id').value = '';
+    }
+
+    function lookupDeviceManually() {
+      const deviceId = document.getElementById('manual-device-id').value.trim();
+
+      if (!deviceId) {
+        alert('Please enter a device ID');
+        return;
+      }
+
+      // Create QR data format for manual lookup
+      const qrData = JSON.stringify({
+        device_id: deviceId,
+        device_name: 'Manual Lookup',
+        lab_id: 'unknown',
+        timestamp: Date.now()
+      });
+
+      lookupDevice(qrData);
+    }
+
+    function lookupDevice(qrData) {
+      const formData = new FormData();
+      formData.append('action', 'lookup_device');
+      formData.append('qr_data', qrData);
+
+      fetch('qr_generator.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.device) {
+            // Redirect to device details page
+            window.location.href = `viewDevice.php?id=${data.device.device_id}`;
+          } else {
+            alert('Device not found: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Lookup error:', error);
+          alert('Error looking up device: ' + error.message);
+        });
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'qr-scanner-modal') {
+        closeQRScanner();
+      }
+      if (e.target.id === 'manual-input-modal') {
+        closeManualInput();
+      }
+    });
+
+    // Handle Enter key in manual input
+    document.getElementById('manual-device-id').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        lookupDeviceManually();
+      }
+    });
   </script>
 </body>
 

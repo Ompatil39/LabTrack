@@ -144,9 +144,11 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
         <div class="main-content">
             <div class="header">
                 <div class="sub-heading"><span>Overview</span></div>
-                <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
-                    <i class="fa-solid fa-circle-user"></i>
-                    <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="user-info" onclick="window.location.href = 'profileManage.php';" style="margin-right: 0.5rem;">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <span class="font-rale"><?php echo htmlspecialchars(strtoupper($_SESSION['username']) ?? 'User');  ?></span>
+                    </div>
                 </div>
             </div>
 
@@ -252,6 +254,7 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                             <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
                                 <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
                             </a>
+                            <button class='btn-icon qr-btn' onclick='showQRCode(\"" . $row['device_id'] . "\")' title='View QR Code'><i class='fa-solid fa-qrcode'></i></button>
                             <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
                           </td>";
                                     echo "</tr>";
@@ -285,6 +288,31 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
             <div class="popupDelte-footer">
                 <button class="btnPopup btnPopup-cancel" id="cancel-btnPopup">Cancel</button>
                 <button class="btnPopup btnPopup-delete" id="confirm-delete-btnPopup">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-code-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon icon-blue">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <h2 class="modal-title">Device QR Code</h2>
+            </div>
+            <div class="modal-body">
+                <div id="qr-code-container" style="text-align: center;">
+                    <div id="qr-loading" style="display: none;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading QR code...
+                    </div>
+                    <div id="qr-code-image" style="display: none;"></div>
+                    <div id="qr-error" style="display: none; color: #e74c3c;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btnModal btnModal-secondary" onclick="closeQRModal()">Close</button>
+                <button class="btnModal btnModal-primary btnModal-blue" onclick="downloadQRCode()" id="download-qr-btn" style="display: none;">Download QR Code</button>
             </div>
         </div>
     </div>
@@ -391,7 +419,90 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                 }
             });
         });
+
+        // QR Code functionality
+        let currentQRCodeUrl = '';
+
+        function showQRCode(deviceId) {
+            const modal = document.getElementById('qr-code-modal');
+            const loading = document.getElementById('qr-loading');
+            const image = document.getElementById('qr-code-image');
+            const error = document.getElementById('qr-error');
+            const downloadBtn = document.getElementById('download-qr-btn');
+
+            // Reset modal state
+            loading.style.display = 'block';
+            image.style.display = 'none';
+            error.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            modal.style.display = 'flex';
+
+            // Fetch QR code
+            const formData = new FormData();
+            formData.append('action', 'generate_qr');
+            formData.append('device_id', deviceId);
+
+            fetch('qr_generator.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+
+                    if (data.success && data.qr_code_url) {
+                        currentQRCodeUrl = data.qr_code_url;
+                        image.innerHTML = `
+                        <img src="${data.qr_code_url}" alt="Device QR Code" style="max-width: 300px; border: 1px solid #ddd; border-radius: 0.5rem;">
+                        <p style="margin-top: 1rem; color: #7f8c8d;">Scan this QR code to access device details</p>
+                    `;
+                        image.style.display = 'block';
+                        downloadBtn.style.display = 'inline-block';
+                    } else {
+                        error.textContent = 'Error generating QR code: ' + (data.message || 'Unknown error');
+                        error.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    error.textContent = 'Error loading QR code: ' + error.message;
+                    error.style.display = 'block';
+                });
+        }
+
+        function closeQRModal() {
+            document.getElementById('qr-code-modal').style.display = 'none';
+            currentQRCodeUrl = '';
+        }
+
+        function downloadQRCode() {
+            if (currentQRCodeUrl) {
+                const link = document.createElement('a');
+                link.href = currentQRCodeUrl;
+                link.download = 'device-qr-code.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Close QR modal when clicking outside
+        document.getElementById('qr-code-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRModal();
+            }
+        });
     </script>
+
+    <style>
+        .qr-btn {
+            color: #3498db !important;
+        }
+
+        .qr-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+    </style>
 </body>
 
 </html>
