@@ -251,7 +251,7 @@ if (!empty($detail_query)) {
                 </div>
 
                 <!-- QR Code Section -->
-                <div style="margin-top: 1.5rem; text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
+                <!-- <div style="margin-top: 1.5rem; text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
                     <h4 style="margin-bottom: 1rem; color: #2c3e50;">Device QR Code</h4>
                     <?php
                     // Get QR code from database
@@ -271,7 +271,7 @@ if (!empty($detail_query)) {
                         }
                     }
                     ?>
-                </div>
+                </div> -->
             </div>
 
             <!-- card 2 - Technical Specifications -->

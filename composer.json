@@ -1,6 +1,7 @@
 {
   "require": {
     "phpmailer/phpmailer": "^6.9",
-    "chillerlan/php-qrcode": "^5.0"
+    "chillerlan/php-qrcode": "^5.0",
+    "tecnickcom/tcpdf": "^6.10"
   }
 }

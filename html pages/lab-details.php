@@ -129,6 +129,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,200,0,200&icon_names=dns" />
     <link
@@ -615,6 +616,11 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                 </div>
             </div>
         </div>
+
+        <a href="exportBarcodes.php?id=<?php echo $lab_id; ?>" target="_blank" class="fab font-number">
+            <i class="fa-solid fa-download"></i>
+            Export Barcodes
+        </a>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {

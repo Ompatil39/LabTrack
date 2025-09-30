@@ -859,6 +859,17 @@ hr.solid {
   font-size: 1.1rem;
 }
 
+a.float-color {
+  background-color: #1976d2 !important; /* Blue */
+  color: white !important;
+}
+
+a.float-color:hover {
+  background-color: white !important;
+  color: #1976d2 !important;
+  border: 2px solid #1976d2 !important;
+}
+
 /* ------------------------ Maintenance Module Styles ------------------------ */
 /* ------------------------MAINTENANCE MODULE CSS ----------------------------- */
 /* Lab Selection */
