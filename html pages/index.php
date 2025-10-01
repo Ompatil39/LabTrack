@@ -60,6 +60,7 @@ $conn->close();
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lab Monitoring System</title>
@@ -74,6 +75,8 @@ $conn->close();
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+
+  
 
   <!-- Load Chart.js UMD version from unpkg -->
   <script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js" defer></script>
@@ -422,7 +425,7 @@ $conn->close();
           labels: <?php echo json_encode(array_column($lab_occupancy, 'status')); ?>,
           datasets: [{
             data: <?php echo json_encode(array_column($lab_occupancy, 'count')); ?>,
-            backgroundColor: ["#3498db", "#5d8aa8", "#ff6f61"]
+            backgroundColor: ["#3498db", "#ff6f61", "#5d8aa8"]
           }]
         },
         options: {

@@ -6,8 +6,6 @@ if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
 }
 
 include 'db.php';
-include 'qr_generator.php';
-
 // Function to generate unique device IDs
 function generateDeviceId($type, $conn)
 {
@@ -132,14 +130,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $mouse_device_id = generateDeviceId('Mouse', $conn);
                 $cpu_device_id = generateDeviceId('CPU', $conn);
 
-                // Generate QR code for PC
-                $pc_qr_code = generateQRCode($pc_device_id, $device_name, $lab_id);
-
                 // Insert main PC device
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'PC', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'PC', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $pc_device_id, $lab_id, $device_name, $serial_number, $device_status, $pc_qr_code);
+                $stmt->bind_param("sssss", $pc_device_id, $lab_id, $device_name, $serial_number, $device_status);
                 $stmt->execute();
 
                 // Insert PC details
@@ -149,14 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $stmt->bind_param("ssssssss", $pc_device_id, $processor, $ram, $storage, $os, $ethernet_mac, $wifi_adapter, $ip_address);
                 $stmt->execute();
 
-                // Generate QR code for monitor
-                $monitor_qr_code = generateQRCode($monitor_device_id, $monitor_brand, $lab_id);
-
                 // Insert monitor
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'Monitor', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'Monitor', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $monitor_device_id, $lab_id, $monitor_brand, $monitor_serial, $monitor_status, $monitor_qr_code);
+                $stmt->bind_param("sssss", $monitor_device_id, $lab_id, $monitor_brand, $monitor_serial, $monitor_status);
                 $stmt->execute();
 
                 // Insert monitor details
@@ -166,14 +158,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $stmt->bind_param("sssss", $monitor_device_id, $monitor_brand, $monitor_resolution, $monitor_serial, $monitor_status);
                 $stmt->execute();
 
-                // Generate QR code for keyboard
-                $keyboard_qr_code = generateQRCode($keyboard_device_id, $keyboard_name, $lab_id);
-
                 // Insert keyboard
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'Keyboard', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'Keyboard', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $keyboard_device_id, $lab_id, $keyboard_name, $keyboard_serial, $keyboard_status, $keyboard_qr_code);
+                $stmt->bind_param("sssss", $keyboard_device_id, $lab_id, $keyboard_name, $keyboard_serial, $keyboard_status);
                 $stmt->execute();
 
                 // Insert keyboard details
@@ -183,14 +172,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $stmt->bind_param("sssss", $keyboard_device_id, $keyboard_name, $keyboard_type, $keyboard_serial, $keyboard_status);
                 $stmt->execute();
 
-                // Generate QR code for mouse
-                $mouse_qr_code = generateQRCode($mouse_device_id, $mouse_name, $lab_id);
-
                 // Insert mouse
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'Mouse', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'Mouse', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $mouse_device_id, $lab_id, $mouse_name, $mouse_serial, $mouse_status, $mouse_qr_code);
+                $stmt->bind_param("sssss", $mouse_device_id, $lab_id, $mouse_name, $mouse_serial, $mouse_status);
                 $stmt->execute();
 
                 // Insert mouse details
@@ -200,14 +186,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $stmt->bind_param("sssss", $mouse_device_id, $mouse_name, $mouse_type, $mouse_serial, $mouse_status);
                 $stmt->execute();
 
-                // Generate QR code for CPU
-                $cpu_qr_code = generateQRCode($cpu_device_id, $case_model, $lab_id);
-
                 // Insert CPU
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'CPU', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'CPU', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $cpu_device_id, $lab_id, $case_model, $cpu_serial, $cpu_status, $cpu_qr_code);
+                $stmt->bind_param("sssss", $cpu_device_id, $lab_id, $case_model, $cpu_serial, $cpu_status);
                 $stmt->execute();
 
                 // Insert CPU details
@@ -287,14 +270,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
                 // Generate device ID
                 $printer_device_id = generateDeviceId('Printer', $conn);
 
-                // Generate QR code for printer
-                $printer_qr_code = generateQRCode($printer_device_id, $printer_model, $lab_id);
-
                 // Insert printer device
-                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code, created_at, updated_at) 
-                          VALUES (?, ?, 'Printer', ?, ?, ?, ?, NOW(), NOW())";
+                $query = "INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, created_at, updated_at) 
+                          VALUES (?, ?, 'Printer', ?, ?, ?, NOW(), NOW())";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $printer_device_id, $lab_id, $printer_model, $serial_number, $status, $printer_qr_code);
+                $stmt->bind_param("sssss", $printer_device_id, $lab_id, $printer_model, $serial_number, $status);
                 $stmt->execute();
 
                 // Insert printer details
@@ -404,6 +384,7 @@ $conn->close();
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Monitoring System</title>

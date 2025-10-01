@@ -111,6 +111,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Monitoring System</title>
@@ -129,7 +130,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
+    
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,200,0,200&icon_names=dns" />
     <link

@@ -51,7 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
             // Update session variables
             $_SESSION['full_name'] = $fullName;
             $_SESSION['email'] = $email;
-
         } else {
             $error = "Error updating profile: " . $conn->error;
         }
@@ -98,6 +97,7 @@ $conn->close();
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Monitoring System</title>

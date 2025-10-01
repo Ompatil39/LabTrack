@@ -228,8 +228,7 @@ while ($currentLabel < $totalLabels) {
             $qrData = json_encode([
                 "device_id" => $pc['device_id'],
                 "device_name" => $pc['device_name'] ?: "",
-                "lab_id" => $lab['lab_id'],
-                "timestamp" => time()  // Use current timestamp or fetch from DB if needed
+                "lab_id" => $lab['lab_id']
             ]);
             $pdf->write2DBarcode($qrData, 'QRCODE,H', $qrX, $qrY, $qrSize, $qrSize, array('border' => 0), 'N');
 

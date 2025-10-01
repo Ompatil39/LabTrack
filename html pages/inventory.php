@@ -76,6 +76,7 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="../public/images/logo.svg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Monitoring System</title>
