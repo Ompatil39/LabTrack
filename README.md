@@ -13,6 +13,18 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 
 ---
 
+## Demo Videos
+
+### Complete System Walkthrough
+<video src="images/LabTrack.mp4" controls></video>
+
+### QR Code Feature Demo
+<video src="images/QR.mp4" controls></video>
+
+
+
+---
+
 ## Features
 
   **Role-Based Access Control**  
@@ -29,7 +41,16 @@ LabTrack is a web-based laboratory monitoring and management system designed for
   **Device Management (Inventory)**  
   - Add and manage devices such as PCs, printers, and peripherals.  
   - Store detailed specifications including monitor, keyboard, mouse, and CPU details.  
-  - “Copy Last Entry” option for quick registration of similar devices.  
+  - "Copy Last Entry" option for quick registration of similar devices.  
+
+  **QR Code Integration**  
+  - **Automatic QR Generation**: Each device is automatically assigned a unique QR code for easy identification.  
+  - **QR Code Scanning**: Built-in scanner allows users to scan a device's QR code and instantly navigate to its detailed page in the system.  
+  - **PDF Export with QR Codes**: Generate comprehensive PDF reports containing:
+    * Basic lab details (lab name, code, statistics)
+    * Structured table listing all devices with their unique QR codes
+    * Perfect for offline use, printing, and quick reference
+  - This feature improves device management, reduces manual searching, and makes lab operations more efficient.
 
   **Grievance Management**  
   - Students can submit issues or complaints.  
@@ -40,31 +61,8 @@ LabTrack is a web-based laboratory monitoring and management system designed for
   - Password hashing, input sanitization, CSRF protection, and prepared statements to prevent SQL injection.  
   - Session-based authentication with role-level access control.  
 
-
 ---
 
-## Screenshots
-
-### Login Page
-<img src="images/1.png" alt="Login Page" width="80%"/>
-
-### Dashboard
-<img src="images/2.png" alt="Dashboard" width="80%"/>
-
-### Labs Overview
-<img src="images/3.png" alt="Labs Overview" width="80%"/>
-
-### Lab Management
-<img src="images/4.png" alt="Lab Management" width="80%"/>
-
-### Device Inventory
-<img src="images/5.png" alt="Device Inventory" width="80%"/>
-
-### Grievance Management
-<img src="images/6.png" alt="Grievance Management" width="80%"/>
-
-
----
 ## Requirements
 
 - **PHP**: 7.4 or higher
@@ -75,7 +73,6 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 - **Storage**: At least 500MB free disk space
 
 ---
-
 
 ## Usage
 
