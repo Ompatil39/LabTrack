@@ -16,10 +16,12 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 ## Demo Videos
 
 ### Complete System Walkthrough
-https://github.com/user-attachments/assets/LabTrack.mp4
+<video src="images/LabTrack.mp4" controls></video>
 
 ### QR Code Feature Demo
-https://github.com/user-attachments/assets/QR.mp4
+<video src="images/QR.mp4" controls></video>
+
+
 
 ---
 
