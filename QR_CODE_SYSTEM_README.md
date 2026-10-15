@@ -52,7 +52,7 @@ ALTER TABLE devices ADD COLUMN qr_code TEXT;
 
 #### Modified Files:
 
-- `databse_tables.sql` - Added qr_code column to devices table
+- `database/schema.sql` - Added qr_code column to devices table
 - `html pages/index.php` - Added scanner button and modal
 - `html pages/addDevice.php` - Auto-generate QR codes for new devices
 - `html pages/viewDevice.php` - Display QR codes in device details

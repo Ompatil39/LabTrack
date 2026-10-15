@@ -1,16 +1,20 @@
 <?php
-// Database configuration
-$host = "localhost"; // Replace with your database host if not local
-$user = "root";      // Replace with your database username
-$password = "";      // No password
-$database = "lab_db"; // Database name
 
-// Create a connection to the database
-$conn = new mysqli($host, $user, $password, $database);
+require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../config/config.php';
 
+$dbConfig = app_config()['db'];
+$conn = new mysqli(
+    $dbConfig['host'],
+    $dbConfig['username'],
+    $dbConfig['password'],
+    $dbConfig['database'],
+    $dbConfig['port']
+);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    app_logger()->error('mysqli_connection_failed', ['error' => $conn->connect_error]);
+    http_response_code(500);
+    echo 'A database error occurred.';
+    exit;
 }
-
-?>

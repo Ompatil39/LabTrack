@@ -1,48 +1,73 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
+startSecureSession();
+
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    header('Location: index.php');
+    exit;
+}
+
 include 'db.php';
 $error = '';
+$clientIp = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
 
-$password = "admin123";
-$hashed_password = password_hash($password, PASSWORD_BCRYPT);
-// echo $hashed_password;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    enforceCsrfProtection();
+    $username = trim((string) ($_POST['username'] ?? ''));
+    $password = trim((string) ($_POST['password'] ?? ''));
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = trim($_POST['password'] ?? '');
+    if ($username === '' || $password === '') {
+        $error = 'Please fill in both fields.';
+    } else {
+        $remaining = 0;
+        if (isLoginLocked($username, $clientIp, $remaining)) {
+            $error = 'Too many failed login attempts. Try again in ' . max(1, (int) ceil($remaining / 60)) . ' minute(s).';
+        } else {
+            $user = db_fetch_one(
+                $conn,
+                'SELECT user_id, username, password, user_type FROM users WHERE username = ? LIMIT 1',
+                's',
+                [$username]
+            );
 
-    if (!empty($username) && !empty($password)) {
-
-        $stmt = $conn->prepare("SELECT user_id, username, password, user_type FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
-
-            if (password_verify($password, $user['password'])) {
-
+            if ($user && password_verify($password, (string) $user['password'])) {
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_type'] = $user['user_type'];
                 $_SESSION['logged_in'] = true;
+                $_SESSION['last_activity'] = time();
 
-                header("Location: index.php");
-                exit();
-            } else {
-                $error = "Invalid username or password.";
+                clearFailedLogin($username, $clientIp);
+
+                $mustChangePassword = false;
+                $columnCheck = db_fetch_one($conn, "SHOW COLUMNS FROM users LIKE 'must_change_password'");
+                if ($columnCheck) {
+                    $mustChangeRow = db_fetch_one(
+                        $conn,
+                        'SELECT must_change_password FROM users WHERE user_id = ? LIMIT 1',
+                        's',
+                        [(string) $user['user_id']]
+                    );
+                    $mustChangePassword = isset($mustChangeRow['must_change_password']) && (int) $mustChangeRow['must_change_password'] === 1;
+                }
+
+                if ($mustChangePassword) {
+                    $_SESSION['force_password_change'] = true;
+                    header('Location: profileManage.php?force_password_change=1');
+                    exit;
+                }
+
+                header('Location: index.php');
+                exit;
             }
-        } else {
-            $error = "Invalid username or password.";
-        }
 
-        $stmt->close();
-    } else {
-        $error = "Please fill in both fields.";
+            recordFailedLogin($username, $clientIp);
+            $error = 'Invalid username or password.';
+        }
     }
 }
+
 $conn->close();
 ?>
 
@@ -82,10 +107,11 @@ $conn->close();
                 <h2>Sign in to your account</h2>
 
                 <?php if ($error): ?>
-                    <div class="error-message"><?= htmlspecialchars($error) ?></div>
+                    <div class="error-message"><?= e($error) ?></div>
                 <?php endif; ?>
 
                 <form method="POST" action="">
+                    <?= csrfInputField() ?>
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" placeholder="Enter your username" required>
@@ -95,14 +121,7 @@ $conn->close();
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        <!-- <i class="fas fa-lock icon"></i> Changed to lock icon -->
                         <i class="fas fa-eye toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-25%); color: #7f8c8d; cursor: pointer;"></i>
-                    </div>
-
-                    <div class="remember-forgot">
-                        <div class="forgot">
-                            <a href="#">Forgot password?</a>
-                        </div>
                     </div>
 
                     <button type="submit" class="sign-in-btn">Sign In</button>

@@ -66,12 +66,30 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 
 ## Requirements
 
-- **PHP**: 7.4 or higher
+- **PHP**: 8.2 or higher
 - **Web Server**: Apache 2.4+ or Nginx 1.18+
 - **Database**: MySQL 5.7+ or MariaDB 10.3+
 - **Extensions**: PDO, PDO_MySQL, JSON, CURL
 - **Memory**: Minimum 512MB RAM
 - **Storage**: At least 500MB free disk space
+
+---
+
+## Quick Start (Docker + Simulated Lab)
+
+1. Copy the environment template:
+   - `cp .env.example .env`
+2. Start the full stack:
+   - `docker compose up --build`
+3. Open the application:
+   - `http://localhost:8080/html%20pages/login.php`
+4. Telemetry ingestion endpoint:
+   - `http://localhost:8080/api/v1/telemetry.php`
+5. Default seeded users:
+   - Admin: `admin / admin123`
+   - In-charges: `incharge_lab1 / incharge123`, `incharge_lab2 / incharge123`
+
+The app container automatically runs migrations and deterministic seeding on startup, and the `lab-simulator` service continuously streams telemetry from 10 virtual PCs.
 
 ---
 

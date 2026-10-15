@@ -1,8 +1,9 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-  header("Location: login.php");
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+requireRole('Admin');
+startCsrfOutputBuffer();
+enforceCsrfProtection();
 include 'db.php';
 
 // Fetch lab options

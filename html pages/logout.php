@@ -1,20 +1,14 @@
 <?php
-// logout.php - Place this in a separate file
+require_once __DIR__ . '/../includes/security.php';
+startSecureSession();
 
-// Start the session if it's not already started
-session_start();
+$_SESSION = [];
 
-// Unset all session variables
-$_SESSION = array();
-
-// If a session cookie is used, destroy it
-if (isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), '', time() - 42000, '/');
+if (ini_get('session.use_cookies')) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], (bool) $params['secure'], (bool) $params['httponly']);
 }
 
-// Destroy the session
 session_destroy();
-
-// Redirect to login page
-header("Location: login.php");
+header('Location: login.php');
 exit;
