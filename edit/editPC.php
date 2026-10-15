@@ -1,13 +1,11 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-    header("Location: ../html pages/login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include '../html pages/db.php';
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    app_logger()->error("Database connection failed in editPC.php");
+    exit("Database connection failed. Please try again later.");
 }
 
 // Initialize variables
@@ -18,7 +16,7 @@ $isEditMode = false;
 $device_data = null;
 
 // Get id from URL and fetch data
-$id = isset($_GET['id']) ? trim($_GET['id']) : '';
+$id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 if (!empty($id)) {
     $isEditMode = true;
 
@@ -27,16 +25,10 @@ if (!empty($id)) {
               FROM devices d 
               LEFT JOIN pc_details p ON d.device_id = p.device_id 
               WHERE d.device_id = ?";
-    $stmt = $conn->prepare($query);
-    if ($stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $device_data = db_fetch_one($conn, $query, "s", [$id]);
 
-    if ($result && $result->num_rows > 0) {
-        $device_data = $result->fetch_assoc();
+    if ($device_data !== null) {
+        requireLabAccess($conn, (string)$device_data['lab_id']);
     } else {
         $message = "Device not found in database!";
         $messageType = "error";
@@ -49,6 +41,7 @@ if (!empty($id)) {
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
+    enforceCsrfProtection();
     $id = trim($_POST['id'] ?? '');
     $device_name = trim($_POST['pc_name'] ?? '');
     $pc_code = trim($_POST['pc_code'] ?? '');
@@ -83,24 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                       status = ?, 
                       updated_at = ? 
                       WHERE device_id = ?";
-            $stmt = $conn->prepare($query);
-            if ($stmt === false) {
-                die("Prepare failed: " . $conn->error);
+            $updated = db_execute($conn, $query, "sssss", [$device_name, $serial_number, $status, $updated_at, $id]);
+            if (!$updated) {
+                throw new Exception("Failed to update devices table");
             }
-            $stmt->bind_param("sssss", $device_name, $serial_number, $status, $updated_at, $id);
-            $stmt->execute();
 
             // Check and update pc_details table
-            $checkQuery = "SELECT device_id FROM pc_details WHERE device_id = ?";
-            $checkStmt = $conn->prepare($checkQuery);
-            if ($checkStmt === false) {
-                die("Prepare failed: " . $conn->error);
-            }
-            $checkStmt->bind_param("s", $id);
-            $checkStmt->execute();
-            $checkResult = $checkStmt->get_result();
+            $checkRow = db_fetch_one($conn, "SELECT device_id FROM pc_details WHERE device_id = ?", "s", [$id]);
 
-            if ($checkResult->num_rows > 0) {
+            if ($checkRow !== null) {
                 $query = "UPDATE pc_details SET 
                           processor = ?, 
                           ram = ?, 
@@ -108,24 +92,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                           operating_system = ?,
                           ethernet_mac = ?,
                           wifi_adapter = ?,
-                          ip_address = ?
+                          ip_address = ? 
                           WHERE device_id = ?";
-                $stmt = $conn->prepare($query);
-                if ($stmt === false) {
-                    die("Prepare failed: " . $conn->error);
+                $updatedPc = db_execute($conn, $query, "ssssssss", [$processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address, $id]);
+                if (!$updatedPc) {
+                    throw new Exception("Failed to update pc_details table");
                 }
-                $stmt->bind_param("ssssssss", $processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address, $id);
-                $stmt->execute();
             } else {
-                // Insert if it doesn't exist
                 $query = "INSERT INTO pc_details (device_id, processor, ram, storage, operating_system, ethernet_mac, wifi_adapter, ip_address)
                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($query);
-                if ($stmt === false) {
-                    die("Prepare failed: " . $conn->error);
+                $insertedPc = db_execute($conn, $query, "ssssssss", [$id, $processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address]);
+                if (!$insertedPc) {
+                    throw new Exception("Failed to insert into pc_details table");
                 }
-                $stmt->bind_param("ssssssss", $id, $processor, $ram, $storage, $operating_system, $ethernet_mac, $wifi_adapter, $ip_address);
-                $stmt->execute();
             }
 
             $conn->commit();
@@ -137,12 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                 'device_id' => $id,
                 'device_name' => $device_name,
                 'device_type' => 'PC',
-                'lab_id' => $device_data['lab_id'],
-                'lab_name' => getLabName($device_data['lab_id'], $conn)
+                'lab_id' => $device_data['lab_id'] ?? '',
+                'lab_name' => getLabName($device_data['lab_id'] ?? '', $conn)
             ];
         } catch (Exception $e) {
             $conn->rollback();
-            $message = "Error: " . $e->getMessage();
+            app_logger()->error("Failed to update PC device: " . $e->getMessage());
+            $message = "An error occurred while updating the device. Please try again.";
             $messageType = "error";
         }
     } else {
@@ -153,15 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
 
 function getLabName($lab_id, $conn)
 {
-    $query = "SELECT lab_name FROM labs WHERE lab_id = ?";
-    $stmt = $conn->prepare($query);
-    if ($stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("s", $lab_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return ($result && $result->num_rows > 0) ? $result->fetch_assoc()['lab_name'] : "Unknown Lab";
+    $row = db_fetch_one($conn, "SELECT lab_name FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+    return $row['lab_name'] ?? "Unknown Lab";
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
@@ -287,6 +260,7 @@ $showModal = ($messageType === 'success' && $deviceDetails !== null);
 
                         <?php if ($isEditMode && $device_data !== null): ?>
                             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . urlencode($id)); ?>">
+                                <?php echo csrfInputField(); ?>
                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($device_data['device_id']); ?>">
 
                                 <div class="selectLabDevice" style="margin-bottom: 0rem !important;">

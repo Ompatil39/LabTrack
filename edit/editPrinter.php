@@ -1,21 +1,15 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-    header("Location: ../html pages/login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include '../html pages/db.php';
+if (!$conn) {
+    app_logger()->error("Database connection failed in editPrinter.php");
+    exit("Database connection failed. Please try again later.");
+}
 
 // Fetch active labs for dropdown
-$labsQuery = "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'";
-$labsResult = $conn->query($labsQuery);
-$labs = [];
-if ($labsResult && $labsResult->num_rows > 0) {
-    while ($row = $labsResult->fetch_assoc()) {
-        $labs[] = $row;
-    }
-}
+$labs = db_fetch_all($conn, "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'");
 
 // Initialize variables
 $message = '';
@@ -25,31 +19,29 @@ $isEditMode = false;
 $printer_data = null;
 
 // Get device_id from URL
-$device_id = isset($_GET['id']) ? trim($_GET['id']) : '';
+$device_id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 if (!empty($device_id)) {
     // Fetch printer details
     $query = "SELECT d.*, p.* FROM devices d 
               LEFT JOIN printers p ON d.device_id = p.device_id 
               WHERE d.device_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $device_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $printer_data = db_fetch_one($conn, $query, "s", [$device_id]);
 
-    if ($result && $result->num_rows > 0) {
-        $printer_data = $result->fetch_assoc();
+    if ($printer_data !== null) {
+        requireLabAccess($conn, (string)$printer_data['lab_id']);
         $isEditMode = true;
     } else {
-        $message = "Device ID '$device_id' not found in database!";
+        $message = "Device ID '" . htmlspecialchars($device_id, ENT_QUOTES, 'UTF-8') . "' not found in database!";
         $messageType = "error";
     }
 } else {
-    $message = "Please provide a device ID in the URL (e.g., ?device_id=PRT-2025-0001)!";
+    $message = "Please provide a device ID in the URL!";
     $messageType = "error";
 }
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
+    enforceCsrfProtection();
     $device_id = trim($_POST['device_id'] ?? '');
     $lab_id = trim($_POST['lab_id'] ?? '');
     $device_type = 'Printer';
@@ -74,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
         try {
             $conn->begin_transaction();
 
+            $device_status = ($status === 'Active') ? 'Active' : (($status === 'In Repair' || $status === 'Under Repair') ? 'Under Repair' : 'InActive');
+
             // Update devices table
             $query = "UPDATE devices SET 
                       lab_id = ?, 
@@ -82,18 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
                       status = ?, 
                       updated_at = ? 
                       WHERE device_id = ?";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ssssss", $lab_id, $printer_model, $serial_number, $status, $updated_at, $device_id);
-            $stmt->execute();
+            $updated = db_execute($conn, $query, "ssssss", [$lab_id, $printer_model, $serial_number, $device_status, $updated_at, $device_id]);
+            if (!$updated) {
+                throw new Exception("Failed to update devices table");
+            }
 
             // Check if printer record exists and update
-            $checkQuery = "SELECT device_id FROM printers WHERE device_id = ?";
-            $checkStmt = $conn->prepare($checkQuery);
-            $checkStmt->bind_param("s", $device_id);
-            $checkStmt->execute();
-            $checkResult = $checkStmt->get_result();
+            $checkRow = db_fetch_one($conn, "SELECT device_id FROM printers WHERE device_id = ?", "s", [$device_id]);
 
-            if ($checkResult->num_rows > 0) {
+            if ($checkRow !== null) {
                 $query = "UPDATE printers SET 
                           printer_model = ?, 
                           printer_type = ?, 
@@ -101,9 +92,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
                           connectivity = ?, 
                           serial_number = ? 
                           WHERE device_id = ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssssss", $printer_model, $printer_type, $color_capability, $connectivity, $serial_number, $device_id);
-                $stmt->execute();
+                $updatedPrn = db_execute($conn, $query, "ssssss", [$printer_model, $printer_type, $color_capability, $connectivity, $serial_number, $device_id]);
+                if (!$updatedPrn) {
+                    throw new Exception("Failed to update printers table");
+                }
+            } else {
+                $query = "INSERT INTO printers (device_id, printer_model, printer_type, color_capability, connectivity, serial_number) 
+                          VALUES (?, ?, ?, ?, ?, ?)";
+                $insertedPrn = db_execute($conn, $query, "ssssss", [$device_id, $printer_model, $printer_type, $color_capability, $connectivity, $serial_number]);
+                if (!$insertedPrn) {
+                    throw new Exception("Failed to insert into printers table");
+                }
             }
 
             $conn->commit();
@@ -120,7 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
             ];
         } catch (Exception $e) {
             $conn->rollback();
-            $message = "Error: " . $e->getMessage();
+            app_logger()->error("Failed to update Printer: " . $e->getMessage());
+            $message = "An error occurred while updating the printer. Please try again.";
             $messageType = "error";
         }
     } else {
@@ -131,12 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
 
 function getLabName($lab_id, $conn)
 {
-    $query = "SELECT lab_name FROM labs WHERE lab_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $lab_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return ($result && $result->num_rows > 0) ? $result->fetch_assoc()['lab_name'] : "Unknown Lab";
+    $row = db_fetch_one($conn, "SELECT lab_name FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+    return $row['lab_name'] ?? "Unknown Lab";
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
@@ -237,6 +233,7 @@ $conn->close();
 
                         <?php if ($isEditMode && $printer_data): ?>
                             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                                <?php echo csrfInputField(); ?>
                                 <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($printer_data['device_id']); ?>">
 
                                 <div class="selectLabDevice">

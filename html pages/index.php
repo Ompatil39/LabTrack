@@ -1,59 +1,110 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-  header("Location: login.php");
-  exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 require_once 'db.php';
 
-// Fetch dashboard statistics with error checking
-function fetchSingleValue($conn, $query, $description)
+function fetchSingleValue(mysqli $conn, string $query, string $types = '', array $params = []): int|float|string
 {
-  $result = mysqli_query($conn, $query);
-  if ($result === false) {
-    die("Query failed ($description): " . mysqli_error($conn));
+  try {
+    $row = db_fetch_one($conn, $query, $types, $params);
+    if ($row) {
+      $vals = array_values($row);
+      return $vals[0] ?? 0;
+    }
+    return 0;
+  } catch (Throwable $t) {
+    app_logger()->error('fetch_single_value_failed', ['error' => $t->getMessage(), 'sql' => $query]);
+    return 0;
   }
-  $row = mysqli_fetch_row($result);
-  return $row ? $row[0] : 0;
 }
 
-function fetchArray($conn, $query, $description)
+function fetchArray(mysqli $conn, string $query, string $types = '', array $params = []): array
 {
-  $result = mysqli_query($conn, $query);
-  if ($result === false) {
-    die("Query failed ($description): " . mysqli_error($conn));
+  try {
+    return db_fetch_all($conn, $query, $types, $params);
+  } catch (Throwable $t) {
+    app_logger()->error('fetch_array_failed', ['error' => $t->getMessage(), 'sql' => $query]);
+    return [];
   }
-  $data = [];
-  while ($row = mysqli_fetch_assoc($result)) {
-    $data[] = $row;
-  }
-  return $data;
 }
 
-$total_labs = fetchSingleValue($conn, "SELECT COUNT(*) FROM labs", "Total Labs");
-$active_devices = fetchSingleValue($conn, "SELECT COUNT(*) FROM devices WHERE status = 'Active'", "Active Devices");
-$resolved_grievances = fetchSingleValue($conn, "SELECT COUNT(*) FROM grievances WHERE status = 'Resolved'", "Resolved Grievances");
-$pending_grievances = fetchSingleValue($conn, "SELECT COUNT(*) FROM grievances WHERE status IN ('Submitted', 'In Progress', 'Under Review')", "Pending Grievances");
+// Scoping for Incharge
+$labScope = restrictLabSql('lab_id');
+$deviceScope = restrictLabSql('lab_id', 'devices');
+$grievanceScope = restrictLabSql('lab_id', 'grievances');
 
-$total_devices = fetchSingleValue($conn, "SELECT COUNT(*) FROM devices", "Total Devices");
+// Build scoped query helper
+$scopedSql = static function (string $baseSql, array $scope, string $conjunction = 'WHERE'): array {
+  if ($scope['clause'] === '') {
+    return ['sql' => $baseSql, 'types' => '', 'params' => []];
+  }
+  return [
+    'sql' => $baseSql . ' ' . $conjunction . ' ' . trim($scope['clause']),
+    'types' => $scope['types'],
+    'params' => $scope['params'],
+  ];
+};
+
+$labsQuery = $scopedSql('SELECT COUNT(*) as count FROM labs', $labScope);
+$total_labs = (int) fetchSingleValue($conn, $labsQuery['sql'], $labsQuery['types'], $labsQuery['params']);
+
+$activeDevQuery = $scopedSql("SELECT COUNT(*) as count FROM devices WHERE status = 'Active'", $deviceScope, 'AND');
+$active_devices = (int) fetchSingleValue($conn, $activeDevQuery['sql'], $activeDevQuery['types'], $activeDevQuery['params']);
+
+$resolvedGrvQuery = $scopedSql("SELECT COUNT(*) as count FROM grievances WHERE status = 'Resolved'", $grievanceScope, 'AND');
+$resolved_grievances = (int) fetchSingleValue($conn, $resolvedGrvQuery['sql'], $resolvedGrvQuery['types'], $resolvedGrvQuery['params']);
+
+$pendingGrvQuery = $scopedSql("SELECT COUNT(*) as count FROM grievances WHERE status IN ('Submitted', 'In Progress', 'Under Review')", $grievanceScope, 'AND');
+$pending_grievances = (int) fetchSingleValue($conn, $pendingGrvQuery['sql'], $pendingGrvQuery['types'], $pendingGrvQuery['params']);
+
+$totalDevQuery = $scopedSql('SELECT COUNT(*) as count FROM devices', $deviceScope);
+$total_devices = (int) fetchSingleValue($conn, $totalDevQuery['sql'], $totalDevQuery['types'], $totalDevQuery['params']);
 $active_percentage = $total_devices > 0 ? round(($active_devices / $total_devices) * 100, 1) : 0;
 
-$device_status = fetchArray($conn, "SELECT status, COUNT(*) as count FROM devices GROUP BY status", "Device Status");
-$grievance_trend = fetchArray($conn, "SELECT DATE_FORMAT(submission_date, '%b') as month, COUNT(*) as count FROM grievances GROUP BY MONTH(submission_date) ORDER BY submission_date LIMIT 8", "Grievance Trend");
-$grievance_requests = fetchArray($conn, "SELECT labs.lab_name, COUNT(*) as count FROM grievances JOIN labs ON grievances.lab_id = labs.lab_id GROUP BY labs.lab_id, labs.lab_name LIMIT 8", "Grievance Requests");
-$lab_occupancy = fetchArray($conn, "SELECT status, COUNT(*) as count FROM labs GROUP BY status", "Lab Occupancy");
-$device_distribution = fetchArray($conn, "SELECT labs.lab_name, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id GROUP BY labs.lab_id, labs.lab_name LIMIT 8", "Device Distribution");
-$faulty_devices = fetchArray($conn, "SELECT labs.lab_name, devices.device_type, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id WHERE devices.status = 'InActive' GROUP BY labs.lab_id, devices.device_type LIMIT 16", "InActive Devices");
+$devStatusQuery = $scopedSql('SELECT status, COUNT(*) as count FROM devices', $deviceScope);
+$device_status = fetchArray($conn, $devStatusQuery['sql'] . ' GROUP BY status', $devStatusQuery['types'], $devStatusQuery['params']);
 
-$grievances_by_category = fetchArray($conn, "SELECT device_category, COUNT(*) as count FROM grievances GROUP BY device_category", "Grievances by Category");
-$grievance_status = fetchArray($conn, "SELECT status, COUNT(*) as count FROM grievances GROUP BY status", "Grievance Status");
-$device_status_for_chart = fetchArray($conn, "SELECT status, COUNT(*) as count FROM devices GROUP BY status", "Device Status for Chart");
-$pending_grievances_by_category = fetchArray($conn, "SELECT device_category, COUNT(*) as count FROM grievances WHERE status IN ('Submitted', 'In Progress', 'Under Review') GROUP BY device_category", "Pending Grievances by Category");
-$avg_grievance_time = fetchArray($conn, "SELECT device_type, COUNT(*) as count FROM devices WHERE status = 'In Repair' GROUP BY device_type LIMIT 4", "Average Grievance Time");
+$trendQuery = $scopedSql("SELECT DATE_FORMAT(submission_date, '%b') as month, COUNT(*) as count FROM grievances", $grievanceScope);
+$grievance_trend = fetchArray($conn, $trendQuery['sql'] . " GROUP BY MONTH(submission_date), DATE_FORMAT(submission_date, '%b') ORDER BY MIN(submission_date) LIMIT 8", $trendQuery['types'], $trendQuery['params']);
+
+$reqScope = restrictLabSql('lab_id', 'labs');
+$grvReqSql = "SELECT labs.lab_name, COUNT(*) as count FROM grievances JOIN labs ON grievances.lab_id = labs.lab_id";
+if ($reqScope['clause'] !== '') {
+  $grvReqSql .= " WHERE " . trim($reqScope['clause']);
+}
+$grievance_requests = fetchArray($conn, $grvReqSql . " GROUP BY labs.lab_id, labs.lab_name LIMIT 8", $reqScope['types'], $reqScope['params']);
+
+$labOccQuery = $scopedSql('SELECT status, COUNT(*) as count FROM labs', $labScope);
+$lab_occupancy = fetchArray($conn, $labOccQuery['sql'] . ' GROUP BY status', $labOccQuery['types'], $labOccQuery['params']);
+
+$devDistSql = "SELECT labs.lab_name, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id";
+if ($reqScope['clause'] !== '') {
+  $devDistSql .= " WHERE " . trim($reqScope['clause']);
+}
+$device_distribution = fetchArray($conn, $devDistSql . " GROUP BY labs.lab_id, labs.lab_name LIMIT 8", $reqScope['types'], $reqScope['params']);
+
+$faultyDevSql = "SELECT labs.lab_name, devices.device_type, COUNT(*) as count FROM devices JOIN labs ON devices.lab_id = labs.lab_id WHERE devices.status IN ('InActive', 'Inactive', 'Under Repair')";
+if ($reqScope['clause'] !== '') {
+  $faultyDevSql .= " AND " . trim($reqScope['clause']);
+}
+$faulty_devices = fetchArray($conn, $faultyDevSql . " GROUP BY labs.lab_id, devices.device_type LIMIT 16", $reqScope['types'], $reqScope['params']);
+
+$catGrvQuery = $scopedSql('SELECT device_category, COUNT(*) as count FROM grievances', $grievanceScope);
+$grievances_by_category = fetchArray($conn, $catGrvQuery['sql'] . ' GROUP BY device_category', $catGrvQuery['types'], $catGrvQuery['params']);
+
+$statGrvQuery = $scopedSql('SELECT status, COUNT(*) as count FROM grievances', $grievanceScope);
+$grievance_status = fetchArray($conn, $statGrvQuery['sql'] . ' GROUP BY status', $statGrvQuery['types'], $statGrvQuery['params']);
+
+$device_status_for_chart = $device_status;
+
+$pendCatQuery = $scopedSql("SELECT device_category, COUNT(*) as count FROM grievances WHERE status IN ('Submitted', 'In Progress', 'Under Review')", $grievanceScope, 'AND');
+$pending_grievances_by_category = fetchArray($conn, $pendCatQuery['sql'] . ' GROUP BY device_category', $pendCatQuery['types'], $pendCatQuery['params']);
+
+$repairDevQuery = $scopedSql("SELECT device_type, COUNT(*) as count FROM devices WHERE status IN ('Under Repair', 'In Repair')", $deviceScope, 'AND');
+$avg_grievance_time = fetchArray($conn, $repairDevQuery['sql'] . ' GROUP BY device_type LIMIT 4', $repairDevQuery['types'], $repairDevQuery['params']);
 
 $conn->close();
-
 ?>
 
 <!DOCTYPE html>

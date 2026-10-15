@@ -4,3 +4,4 @@
 !/logs/.gitkeep
 /uploads/*
 !/uploads/.gitkeep
+.codegraph

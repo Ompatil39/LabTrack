@@ -1,49 +1,79 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-}
+require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/DeviceStatus.php';
+requireLogin();
 include 'db.php';
 
 // Pagination parameters
 $items_per_page = 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $items_per_page;
 
 // Get filter parameters from GET (for URL persistence)
-$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
-$lab_filter = isset($_GET['lab']) ? $conn->real_escape_string($_GET['lab']) : '';
-$status_filter = isset($_GET['status']) ? $conn->real_escape_string($_GET['status']) : '';
-$category_filter = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : '';
+$search = isset($_GET['search']) ? trim((string)$_GET['search']) : '';
+$lab_filter = isset($_GET['lab']) ? trim((string)$_GET['lab']) : '';
+$status_filter = isset($_GET['status']) ? trim((string)$_GET['status']) : '';
+$category_filter = isset($_GET['category']) ? trim((string)$_GET['category']) : '';
 
 // Build the WHERE clause for filtering
-$where = "WHERE 1=1"; // Base condition that’s always true
-if (!empty($search)) {
-    $where .= " AND (d.device_id LIKE '%$search%' OR d.device_name LIKE '%$search%')";
-}
-if (!empty($lab_filter)) {
-    $where .= " AND l.lab_name = '$lab_filter'";
-}
-if (!empty($status_filter)) {
-    $where .= " AND d.status = '$status_filter'";
-}
-if (!empty($category_filter)) {
-    $where .= " AND d.device_type = '$category_filter'";
+$whereClauses = ['1=1'];
+$filterTypes = '';
+$filterParams = [];
+
+// Apply Incharge lab access scoping
+$labScope = restrictLabSql('lab_id', 'd');
+if ($labScope['clause'] !== '') {
+    $whereClauses[] = $labScope['clause'];
+    $filterTypes .= $labScope['types'];
+    $filterParams = array_merge($filterParams, $labScope['params']);
 }
 
-// Get total counts for cards
-$total_labs = $conn->query("SELECT COUNT(*) as count FROM labs")->fetch_assoc()['count'];
-$total_devices = $conn->query("SELECT COUNT(*) as count FROM devices")->fetch_assoc()['count'];
-$in_repair = $conn->query("SELECT COUNT(*) as count FROM devices WHERE status = 'In Repair'")->fetch_assoc()['count'];
-$faulty_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE status = 'Faulty'")->fetch_assoc()['count'];
+if ($search !== '') {
+    $whereClauses[] = "(d.device_id LIKE ? OR d.device_name LIKE ?)";
+    $filterTypes .= "ss";
+    $filterParams[] = "%{$search}%";
+    $filterParams[] = "%{$search}%";
+}
+if ($lab_filter !== '') {
+    $whereClauses[] = "l.lab_name = ?";
+    $filterTypes .= "s";
+    $filterParams[] = $lab_filter;
+}
+if ($status_filter !== '') {
+    $whereClauses[] = "d.status = ?";
+    $filterTypes .= "s";
+    $filterParams[] = $status_filter;
+}
+if ($category_filter !== '') {
+    $whereClauses[] = "d.device_type = ?";
+    $filterTypes .= "s";
+    $filterParams[] = $category_filter;
+}
+
+$whereSql = "WHERE " . implode(' AND ', $whereClauses);
+
+// Scoped counts for cards
+$labCountScope = restrictLabSql('lab_id');
+$total_labs_sql = "SELECT COUNT(*) as count FROM labs" . ($labCountScope['clause'] !== '' ? " WHERE " . $labCountScope['clause'] : "");
+$total_labs = (int)(db_fetch_one($conn, $total_labs_sql, $labCountScope['types'], $labCountScope['params'])['count'] ?? 0);
+
+$devScope = restrictLabSql('lab_id', 'devices');
+$devWhere = $devScope['clause'] !== '' ? " WHERE " . $devScope['clause'] : "";
+$total_devices = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices" . $devWhere, $devScope['types'], $devScope['params'])['count'] ?? 0);
+
+$repairWhere = " WHERE (status = 'Under Repair' OR status = 'In Repair')" . ($devScope['clause'] !== '' ? " AND " . $devScope['clause'] : "");
+$in_repair = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices" . $repairWhere, $devScope['types'], $devScope['params'])['count'] ?? 0);
+
+$inactiveWhere = " WHERE (status = 'InActive' OR status = 'Faulty')" . ($devScope['clause'] !== '' ? " AND " . $devScope['clause'] : "");
+$faulty_devices = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices" . $inactiveWhere, $devScope['types'], $devScope['params'])['count'] ?? 0);
 
 // Get total items for pagination
-$total_items = $conn->query("SELECT COUNT(*) as count FROM devices d LEFT JOIN labs l ON d.lab_id = l.lab_id $where")->fetch_assoc()['count'];
+$total_items = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices d LEFT JOIN labs l ON d.lab_id = l.lab_id $whereSql", $filterTypes, $filterParams)['count'] ?? 0);
 
 // Function to generate pagination links
 function generatePagination($total_items, $items_per_page, $current_page, $base_url)
 {
-    $total_pages = ceil($total_items / $items_per_page);
+    $total_pages = max(1, (int)ceil($total_items / $items_per_page));
     $pagination = '<div class="pagination">';
 
     $params = $_GET;
@@ -190,18 +220,19 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                             <select id="labFilter" name="lab" class="float-right">
                                 <option value="">All Labs</option>
                                 <?php
-                                $labs = $conn->query("SELECT DISTINCT lab_name FROM labs ORDER BY lab_name");
-                                while ($lab = $labs->fetch_assoc()) {
+                                $labsFilterSql = "SELECT DISTINCT lab_name FROM labs" . ($labCountScope['clause'] !== '' ? " WHERE " . $labCountScope['clause'] : "") . " ORDER BY lab_name";
+                                $labs = db_fetch_all($conn, $labsFilterSql, $labCountScope['types'], $labCountScope['params']);
+                                foreach ($labs as $lab) {
                                     $selected = ($lab_filter === $lab['lab_name']) ? 'selected' : '';
-                                    echo "<option value='" . htmlspecialchars($lab['lab_name']) . "' $selected>" . htmlspecialchars($lab['lab_name']) . "</option>";
+                                    echo "<option value='" . htmlspecialchars($lab['lab_name'], ENT_QUOTES, 'UTF-8') . "' $selected>" . htmlspecialchars($lab['lab_name'], ENT_QUOTES, 'UTF-8') . "</option>";
                                 }
                                 ?>
                             </select>
                             <select id="statusFilter" name="status">
                                 <option value="">All Status</option>
                                 <option value="Active" <?php echo $status_filter === 'Active' ? 'selected' : ''; ?>>Active</option>
-                                <option value="In Repair" <?php echo $status_filter === 'Under Repair' ? 'selected' : ''; ?>>Under Repair</option>
-                                <option value="Faulty" <?php echo $status_filter === 'InActive' ? 'selected' : ''; ?>>InActive</option>
+                                <option value="Under Repair" <?php echo ($status_filter === 'Under Repair' || $status_filter === 'In Repair') ? 'selected' : ''; ?>>Under Repair</option>
+                                <option value="InActive" <?php echo ($status_filter === 'InActive' || $status_filter === 'Faulty') ? 'selected' : ''; ?>>InActive</option>
                             </select>
                             <select id="categoryFilter" name="category">
                                 <option value="">All Categories</option>
@@ -234,29 +265,31 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                     FROM devices d
                     LEFT JOIN labs l ON d.lab_id = l.lab_id
                     LEFT JOIN pc_details p ON d.device_id = p.device_id
-                    $where
-                    LIMIT $offset, $items_per_page";
-                            $result = $conn->query($sql);
+                    $whereSql
+                    LIMIT ?, ?";
+                            $mainTypes = $filterTypes . 'ii';
+                            $mainParams = array_merge($filterParams, [$offset, $items_per_page]);
+                            $rows = db_fetch_all($conn, $sql, $mainTypes, $mainParams);
 
-                            if ($result && $result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
+                            if (!empty($rows)) {
+                                foreach ($rows as $row) {
                                     echo "<tr>";
-                                    echo "<td>" . htmlspecialchars($row['device_id']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['device_name']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['device_type']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['lab_name']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['pc_id']) . "</td>";
-                                    echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
+                                    echo "<td>" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['device_type'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['lab_name'] ?? 'N/A', ENT_QUOTES, 'UTF-8') . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['pc_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                    echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', (string)$row['status'])) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
 
                                     echo "<td>
-                            <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
+                            <a href='viewDevice.php?id=" . urlencode($row['device_id']) . "' class='none'>
                                 <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                             </a>
-                            <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
+                            <a href='../edit/deviceRouter.php?id=" . urlencode($row['device_id']) . "' class='none'>
                                 <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
                             </a>
-                            <button class='btn-icon qr-btn' onclick='showQRCode(\"" . $row['device_id'] . "\")' title='View QR Code'><i class='fa-solid fa-qrcode'></i></button>
-                            <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
+                            <button class='btn-icon qr-btn' onclick='showQRCode(\"" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "\")' title='View QR Code'><i class='fa-solid fa-qrcode'></i></button>
+                            <button class='btn-icon delete-btn delete-trigger' data-id='" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "' data-name='" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "'><i class='fa-solid fa-trash'></i></button>
                           </td>";
                                     echo "</tr>";
                                 }
@@ -378,6 +411,7 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
 
                 const formData = new FormData();
                 formData.append('device_id', currentDeviceId);
+                formData.append('csrf_token', <?php echo json_encode(generateCsrfToken()); ?>);
 
                 fetch('deleteDevice.php', {
                         method: 'POST',

@@ -1,3 +1,12 @@
+<?php
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+
+if (isset($_GET['id']) && trim((string)$_GET['id']) !== '') {
+    header("Location: ../edit/deviceRouter.php?id=" . urlencode($_GET['id']));
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

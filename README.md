@@ -75,21 +75,26 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 
 ---
 
-## Quick Start (Docker + Simulated Lab)
+## Documentation & Architecture
+
+- **Database Schema (PDF):** [docs/DB_schema.pdf](docs/DB_schema.pdf)
+- **Database ER Diagram:** [docs/db.png](docs/db.png)
+
+---
+
+## Quick Start (Docker)
 
 1. Copy the environment template:
    - `cp .env.example .env`
-2. Start the full stack:
+2. Start the application stack:
    - `docker compose up --build`
 3. Open the application:
    - `http://localhost:8080/html%20pages/login.php`
-4. Telemetry ingestion endpoint:
-   - `http://localhost:8080/api/v1/telemetry.php`
-5. Default seeded users:
+4. Default seeded users:
    - Admin: `admin / admin123`
    - In-charges: `incharge_lab1 / incharge123`, `incharge_lab2 / incharge123`
 
-The app container automatically runs migrations and deterministic seeding on startup, and the `lab-simulator` service continuously streams telemetry from 10 virtual PCs.
+The app container automatically runs migrations and deterministic seeding on startup. Optional phpMyAdmin is accessible at `http://localhost:8081`.
 
 ---
 

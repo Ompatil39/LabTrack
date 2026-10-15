@@ -39,10 +39,10 @@ $departments = [
 
 // Fetch in-charges from users table (only Incharge or Admin user_types)
 $incharge_query = "SELECT username FROM users WHERE user_type IN ('Admin', 'Incharge')";
-$incharge_result = $conn->query($incharge_query);
+$inchargeRows = db_fetch_all($conn, $incharge_query);
 $incharges = [];
-while ($row = $incharge_result->fetch_assoc()) {
-    $incharges[] = ['username' => $row['username']];
+foreach ($inchargeRows as $row) {
+    $incharges[] = ['username' => (string) $row['username']];
 }
 
 // Process form submission
@@ -104,7 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $result = $stmt->get_result();
                 $lab = $result->fetch_assoc();
             } else {
-                $error_message = "Error updating lab: " . $update_stmt->error;
+                app_logger()->error('edit_lab_error', ['error' => $update_stmt->error]);
+                $error_message = "Error updating lab. Please try again.";
             }
         }
     }

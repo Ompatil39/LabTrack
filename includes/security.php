@@ -71,7 +71,7 @@ if (!function_exists('requireLogin')) {
 if (!function_exists('currentUserRole')) {
     function currentUserRole(): string
     {
-        return (string) ($_SESSION['user_type'] ?? '');
+        return (string) ($_SESSION['user_type'] ?? $_SESSION['role'] ?? '');
     }
 }
 
@@ -128,13 +128,51 @@ if (!function_exists('restrictLabSql')) {
         }
 
         $column = $labAlias !== '' ? $labAlias . '.' . $labColumn : $labColumn;
-        $sql = " {$column} IN (SELECT lab_id FROM labs WHERE lab_incharge = ?)";
+        $sql = " {$column} IN (SELECT lab_id FROM labs WHERE lab_incharge = ? OR lab_incharge = ? OR lab_incharge = ?)";
 
         return [
             'clause' => $sql,
-            'types' => 's',
-            'params' => [inchargeDisplayName()],
+            'types' => 'sss',
+            'params' => [inchargeDisplayName(), currentUsername(), (string) ($_SESSION['full_name'] ?? '')],
         ];
+    }
+}
+
+if (!function_exists('canAccessLab')) {
+    function canAccessLab(mysqli $conn, string $labId): bool
+    {
+        if (isAdmin()) {
+            return true;
+        }
+
+        $username = currentUsername();
+        $displayName = inchargeDisplayName();
+        $fullName = (string) ($_SESSION['full_name'] ?? '');
+
+        $row = db_fetch_one(
+            $conn,
+            'SELECT 1 FROM labs WHERE lab_id = ? AND (lab_incharge = ? OR lab_incharge = ? OR lab_incharge = ?) LIMIT 1',
+            'ssss',
+            [$labId, $username, $displayName, $fullName]
+        );
+
+        return $row !== null;
+    }
+}
+
+if (!function_exists('requireLabAccess')) {
+    function requireLabAccess(mysqli $conn, string $labId, bool $json = false): void
+    {
+        if (!canAccessLab($conn, $labId)) {
+            http_response_code(403);
+            if ($json) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Forbidden: Lab access denied.']);
+            } else {
+                echo '403 Forbidden: Lab access denied.';
+            }
+            exit;
+        }
     }
 }
 
@@ -337,8 +375,9 @@ if (!function_exists('login_attempt_key')) {
 }
 
 if (!function_exists('isLoginLocked')) {
-    function isLoginLocked(string $username, string $ip, int &$remainingSeconds = 0): bool
+    function isLoginLocked(string $username, string $ip = '', int &$remainingSeconds = 0): bool
     {
+        $ip = $ip !== '' ? $ip : (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
         $state = read_login_attempt_state();
         $key = login_attempt_key($username, $ip);
         $entry = $state[$key] ?? null;
@@ -354,8 +393,9 @@ if (!function_exists('isLoginLocked')) {
 }
 
 if (!function_exists('recordFailedLogin')) {
-    function recordFailedLogin(string $username, string $ip): void
+    function recordFailedLogin(string $username, string $ip = ''): void
     {
+        $ip = $ip !== '' ? $ip : (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
         $state = read_login_attempt_state();
         $key = login_attempt_key($username, $ip);
         $entry = $state[$key] ?? ['count' => 0, 'first_attempt' => time(), 'locked_until' => 0];
@@ -379,8 +419,9 @@ if (!function_exists('recordFailedLogin')) {
 }
 
 if (!function_exists('clearFailedLogin')) {
-    function clearFailedLogin(string $username, string $ip): void
+    function clearFailedLogin(string $username, string $ip = ''): void
     {
+        $ip = $ip !== '' ? $ip : (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
         $state = read_login_attempt_state();
         $key = login_attempt_key($username, $ip);
         unset($state[$key]);

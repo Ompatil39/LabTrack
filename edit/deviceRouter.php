@@ -10,9 +10,11 @@
  * - CPU-YYYY-#### -> editCPU.php
  * etc.
  */
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 // Get the device ID from the query parameter
-$deviceId = isset($_GET['id']) ? $_GET['id'] : '';
+$deviceId = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 
 // Validate device ID format (basic validation)
 if (empty($deviceId) || !preg_match('/^([A-Z]{2,3})-\d{4}-\d{4}$/', $deviceId, $matches)) {

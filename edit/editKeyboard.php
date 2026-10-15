@@ -1,13 +1,11 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-    header("Location: ../html pages/login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include '../html pages/db.php';
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    app_logger()->error("Database connection failed in editKeyboard.php");
+    exit("Database connection failed. Please try again later.");
 }
 
 // Initialize variables
@@ -18,7 +16,7 @@ $isEditMode = false;
 $device_data = null;
 
 // Get id from URL and fetch data
-$id = isset($_GET['id']) ? trim($_GET['id']) : '';
+$id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 if (!empty($id)) {
     $isEditMode = true;
 
@@ -27,18 +25,12 @@ if (!empty($id)) {
               FROM devices d 
               LEFT JOIN keyboards k ON d.device_id = k.device_id 
               WHERE d.device_id = ?";
-    $stmt = $conn->prepare($query);
-    if ($stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $device_data = db_fetch_one($conn, $query, "s", [$id]);
 
-    if ($result && $result->num_rows > 0) {
-        $device_data = $result->fetch_assoc();
+    if ($device_data !== null) {
+        requireLabAccess($conn, (string)$device_data['lab_id']);
     } else {
-        $message = "Device not found in database for ID: " . htmlspecialchars($id);
+        $message = "Device not found in database for ID: " . htmlspecialchars($id, ENT_QUOTES, 'UTF-8');
         $messageType = "error";
         $isEditMode = false;
     }
@@ -49,6 +41,7 @@ if (!empty($id)) {
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
+    enforceCsrfProtection();
     $id = trim($_POST['id'] ?? '');
     $device_name = trim($_POST['keyboard_name'] ?? '');
     $keyboard_type = trim($_POST['keyboard_type'] ?? '');
@@ -74,37 +67,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                       status = ?, 
                       updated_at = ? 
                       WHERE device_id = ?";
-            $stmt = $conn->prepare($query);
-            if ($stmt === false) {
-                die("Prepare failed: " . $conn->error);
+            $device_status = ($status === 'Active') ? 'Active' : (($status === 'In Repair' || $status === 'Under Repair') ? 'Under Repair' : 'InActive');
+            $updated = db_execute($conn, $query, "sssss", [$device_name, $serial_number, $device_status, $updated_at, $id]);
+            if (!$updated) {
+                throw new Exception("Failed to update devices table");
             }
-            $device_status = ($status === 'Active') ? 'Active' : (($status === 'In Repair') ? 'Under Repair' : 'InActive');
-            $stmt->bind_param("sssss", $device_name, $serial_number, $device_status, $updated_at, $id);
-            $stmt->execute();
 
             // Check and update keyboards table
-            $checkQuery = "SELECT device_id FROM keyboards WHERE device_id = ?";
-            $checkStmt = $conn->prepare($checkQuery);
-            if ($checkStmt === false) {
-                die("Prepare failed: " . $conn->error);
-            }
-            $checkStmt->bind_param("s", $id);
-            $checkStmt->execute();
-            $checkResult = $checkStmt->get_result();
+            $checkRow = db_fetch_one($conn, "SELECT device_id FROM keyboards WHERE device_id = ?", "s", [$id]);
 
-            if ($checkResult->num_rows > 0) {
+            if ($checkRow !== null) {
                 $query = "UPDATE keyboards SET 
                           keyboard_name = ?, 
                           keyboard_type = ?, 
                           serial_number = ?, 
                           status = ? 
                           WHERE device_id = ?";
-                $stmt = $conn->prepare($query);
-                if ($stmt === false) {
-                    die("Prepare failed: " . $conn->error);
+                $updatedKb = db_execute($conn, $query, "sssss", [$device_name, $keyboard_type, $serial_number, $status, $id]);
+                if (!$updatedKb) {
+                    throw new Exception("Failed to update keyboards table");
                 }
-                $stmt->bind_param("sssss", $device_name, $keyboard_type, $serial_number, $status, $id);
-                $stmt->execute();
+            } else {
+                $query = "INSERT INTO keyboards (device_id, keyboard_name, keyboard_type, serial_number, status) 
+                          VALUES (?, ?, ?, ?, ?)";
+                $insertedKb = db_execute($conn, $query, "sssss", [$id, $device_name, $keyboard_type, $serial_number, $status]);
+                if (!$insertedKb) {
+                    throw new Exception("Failed to insert into keyboards table");
+                }
             }
 
             $conn->commit();
@@ -116,12 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                 'device_id' => $id,
                 'device_name' => $device_name,
                 'device_type' => 'Keyboard',
-                'lab_id' => $device_data['lab_id'],
-                'lab_name' => getLabName($device_data['lab_id'], $conn)
+                'lab_id' => $device_data['lab_id'] ?? '',
+                'lab_name' => getLabName($device_data['lab_id'] ?? '', $conn)
             ];
         } catch (Exception $e) {
             $conn->rollback();
-            $message = "Error: " . $e->getMessage();
+            app_logger()->error("Failed to update Keyboard: " . $e->getMessage());
+            $message = "An error occurred while updating the keyboard. Please try again.";
             $messageType = "error";
         }
     } else {
@@ -132,15 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
 
 function getLabName($lab_id, $conn)
 {
-    $query = "SELECT lab_name FROM labs WHERE lab_id = ?";
-    $stmt = $conn->prepare($query);
-    if ($stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("s", $lab_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return ($result && $result->num_rows > 0) ? $result->fetch_assoc()['lab_name'] : "Unknown Lab";
+    $row = db_fetch_one($conn, "SELECT lab_name FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+    return $row['lab_name'] ?? "Unknown Lab";
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
@@ -262,6 +245,7 @@ $showModal = ($messageType === 'success' && $deviceDetails !== null);
 
                         <?php if ($isEditMode && $device_data !== null): ?>
                             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . urlencode($id)); ?>">
+                                <?php echo csrfInputField(); ?>
                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($device_data['device_id']); ?>">
 
                                 <div class="selectLabDevice" style="margin-bottom: 0rem !important;">

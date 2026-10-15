@@ -13,28 +13,21 @@ function generateDeviceId($type, $conn)
 {
     $prefix = ($type === 'Printer') ? 'PRT' : 'DEV';
     $year = date('Y');
-    $query = "SELECT device_id FROM devices WHERE device_id LIKE '$prefix-$year-%' ORDER BY device_id DESC LIMIT 1";
-    $result = $conn->query($query);
+    $pattern = $prefix . '-' . $year . '-%';
+    $row = db_fetch_one($conn, 'SELECT device_id FROM devices WHERE device_id LIKE ? ORDER BY device_id DESC LIMIT 1', 's', [$pattern]);
 
     $newNum = 1;
-    if ($result && $result->num_rows > 0) {
-        $lastId = $result->fetch_assoc()['device_id'];
+    if ($row && !empty($row['device_id'])) {
+        $lastId = (string) $row['device_id'];
         $lastNum = (int) substr($lastId, -4);
         $newNum = $lastNum + 1;
     }
-    $serial = str_pad($newNum, 4, '0', STR_PAD_LEFT);
+    $serial = str_pad((string) $newNum, 4, '0', STR_PAD_LEFT);
     return "$prefix-$year-$serial";
 }
 
 // Fetch active labs for dropdown
-$labsQuery = "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'";
-$labsResult = $conn->query($labsQuery);
-$labs = [];
-if ($labsResult && $labsResult->num_rows > 0) {
-    while ($row = $labsResult->fetch_assoc()) {
-        $labs[] = $row;
-    }
-}
+$labs = db_fetch_all($conn, "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'");
 
 // Initialize variables
 $message = '';
@@ -101,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
             $messageType = "success";
         } catch (Exception $e) {
             $conn->rollback();
-            $message = "Error: " . $e->getMessage();
+            app_logger()->error('add_printer_error', ['error' => $e->getMessage()]);
+            $message = "A database error occurred while adding printer. Please try again.";
             $messageType = "error";
         }
     } else {

@@ -1,98 +1,129 @@
 <?php
-session_start();
-
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+startCsrfOutputBuffer();
 
 include 'db.php';
 
 // Initialize filter variables
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-$lab_filter = isset($_GET['lab']) ? $_GET['lab'] : '';
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
-$category_filter = isset($_GET['category']) ? $_GET['category'] : '';
-$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'submission_date';
-$sort_order = isset($_GET['order']) ? $_GET['order'] : 'DESC';
+$search = trim((string) ($_GET['search'] ?? ''));
+$lab_filter = trim((string) ($_GET['lab'] ?? ''));
+$status_filter = trim((string) ($_GET['status'] ?? ''));
+$category_filter = trim((string) ($_GET['category'] ?? ''));
+$sort_column = (string) ($_GET['sort'] ?? 'submission_date');
+$sort_order = strtoupper((string) ($_GET['order'] ?? 'DESC'));
+
+$valid_columns = [
+    'grievance_id' => 'g.grievance_id',
+    'submitted_by' => 'g.submitted_by',
+    'device_category' => 'g.device_category',
+    'status' => 'g.status',
+    'submission_date' => 'g.submission_date'
+];
+$sort_field = $valid_columns[$sort_column] ?? 'g.submission_date';
+$sort_order = ($sort_order === 'ASC') ? 'ASC' : 'DESC';
 
 // Pagination parameters
-$items_per_page = 10; // Set to 10 rows per page
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$items_per_page = 10;
+$current_page = max(1, (int) ($_GET['page'] ?? 1));
 $offset = ($current_page - 1) * $items_per_page;
 
-// Get counts for the card view
-$new_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status = 'Submitted'")->fetch_assoc()['count'];
-$resolved_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status = 'Resolved'")->fetch_assoc()['count'];
-$in_progress_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status IN ('In Progress', 'Under Review')")->fetch_assoc()['count'];
-$unsolved_count = $conn->query("SELECT COUNT(*) as count FROM grievances WHERE status NOT IN ('Resolved', 'Closed')")->fetch_assoc()['count'];
+$scope = restrictLabSql('lab_id', 'g');
 
-// Build base query with filters
-$base_query = "SELECT g.*, l.lab_name 
-              FROM grievances g
-              LEFT JOIN labs l ON g.lab_id = l.lab_id
-              WHERE 1=1";
-
-$count_query = "SELECT COUNT(*) as total 
-               FROM grievances g
-               LEFT JOIN labs l ON g.lab_id = l.lab_id
-               WHERE 1=1";
-
-if (!empty($search)) {
-    $search_condition = " AND (g.grievance_id LIKE '%$search%' 
-                          OR g.submitted_by LIKE '%$search%' 
-                          OR g.stud_enrollment LIKE '%$search%')";
-    $base_query .= $search_condition;
-    $count_query .= $search_condition;
+// Counts with scope
+$countConditions = [];
+$countTypes = '';
+$countParams = [];
+if ($scope['clause'] !== '') {
+    $countConditions[] = trim($scope['clause']);
+    $countTypes .= $scope['types'];
+    $countParams = array_merge($countParams, $scope['params']);
 }
 
-if (!empty($lab_filter)) {
-    $base_query .= " AND g.lab_id = '$lab_filter'";
-    $count_query .= " AND g.lab_id = '$lab_filter'";
+$getStatCount = function (string $statusCondition) use ($conn, $countConditions, $countTypes, $countParams): int {
+    $conds = array_merge([$statusCondition], $countConditions);
+    $sql = "SELECT COUNT(*) as count FROM grievances g WHERE " . implode(' AND ', $conds);
+    $row = db_fetch_one($conn, $sql, $countTypes, $countParams);
+    return $row ? (int) $row['count'] : 0;
+};
+
+$new_count = $getStatCount("g.status = 'Submitted'");
+$resolved_count = $getStatCount("g.status = 'Resolved'");
+$in_progress_count = $getStatCount("g.status IN ('In Progress', 'Under Review')");
+$unsolved_count = $getStatCount("g.status NOT IN ('Resolved', 'Closed')");
+
+// Build main query with filters
+$conditions = ['1=1'];
+$types = '';
+$params = [];
+
+if ($search !== '') {
+    $conditions[] = "(g.grievance_id LIKE ? OR g.submitted_by LIKE ? OR g.stud_enrollment LIKE ?)";
+    $types .= 'sss';
+    $searchWild = '%' . $search . '%';
+    $params[] = $searchWild;
+    $params[] = $searchWild;
+    $params[] = $searchWild;
 }
 
-if (!empty($status_filter)) {
-    $base_query .= " AND g.status = '$status_filter'";
-    $count_query .= " AND g.status = '$status_filter'";
+if ($lab_filter !== '') {
+    $conditions[] = "g.lab_id = ?";
+    $types .= 's';
+    $params[] = $lab_filter;
 }
 
-if (!empty($category_filter)) {
-    $base_query .= " AND g.device_category = '$category_filter'";
-    $count_query .= " AND g.device_category = '$category_filter'";
+if ($status_filter !== '') {
+    $conditions[] = "g.status = ?";
+    $types .= 's';
+    $params[] = $status_filter;
 }
+
+if ($category_filter !== '') {
+    $conditions[] = "g.device_category = ?";
+    $types .= 's';
+    $params[] = $category_filter;
+}
+
+if ($scope['clause'] !== '') {
+    $conditions[] = trim($scope['clause']);
+    $types .= $scope['types'];
+    $params = array_merge($params, $scope['params']);
+}
+
+$whereClause = implode(' AND ', $conditions);
 
 // Get total count for pagination
-$count_result = $conn->query($count_query);
-$total_items = $count_result->fetch_assoc()['total'];
+$count_query = "SELECT COUNT(*) as total FROM grievances g LEFT JOIN labs l ON g.lab_id = l.lab_id WHERE " . $whereClause;
+$count_result = db_fetch_one($conn, $count_query, $types, $params);
+$total_items = $count_result ? (int) $count_result['total'] : 0;
 
-// Add sorting and pagination to main query
-$valid_columns = ['grievance_id', 'submitted_by', 'device_category', 'status', 'submission_date'];
-$valid_orders = ['ASC', 'DESC'];
-
-$sort_column = in_array($sort_column, $valid_columns) ? $sort_column : 'submission_date';
-$sort_order = in_array($sort_order, $valid_orders) ? $sort_order : 'DESC';
-
-$base_query .= " ORDER BY $sort_column $sort_order LIMIT $offset, $items_per_page";
-$result = $conn->query($base_query);
+// Fetch page items with prepared statement
+$base_query = "SELECT g.*, l.lab_name 
+               FROM grievances g 
+               LEFT JOIN labs l ON g.lab_id = l.lab_id 
+               WHERE " . $whereClause . " 
+               ORDER BY " . $sort_field . " " . $sort_order . " 
+               LIMIT ?, ?";
+$pageTypes = $types . 'ii';
+$pageParams = array_merge($params, [$offset, $items_per_page]);
+$grievanceRows = db_fetch_all($conn, $base_query, $pageTypes, $pageParams);
 
 // Pagination function
 function generatePagination($total_items, $items_per_page, $current_page, $base_url)
 {
-    $total_pages = ceil($total_items / $items_per_page);
+    $total_pages = (int) ceil($total_items / $items_per_page);
     $pagination = '<div class="pagination">';
 
-    // Previous link
     if ($current_page > 1) {
         $pagination .= '<a href="' . $base_url . '&page=' . ($current_page - 1) . '" class="pagination-link">Previous</a>';
     }
 
-    // Page numbers
     for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
         $pagination .= '<a href="' . $base_url . '&page=' . $i . '"';
         $pagination .= ($i == $current_page) ? ' class="pagination-link active"' : ' class="pagination-link"';
         $pagination .= '>' . $i . '</a>';
     }
 
-    // Next link
     if ($current_page < $total_pages) {
         $pagination .= '<a href="' . $base_url . '&page=' . ($current_page + 1) . '" class="pagination-link">Next</a>';
     }
@@ -108,27 +139,39 @@ $base_url = 'grievance.php?' . http_build_query($query_params);
 $pagination_html = generatePagination($total_items, $items_per_page, $current_page, $base_url);
 
 // Get labs for filter dropdown
-$labs_query = "SELECT lab_id, lab_name FROM labs ORDER BY lab_name";
-$labs_result = $conn->query($labs_query);
+$labFilterScope = restrictLabSql('lab_id');
+$labs_query = "SELECT lab_id, lab_name FROM labs";
+if ($labFilterScope['clause'] !== '') {
+    $labs_query .= " WHERE " . trim($labFilterScope['clause']);
+}
+$labs_query .= " ORDER BY lab_name";
+$labs_result_rows = db_fetch_all($conn, $labs_query, $labFilterScope['types'], $labFilterScope['params']);
 
 // Handle delete grievance
-if (isset($_POST['delete_grievance'])) {
-    $grievance_id = $_POST['grievance_id'];
-    $reason = $_POST['delete_reason'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_grievance'])) {
+    enforceCsrfProtection();
+    $grievance_id = (int) ($_POST['grievance_id'] ?? 0);
+    $reason = trim((string) ($_POST['delete_reason'] ?? ''));
 
-    // First update the admin note with the deletion reason
-    $update_query = "UPDATE grievances SET admin_note = CONCAT(IFNULL(admin_note, ''), '\n[DELETION REASON: $reason]') WHERE grievance_id = $grievance_id";
-    $conn->query($update_query);
+    // Verify grievance exists and user has lab access
+    $existing = db_fetch_one($conn, "SELECT grievance_id, lab_id FROM grievances WHERE grievance_id = ? LIMIT 1", "i", [$grievance_id]);
+    if ($existing) {
+        requireLabAccess($conn, (string) $existing['lab_id']);
 
-    // Then delete the grievance
-    $delete_query = "DELETE FROM grievances WHERE grievance_id = $grievance_id";
-    if ($conn->query($delete_query) === TRUE) {
-        $delete_message = "Grievance deleted successfully";
-    } else {
-        $delete_error = "Error deleting grievance: " . $conn->error;
+        $deletionNote = "\n[DELETION REASON: " . $reason . "]";
+        db_execute(
+            $conn,
+            "UPDATE grievances SET admin_note = CONCAT(IFNULL(admin_note, ''), ?) WHERE grievance_id = ?",
+            "si",
+            [$deletionNote, $grievance_id]
+        );
+
+        $deleted = db_execute($conn, "DELETE FROM grievances WHERE grievance_id = ?", "i", [$grievance_id]);
+        if (!$deleted) {
+            app_logger()->error('delete_grievance_error', ['grievance_id' => $grievance_id]);
+        }
     }
 
-    // Redirect to avoid resubmission
     header("Location: grievance.php?deleted=true");
     exit();
 }
@@ -357,11 +400,11 @@ if (isset($_POST['delete_grievance'])) {
                         <input class="search-input" type="text" id="search" name="search" placeholder="Search using ID, Name..." value="<?php echo htmlspecialchars($search); ?>">
                         <select id="labFilter" name="lab">
                             <option value="">All Labs</option>
-                            <?php while ($lab = $labs_result->fetch_assoc()): ?>
-                                <option value="<?php echo $lab['lab_id']; ?>" <?php echo ($lab_filter == $lab['lab_id']) ? 'selected' : ''; ?>>
+                            <?php foreach ($labs_result_rows as $lab): ?>
+                                <option value="<?php echo htmlspecialchars($lab['lab_id']); ?>" <?php echo ($lab_filter === $lab['lab_id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($lab['lab_name']); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </select>
                         <select id="statusFilter" name="status">
                             <option value="">All Status</option>
@@ -423,8 +466,8 @@ if (isset($_POST['delete_grievance'])) {
                     </thead>
                     <tbody>
                         <?php
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
+                        if (!empty($grievanceRows)) {
+                            foreach ($grievanceRows as $row) {
                                 // Determine status badge class
                                 $status_class = '';
                                 switch ($row['status']) {
@@ -446,17 +489,17 @@ if (isset($_POST['delete_grievance'])) {
                                 }
                         ?>
                                 <tr>
-                                    <td>#GRV<?php echo str_pad($row['grievance_id'], 3, '0', STR_PAD_LEFT); ?></td>
-                                    <td><?php echo htmlspecialchars($row['submitted_by']); ?> (<?php echo htmlspecialchars($row['stud_enrollment']); ?>)</td>
-                                    <td><?php echo htmlspecialchars($row['device_category']); ?> <?php echo !empty($row['device_name']) ? '- ' . htmlspecialchars($row['device_name']) : ''; ?></td>
-                                    <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
+                                    <td>#GRV<?php echo str_pad((string) $row['grievance_id'], 3, '0', STR_PAD_LEFT); ?></td>
+                                    <td><?php echo htmlspecialchars($row['submitted_by'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo htmlspecialchars($row['stud_enrollment'], ENT_QUOTES, 'UTF-8'); ?>)</td>
+                                    <td><?php echo htmlspecialchars($row['device_category'], ENT_QUOTES, 'UTF-8'); ?> <?php echo !empty($row['device_name']) ? '- ' . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') : ''; ?></td>
+                                    <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></span></td>
                                     <td><?php echo date('Y-m-d', strtotime($row['submission_date'])); ?></td>
                                     <td>
-                                        <a href="viewGrievance.php?id=<?php echo $row['grievance_id']; ?>" class="none">
-                                            <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
+                                        <a href="viewGrievance.php?id=<?php echo (int) $row['grievance_id']; ?>" class="none">
+                                             <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
                                         </a>
-                                        <button class="btn-icon delete-btn delete-trigger" data-id="<?php echo $row['grievance_id']; ?>"
-                                            data-name="<?php echo htmlspecialchars($row['device_category'] . ' - #GRV' . str_pad($row['grievance_id'], 3, '0', STR_PAD_LEFT)); ?>">
+                                        <button class="btn-icon delete-btn delete-trigger" data-id="<?php echo (int) $row['grievance_id']; ?>"
+                                            data-name="<?php echo htmlspecialchars($row['device_category'] . ' - #GRV' . str_pad((string) $row['grievance_id'], 3, '0', STR_PAD_LEFT), ENT_QUOTES, 'UTF-8'); ?>">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </td>
@@ -498,6 +541,7 @@ if (isset($_POST['delete_grievance'])) {
                 <p class="delete-warning padding-bottom-1">This action cannot be undone. The grievance will be permanently removed from the system.</p>
 
                 <form id="delete-form" method="POST" action="grievance.php">
+                    <?= csrfInputField() ?>
                     <input type="hidden" name="grievance_id" id="grievance_id_input">
                     <input type="hidden" name="delete_grievance" value="1">
                     <textarea name="delete_reason" placeholder="Enter the reason here (this will be shared with the student)" class="form-input" required></textarea>

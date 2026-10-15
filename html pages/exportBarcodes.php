@@ -1,55 +1,46 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include 'db.php';
 
 // Expect lab id
-$lab_id = isset($_GET['id']) ? $_GET['id'] : '';
-if (empty($lab_id)) {
+$lab_id = trim((string) ($_GET['id'] ?? ''));
+if ($lab_id === '') {
     http_response_code(400);
     echo "Missing lab id";
     exit;
 }
 
+// Enforce lab access check for Incharge
+requireLabAccess($conn, $lab_id);
+
 // Load TCPDF via Composer
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Fetch lab
-$labSql = "SELECT * FROM labs WHERE lab_id = '" . $conn->real_escape_string($lab_id) . "' LIMIT 1";
-$labRes = $conn->query($labSql);
-if (!$labRes || $labRes->num_rows === 0) {
+$lab = db_fetch_one($conn, 'SELECT * FROM labs WHERE lab_id = ? LIMIT 1', 's', [$lab_id]);
+if (!$lab) {
     http_response_code(404);
     echo "Lab not found";
     exit;
 }
-$lab = $labRes->fetch_assoc();
 
-// Stats
-$q = function ($sql) use ($conn) {
-    $r = $conn->query($sql);
-    return ($r && $r->num_rows) ? (int)$r->fetch_assoc()['count'] : 0;
-};
-$totalPCs = $q("SELECT COUNT(*) as count FROM devices WHERE lab_id='" . $conn->real_escape_string($lab_id) . "' AND device_type='PC'");
-$activePCs = $q("SELECT COUNT(*) as count FROM devices WHERE lab_id='" . $conn->real_escape_string($lab_id) . "' AND device_type='PC' AND status='Active'");
+// Stats using prepared statements
+$totalRow = db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type = 'PC'", 's', [$lab_id]);
+$totalPCs = $totalRow ? (int) $totalRow['count'] : 0;
+
+$activeRow = db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type = 'PC' AND status = 'Active'", 's', [$lab_id]);
+$activePCs = $activeRow ? (int) $activeRow['count'] : 0;
 $inactivePCs = $totalPCs - $activePCs;
 
 // Fetch PCs
 $pcsSql = "SELECT d.device_id, d.device_name, COALESCE(p.pc_id, 'N/A') AS pc_id, d.status
            FROM devices d
            LEFT JOIN pc_details p ON d.device_id = p.device_id
-           WHERE d.lab_id='" . $conn->real_escape_string($lab_id) . "' AND d.device_type='PC'
+           WHERE d.lab_id = ? AND d.device_type = 'PC'
            ORDER BY d.device_id ASC";
-$pcsRes = $conn->query($pcsSql);
-$pcs = [];
-if ($pcsRes) {
-    while ($row = $pcsRes->fetch_assoc()) {
-        $pcs[] = $row;
-    }
-}
+$pcs = db_fetch_all($conn, $pcsSql, 's', [$lab_id]);
 
 // PDF Setup - Optimized for label printing
 $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);

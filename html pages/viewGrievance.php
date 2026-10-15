@@ -1,101 +1,101 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-    exit;
-}
-
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 include 'db.php';
-require_once '../send_mail.php';
+require_once __DIR__ . '/../send_mail.php';
 
 // Get grievance ID from URL parameter
-$grievance_id = isset($_GET['id']) ? $_GET['id'] : 0;
+$grievance_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$grievance_id_formatted = '#GRV' . sprintf('%03d', $grievance_id);
 
 // Fetch grievance details from database
 $grievance = null;
-if ($grievance_id) {
-    $query = "SELECT g.*, l.lab_name, d.device_name 
-              FROM grievances g 
-              LEFT JOIN labs l ON g.lab_id = l.lab_id 
-              LEFT JOIN devices d ON g.device_id = d.device_id 
-              WHERE g.grievance_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $grievance_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $grievance = $result->fetch_assoc();
-    } else {
-        // Redirect if grievance not found
+if ($grievance_id > 0) {
+    $grievance = db_fetch_one($conn, "SELECT g.*, l.lab_name, d.device_name 
+                                       FROM grievances g 
+                                       LEFT JOIN labs l ON g.lab_id = l.lab_id 
+                                       LEFT JOIN devices d ON g.device_id = d.device_id 
+                                       WHERE g.grievance_id = ?", "i", [$grievance_id]);
+    if (!$grievance) {
         header("Location: grievance.php");
         exit;
     }
-    $stmt->close();
+
+    if (!canAccessLab($conn, (string)$grievance['lab_id'])) {
+        http_response_code(403);
+        echo "403 Forbidden: You do not have access to grievances for this lab.";
+        exit;
+    }
+} else {
+    header("Location: grievance.php");
+    exit;
 }
 
 // Process status update form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
-    $new_status = $_POST['status'];
-    $admin_note = $_POST['status_note'];
+    enforceCsrfProtection();
+    $new_status = (string)($_POST['status'] ?? '');
+    $admin_note = (string)($_POST['status_note'] ?? '');
 
-    $update_query = "UPDATE grievances SET status = ?, admin_note = ? WHERE grievance_id = ?";
-    $stmt = $conn->prepare($update_query);
-    $stmt->bind_param("ssi", $new_status, $admin_note, $grievance_id);
+    $updated = db_execute($conn, "UPDATE grievances SET status = ?, admin_note = ? WHERE grievance_id = ?", "ssi", [$new_status, $admin_note, $grievance_id]);
 
-    if ($stmt->execute()) {
+    if ($updated) {
         // Send email notification to student
         $stud_email = $grievance['stud_email'];
         $sender_name = isset($_SESSION['username']) ? $_SESSION['username'] : 'Administrator';
-        $grievance_id_formatted = $grievance_id;
 
         // Send email notification
-        sendGrievanceEmail(
-            $stud_email,
-            $sender_name,
-            $admin_note,
-            $new_status,
-            $grievance_id_formatted
-        );
+        try {
+            sendGrievanceEmail(
+                $stud_email,
+                $sender_name,
+                $admin_note,
+                $new_status,
+                $grievance_id_formatted
+            );
+        } catch (\Throwable $e) {
+            app_logger()->error('Failed to send status update email: ' . $e->getMessage());
+        }
 
         // Refresh page to show updated data
         header("Location: viewGrievance.php?id=$grievance_id&updated=1");
         exit;
     }
-    $stmt->close();
 }
 
 // Process grievance deletion
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_grievance'])) {
-    $reason = $_POST['delete_reason'];
+    enforceCsrfProtection();
+    $reason = (string)($_POST['delete_reason'] ?? '');
 
     // Send deletion notification email to student first
     $stud_email = $grievance['stud_email'];
     $sender_name = isset($_SESSION['username']) ? $_SESSION['username'] : 'Administrator';
-    $grievance_id_formatted = $grievance_id;
 
     // Format message for deletion email
     $message = "Your grievance (ID: $grievance_id_formatted) has been deleted for the following reason:\n\n$reason";
 
     // Send email notification
-    sendGrievanceEmail(
-        $stud_email,
-        $sender_name,
-        $message,
-        "Deleted",
-        $grievance_id_formatted
-    );
+    try {
+        sendGrievanceEmail(
+            $stud_email,
+            $sender_name,
+            $message,
+            "Deleted",
+            $grievance_id_formatted
+        );
+    } catch (\Throwable $e) {
+        app_logger()->error('Failed to send deletion email: ' . $e->getMessage());
+    }
 
     // Delete the grievance
-    $delete_query = "DELETE FROM grievances WHERE grievance_id = ?";
-    $stmt = $conn->prepare($delete_query);
-    $stmt->bind_param("i", $grievance_id);
+    $deleted = db_execute($conn, "DELETE FROM grievances WHERE grievance_id = ?", "i", [$grievance_id]);
 
-    if ($stmt->execute()) {
+    if ($deleted) {
         // Redirect to grievance list
         header("Location: grievance.php?deleted=1");
         exit;
     }
-    $stmt->close();
 }
 
 // Helper function to format status class
@@ -445,6 +445,7 @@ $grievance_id_formatted = $grievance_id;
                 </div>
 
                 <form method="POST" action="">
+                    <?php echo csrfInputField(); ?>
                     <div class="popupDelte-body">
                         <p class="delete-text">Are you sure you want to delete this grievance?</p>
                         <div class="item-name" id="item-name">
@@ -483,6 +484,7 @@ $grievance_id_formatted = $grievance_id;
                 </div>
 
                 <form method="POST" action="">
+                    <?php echo csrfInputField(); ?>
                     <div class="modal-body">
                         <p class="status-text margin-bottom-half">Update the status for grievance:</p>
                         <div class="item-name-new-new margin-bottom-half" id="grievance-id">

@@ -1,18 +1,11 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 include 'db.php';
 
 // Get lab ID from URL parameter
-$lab_id = isset($_GET['id']) ? $_GET['id'] : '';
+$lab_id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 $lab_exists = false;
-
-// Pagination and filter parameters
-$items_per_page = 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $items_per_page;
 
 // Initialize variables with default values
 $lab = array(
@@ -33,53 +26,49 @@ $availableDevices = 0;
 
 // Fetch lab details if lab_id is provided
 if (!empty($lab_id)) {
-    $sql = "SELECT * FROM labs WHERE lab_id = '$lab_id'";
-    $result = $conn->query($sql);
+    requireLabAccess($conn, $lab_id);
 
-    if ($result && $result->num_rows > 0) {
-        $lab = $result->fetch_assoc();
+    $labData = db_fetch_one($conn, "SELECT * FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+    if ($labData) {
+        $lab = $labData;
         $lab_exists = true;
 
-        // Get device stats
-        $totalPCsql = "SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type = 'PC'";
-        $availablePCsql = "SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type = 'PC' AND status = 'Active'";
-        $totalDevicesSql = "SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id'";
-        $availableDevicesSql = "SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND status = 'Active'";
-
-        $totalPCs = $conn->query($totalPCsql)->fetch_assoc()['count'];
-        $availablePCs = $conn->query($availablePCsql)->fetch_assoc()['count'];
-        $totalDevices = $conn->query($totalDevicesSql)->fetch_assoc()['count'];
-        $availableDevices = $conn->query($availableDevicesSql)->fetch_assoc()['count'];
+        $totalPCs = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type = 'PC'", "s", [$lab_id])['count'] ?? 0);
+        $availablePCs = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type = 'PC' AND status = 'Active'", "s", [$lab_id])['count'] ?? 0);
+        $totalDevices = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ?", "s", [$lab_id])['count'] ?? 0);
+        $availableDevices = (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND status = 'Active'", "s", [$lab_id])['count'] ?? 0);
     }
 }
 
 // Handle activate/deactivate action after lab data is fetched
 $statusMessage = "";
-if (isset($_POST['toggle_status']) && !empty($lab_id)) {
-    $newStatus = $lab['status'] === 'Active' ? 'Inactive' : 'Active';
-    $updateSql = "UPDATE labs SET status = '$newStatus' WHERE lab_id = '$lab_id'";
-    if ($conn->query($updateSql) === TRUE) {
+if (isset($_POST['toggle_status']) && !empty($lab_id) && $lab_exists) {
+    enforceCsrfProtection();
+    $newStatus = ($lab['status'] === 'Active') ? 'Inactive' : 'Active';
+    $updated = db_execute($conn, "UPDATE labs SET status = ? WHERE lab_id = ?", "ss", [$newStatus, $lab_id]);
+    if ($updated) {
         $statusMessage = "<div class='success-message'>Lab status updated successfully!</div>";
-        // Refresh lab data after status change
-        $sql = "SELECT * FROM labs WHERE lab_id = '$lab_id'";
-        $result = $conn->query($sql);
-        if ($result && $result->num_rows > 0) {
-            $lab = $result->fetch_assoc();
+        $refreshed = db_fetch_one($conn, "SELECT * FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+        if ($refreshed) {
+            $lab = $refreshed;
         }
     } else {
-        $statusMessage = "<div class='error-message'>Error updating lab status: " . $conn->error . "</div>";
+        $statusMessage = "<div class='error-message'>Error updating lab status. Please try again.</div>";
     }
 }
 
-// Get total grievances count for pagination
-$grievance_count_sql = "SELECT COUNT(*) as total FROM grievances WHERE lab_id = '$lab_id'";
-$grievance_count_result = $conn->query($grievance_count_sql);
-$total_grievances = ($grievance_count_result && $grievance_count_result->num_rows > 0)
-    ? $grievance_count_result->fetch_assoc()['total']
+// Pagination and filter parameters
+$items_per_page = 10;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $items_per_page;
+
+$total_grievances = (!empty($lab_id) && $lab_exists)
+    ? (int)(db_fetch_one($conn, "SELECT COUNT(*) as total FROM grievances WHERE lab_id = ?", "s", [$lab_id])['total'] ?? 0)
     : 0;
+
 function generatePagination($total_items, $items_per_page, $current_page, $base_url, $tab)
 {
-    $total_pages = ceil($total_items / $items_per_page);
+    $total_pages = max(1, (int)ceil($total_items / $items_per_page));
     $pagination = '<div class="pagination">';
 
     if ($current_page > 1) {
@@ -102,8 +91,12 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
 }
 
 // Get total counts for pagination
-$total_pcs = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type = 'PC'")->fetch_assoc()['count'];
-$total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_id = '$lab_id' AND device_type != 'PC'")->fetch_assoc()['count'];
+$total_pcs = (!empty($lab_id) && $lab_exists)
+    ? (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type = 'PC'", "s", [$lab_id])['count'] ?? 0)
+    : 0;
+$total_devices = (!empty($lab_id) && $lab_exists)
+    ? (int)(db_fetch_one($conn, "SELECT COUNT(*) as count FROM devices WHERE lab_id = ? AND device_type != 'PC'", "s", [$lab_id])['count'] ?? 0)
+    : 0;
 
 
 ?>
@@ -359,27 +352,27 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                             COALESCE(p.pc_id, 'N/A') as pc_id, d.status, 'Working' as remarks 
                             FROM devices d 
                             LEFT JOIN pc_details p ON d.device_id = p.device_id 
-                            WHERE d.lab_id = '$lab_id' AND d.device_type = 'PC' 
-                            LIMIT $offset, $items_per_page";
-                                                $pcResult = $conn->query($pcSql);
+                            WHERE d.lab_id = ? AND d.device_type = 'PC' 
+                            LIMIT ?, ?";
+                                                $pcRows = db_fetch_all($conn, $pcSql, "sii", [$lab_id, $offset, $items_per_page]);
 
-                                                if ($pcResult && $pcResult->num_rows > 0) {
-                                                    while ($row = $pcResult->fetch_assoc()) {
+                                                if (!empty($pcRows)) {
+                                                    foreach ($pcRows as $row) {
                                                         echo "<tr>";
-                                                        echo "<td>" . htmlspecialchars($row['device_id']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['device_name']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['device_type']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['pc_id']) . "</td>";
-                                                        echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
-                                                        echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_type'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['pc_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', (string)$row['status'])) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+                                                        echo "<td>" . htmlspecialchars($row['remarks'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>
-                                    <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
+                                    <a href='viewDevice.php?id=" . urlencode($row['device_id']) . "' class='none'>
                                         <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                                     </a>
-                                    <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
+                                    <a href='../edit/deviceRouter.php?id=" . urlencode($row['device_id']) . "' class='none'>
                                         <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
                                     </a>
-                                    <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
+                                    <button class='btn-icon delete-btn delete-trigger' data-id='" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "' data-name='" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "'><i class='fa-solid fa-trash'></i></button>
                                   </td>";
                                                         echo "</tr>";
                                                     }
@@ -439,27 +432,27 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                 END as pc_id, 
                                 d.status, 'Working' as remarks 
                                 FROM devices d 
-                                WHERE d.lab_id = '$lab_id' 
-                                LIMIT $offset, $items_per_page";
-                                                $deviceResult = $conn->query($deviceSql);
+                                WHERE d.lab_id = ? 
+                                LIMIT ?, ?";
+                                                $deviceRows = db_fetch_all($conn, $deviceSql, "sii", [$lab_id, $offset, $items_per_page]);
 
-                                                if ($deviceResult && $deviceResult->num_rows > 0) {
-                                                    while ($row = $deviceResult->fetch_assoc()) {
+                                                if (!empty($deviceRows)) {
+                                                    foreach ($deviceRows as $row) {
                                                         echo "<tr>";
-                                                        echo "<td>" . htmlspecialchars($row['device_id']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['device_name']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['device_type']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['pc_id']) . "</td>";
-                                                        echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
-                                                        echo "<td>" . htmlspecialchars($row['remarks']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_type'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['pc_id'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', (string)$row['status'])) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+                                                        echo "<td>" . htmlspecialchars($row['remarks'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>
-        <a href='viewDevice.php?id=" . $row['device_id'] . "' class='none'>
+        <a href='viewDevice.php?id=" . urlencode($row['device_id']) . "' class='none'>
             <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
         </a>
-        <a href='../edit/deviceRouter.php?id=" . $row['device_id'] . "' class='none'>
+        <a href='../edit/deviceRouter.php?id=" . urlencode($row['device_id']) . "' class='none'>
             <button class='btn-icon edit-btn'><i class='fa-solid fa-pen'></i></button>
         </a>
-        <button class='btn-icon delete-btn delete-trigger' data-id='" . $row['device_id'] . "' data-name='" . $row['device_name'] . "'><i class='fa-solid fa-trash'></i></button>
+        <button class='btn-icon delete-btn delete-trigger' data-id='" . htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') . "' data-name='" . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') . "'><i class='fa-solid fa-trash'></i></button>
       </td>";
                                                         echo "</tr>";
                                                     }
@@ -471,7 +464,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                         </tbody>
                                     </table>
                                 </div>
-                                <?php echo generatePagination($total_pcs, $items_per_page, $page, "?id=$lab_id", "pcs"); ?>
+                                <?php echo generatePagination($total_devices, $items_per_page, $page, "?id=" . urlencode($lab_id), "devices"); ?>
                             </div>
 
                             <!-- Tab 3 Content - Grievance  -->
@@ -522,22 +515,22 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                                 $grievanceSql = "SELECT g.grievance_id, g.submitted_by, g.stud_enrollment, 
                                        g.device_category, g.device_id, g.status, g.submission_date 
                                 FROM grievances g 
-                                WHERE g.lab_id = '$lab_id' 
-                                LIMIT $offset, $items_per_page";
-                                                $grievanceResult = $conn->query($grievanceSql);
+                                WHERE g.lab_id = ? 
+                                LIMIT ?, ?";
+                                                $grievanceRows = db_fetch_all($conn, $grievanceSql, "sii", [$lab_id, $offset, $items_per_page]);
 
-                                                if ($grievanceResult && $grievanceResult->num_rows > 0) {
-                                                    while ($row = $grievanceResult->fetch_assoc()) {
+                                                if (!empty($grievanceRows)) {
+                                                    foreach ($grievanceRows as $row) {
                                                         echo "<tr>";
-                                                        echo "<td>#GRV" . sprintf('%03d', $row['grievance_id']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['submitted_by']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['stud_enrollment']) . "</td>";
-                                                        echo "<td>" . htmlspecialchars($row['device_category']) . "</td>";
-                                                        echo "<td>" . ($row['device_id'] ? htmlspecialchars($row['device_id']) : 'N/A') . "</td>";
-                                                        echo "<td><span class='status-badge " . strtolower(str_replace(' ', '-', $row['status'])) . "'>" . htmlspecialchars($row['status']) . "</span></td>";
-                                                        echo "<td>" . date('Y-m-d', strtotime($row['submission_date'])) . "</td>";
+                                                        echo "<td>#GRV" . sprintf('%03d', (int)$row['grievance_id']) . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['submitted_by'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['stud_enrollment'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . htmlspecialchars($row['device_category'], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                        echo "<td>" . ($row['device_id'] ? htmlspecialchars($row['device_id'], ENT_QUOTES, 'UTF-8') : 'N/A') . "</td>";
+                                                        echo "<td><span class='status-badge " . strtolower(str_replace(' ', '-', (string)$row['status'])) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+                                                        echo "<td>" . htmlspecialchars(date('Y-m-d', strtotime($row['submission_date'])), ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>
-                                <a href='viewGrievance.php?id=" . $row['grievance_id'] . "' class='none'>
+                                <a href='viewGrievance.php?id=" . urlencode($row['grievance_id']) . "' class='none'>
                                     <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                                 </a>
                               </td>";
@@ -551,7 +544,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                         </tbody>
                                     </table>
                                 </div>
-                                <?php echo generatePagination($total_grievances, $items_per_page, $page, "?id=$lab_id", "grievance"); ?>
+                                <?php echo generatePagination($total_grievances, $items_per_page, $page, "?id=" . urlencode($lab_id), "grievance"); ?>
                             </div>
                         </div>
                     </section>
@@ -583,6 +576,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
                                 </a>
                                 <div class="vertical-divider"></div>
                                 <form method="post" id="toggleStatusForm">
+                                    <?php echo csrfInputField(); ?>
                                     <button type="submit" name="toggle_status" class="action-item admin-action">
                                         <i class="fas <?php echo $lab['status'] === 'Active' ? 'fa-ban' : 'fa-check'; ?>"></i>
                                         <span><?php echo $lab['status'] === 'Active' ? 'Deactivate' : 'Activate'; ?></span>
@@ -740,6 +734,7 @@ $total_devices = $conn->query("SELECT COUNT(*) as count FROM devices WHERE lab_i
 
                     const formData = new FormData();
                     formData.append('device_id', currentDeviceId);
+                    formData.append('csrf_token', <?php echo json_encode(generateCsrfToken()); ?>);
 
                     fetch('deleteDevice.php', {
                             method: 'POST',

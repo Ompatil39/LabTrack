@@ -8,56 +8,36 @@ include 'db.php';
 // Function to generate unique device IDs
 function generateDeviceId($type, $conn)
 {
-    $prefix = '';
-    switch ($type) {
-        case 'PC':
-            $prefix = 'PC';
-            break;
-        case 'Monitor':
-            $prefix = 'MON';
-            break;
-        case 'Keyboard':
-            $prefix = 'KEY';
-            break;
-        case 'Mouse':
-            $prefix = 'MOU';
-            break;
-        case 'CPU':
-            $prefix = 'CPU';
-            break;
-        case 'Printer':
-            $prefix = 'PRT';
-            break;
-        default:
-            $prefix = 'DEV';
-            break;
-    }
+    $prefix = match ($type) {
+        'PC' => 'PC',
+        'Monitor' => 'MON',
+        'Keyboard' => 'KEY',
+        'Mouse' => 'MOU',
+        'CPU' => 'CPU',
+        'Printer' => 'PRT',
+        default => 'DEV',
+    };
 
     $year = date('Y');
-    $query = "SELECT device_id FROM devices WHERE device_id LIKE '$prefix-$year-%' ORDER BY device_id DESC LIMIT 1";
-    $result = $conn->query($query);
+    $pattern = $prefix . '-' . $year . '-%';
+    $row = db_fetch_one($conn, 'SELECT device_id FROM devices WHERE device_id LIKE ? ORDER BY device_id DESC LIMIT 1', 's', [$pattern]);
 
-    if ($result && $result->num_rows > 0) {
-        $lastId = $result->fetch_assoc()['device_id'];
+    $newNum = 1;
+    if ($row && !empty($row['device_id'])) {
+        $lastId = (string) $row['device_id'];
         $lastNum = (int) substr($lastId, -4);
         $newNum = $lastNum + 1;
-    } else {
-        $newNum = 1;
     }
 
-    $serial = str_pad($newNum, 4, '0', STR_PAD_LEFT);
+    $serial = str_pad((string) $newNum, 4, '0', STR_PAD_LEFT);
     return "$prefix-$year-$serial";
 }
 
 // Get all active labs
-$labsQuery = "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'";
-$labsResult = $conn->query($labsQuery);
-$labs = [];
-if ($labsResult && $labsResult->num_rows > 0) {
-    while ($row = $labsResult->fetch_assoc()) {
-        $labs[] = $row;
-    }
-}
+$labs = db_fetch_all($conn, "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'");
+
+// Enforce CSRF protection on POST
+enforceCsrfProtection();
 
 // Initialize variables
 $message = '';
@@ -226,7 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
             } catch (Exception $e) {
                 // Rollback in case of error
                 $conn->rollback();
-                $message = "Error: " . $e->getMessage();
+                app_logger()->error('add_pc_error', ['error' => $e->getMessage()]);
+                $message = "A database error occurred while adding PC(s). Please try again.";
                 $messageType = "error";
                 break;
             }
@@ -310,7 +291,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_printer'])) {
             } catch (Exception $e) {
                 // Rollback in case of error
                 $conn->rollback();
-                $message = "Error: " . $e->getMessage();
+                app_logger()->error('add_printer_error', ['error' => $e->getMessage()]);
+                $message = "A database error occurred while adding printer(s). Please try again.";
                 $messageType = "error";
                 break;
             }
@@ -337,11 +319,7 @@ function getLastPCEntry($conn)
               ORDER BY d.created_at DESC
               LIMIT 1";
 
-    $result = $conn->query($query);
-    if ($result && $result->num_rows > 0) {
-        return $result->fetch_assoc();
-    }
-    return null;
+    return db_fetch_one($conn, $query);
 }
 
 // Get last PC entry for Copy Last Entry feature

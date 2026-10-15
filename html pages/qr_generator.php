@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../includes/security.php';
+requireLogin(true);
+
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (($_POST['action'] ?? '') === 'generate_all_qr') {
+        requireRole('Admin', true);
+    }
+}
+
 require_once 'db.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -76,11 +85,10 @@ function updateDeviceQRCode($conn, $device_id, $qr_code_data_uri)
 // Function to generate QR codes for all existing devices
 function generateQRForAllDevices($conn)
 {
-    $query = "SELECT device_id, device_name, lab_id FROM devices WHERE qr_code IS NULL OR qr_code = ''";
-    $result = $conn->query($query);
+    $devices = db_fetch_all($conn, "SELECT device_id, device_name, lab_id FROM devices WHERE qr_code IS NULL OR qr_code = ''");
 
     $updated_count = 0;
-    while ($row = $result->fetch_assoc()) {
+    foreach ($devices as $row) {
         $qr_code_data_uri = generateQRCode($row['device_id'], $row['device_name'], $row['lab_id']);
         if (updateDeviceQRCode($conn, $row['device_id'], $qr_code_data_uri)) {
             $updated_count++;
@@ -126,6 +134,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'generate_all_qr':
+                requireRole('Admin', true);
                 $count = generateQRForAllDevices($conn);
                 echo json_encode(['success' => true, 'updated_count' => $count]);
                 break;
@@ -143,6 +152,11 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 
                     if ($result->num_rows > 0) {
                         $device = $result->fetch_assoc();
+                        if (!canAccessLab($conn, (string)$device['lab_id'])) {
+                            echo json_encode(['success' => false, 'message' => 'Forbidden: You do not have access to this device.']);
+                            exit;
+                        }
+
                         $qr_code_data_uri = generateQRCode($device['device_id'], $device['device_name'], $device['lab_id']);
 
                         if (updateDeviceQRCode($conn, $device_id, $qr_code_data_uri)) {
@@ -162,6 +176,10 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
                 if (isset($_POST['qr_data'])) {
                     $device = getDeviceByQRData($conn, $_POST['qr_data']);
                     if ($device) {
+                        if (!canAccessLab($conn, (string)$device['lab_id'])) {
+                            echo json_encode(['success' => false, 'message' => 'Forbidden: You do not have access to this device.']);
+                            exit;
+                        }
                         echo json_encode(['success' => true, 'device' => $device]);
                     } else {
                         echo json_encode(['success' => false, 'message' => 'Device not found']);

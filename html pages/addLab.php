@@ -7,11 +7,10 @@ enforceCsrfProtection();
 include 'db.php';
 
 // Fetch lab options
-$query = "SELECT username FROM users";
-$result = $conn->query($query);
+$userRows = db_fetch_all($conn, "SELECT username FROM users");
 $labIncharges = [];
-while ($row = $result->fetch_assoc()) {
-  $labIncharges[] = ucfirst($row['username']);
+foreach ($userRows as $row) {
+  $labIncharges[] = ucfirst((string) $row['username']);
 }
 
 // Initialize variables
@@ -21,14 +20,14 @@ $lab_details = [];
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $labName = $_POST['lab_name'];
-  $department = $_POST['department'];
-  $labIncharge = $_POST['lab_incharge'];
-  $estDate = $_POST['est_date'];
-  $labStatus = $_POST['lab_status'];
-  $roomCapacity = $_POST['room_capacity'];
-  $building = $_POST['building'];
-  $room = $_POST['room'];
+  $labName = trim((string) ($_POST['lab_name'] ?? ''));
+  $department = trim((string) ($_POST['department'] ?? ''));
+  $labIncharge = trim((string) ($_POST['lab_incharge'] ?? ''));
+  $estDate = trim((string) ($_POST['est_date'] ?? ''));
+  $labStatus = trim((string) ($_POST['lab_status'] ?? 'Active'));
+  $roomCapacity = (int) ($_POST['room_capacity'] ?? 0);
+  $building = trim((string) ($_POST['building'] ?? ''));
+  $room = trim((string) ($_POST['room'] ?? ''));
 
   function generateLabCode($dept, $estDate, $conn)
   {
@@ -38,10 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $deptShort = strtoupper(substr($dept, 0, 2));
     // Query to find the highest serial number across ALL labs
     $query = "SELECT lab_id FROM labs ORDER BY SUBSTRING(lab_id, -3) DESC LIMIT 1";
-    $result = $conn->query($query);
-    if ($result->num_rows > 0) {
+    $lastLabRow = db_fetch_one($conn, $query);
+    if ($lastLabRow) {
       // If labs exist, increment the highest serial number
-      $lastLabCode = $result->fetch_assoc()['lab_id'];
+      $lastLabCode = (string) $lastLabRow['lab_id'];
       $lastSerial = (int) substr($lastLabCode, -3); // Extract the last 3 digits
       $newSerial = $lastSerial + 1;
     } else {

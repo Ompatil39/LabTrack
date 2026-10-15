@@ -1,21 +1,15 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-    header("Location: ../html pages/login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include '../html pages/db.php';
+if (!$conn) {
+    app_logger()->error("Database connection failed in editMouse.php");
+    exit("Database connection failed. Please try again later.");
+}
 
 // Fetch active labs for dropdown
-$labsQuery = "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'";
-$labsResult = $conn->query($labsQuery);
-$labs = [];
-if ($labsResult && $labsResult->num_rows > 0) {
-    while ($row = $labsResult->fetch_assoc()) {
-        $labs[] = $row;
-    }
-}
+$labs = db_fetch_all($conn, "SELECT lab_id, lab_name FROM labs WHERE status = 'Active'");
 
 // Initialize variables
 $message = '';
@@ -25,22 +19,19 @@ $isEditMode = false;
 $device_data = null;
 
 // Get device_id from URL and fetch data
-$device_id = isset($_GET['id']) ? trim($_GET['id']) : '';
+$device_id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 if (!empty($device_id)) {
     $isEditMode = true;
 
-    // Fetch device details (assuming mouse-specific table)
+    // Fetch device details
     $query = "SELECT d.*, m.mouse_type 
               FROM devices d 
               LEFT JOIN mice m ON d.device_id = m.device_id 
               WHERE d.device_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $device_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $device_data = db_fetch_one($conn, $query, "s", [$device_id]);
 
-    if ($result && $result->num_rows > 0) {
-        $device_data = $result->fetch_assoc();
+    if ($device_data !== null) {
+        requireLabAccess($conn, (string)$device_data['lab_id']);
     } else {
         $message = "Device not found in database!";
         $messageType = "error";
@@ -53,6 +44,7 @@ if (!empty($device_id)) {
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
+    enforceCsrfProtection();
     $device_id = trim($_POST['device_id'] ?? '');
     $lab_id = trim($_POST['lab_id'] ?? '');
     $device_name = trim($_POST['mouse_name'] ?? '');
@@ -72,6 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
         try {
             $conn->begin_transaction();
 
+            $device_status = ($status === 'Active') ? 'Active' : (($status === 'In Repair' || $status === 'Under Repair') ? 'Under Repair' : 'InActive');
+
             // Update devices table
             $query = "UPDATE devices SET 
                       lab_id = ?, 
@@ -80,25 +74,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
                       status = ?, 
                       updated_at = ? 
                       WHERE device_id = ?";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ssssss", $lab_id, $device_name, $serial_number, $status, $updated_at, $device_id);
-            $stmt->execute();
+            $updated = db_execute($conn, $query, "ssssss", [$lab_id, $device_name, $serial_number, $device_status, $updated_at, $device_id]);
+            if (!$updated) {
+                throw new Exception("Failed to update devices table");
+            }
 
             // Check if mouse record exists and update
-            $checkQuery = "SELECT device_id FROM mice WHERE device_id = ?";
-            $checkStmt = $conn->prepare($checkQuery);
-            $checkStmt->bind_param("s", $device_id);
-            $checkStmt->execute();
-            $checkResult = $checkStmt->get_result();
+            $checkRow = db_fetch_one($conn, "SELECT device_id FROM mice WHERE device_id = ?", "s", [$device_id]);
 
-            if ($checkResult->num_rows > 0) {
+            if ($checkRow !== null) {
                 $query = "UPDATE mice SET 
                           mouse_type = ?, 
                           serial_number = ? 
                           WHERE device_id = ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("sss", $mouse_type, $serial_number, $device_id);
-                $stmt->execute();
+                $updatedMouse = db_execute($conn, $query, "sss", [$mouse_type, $serial_number, $device_id]);
+                if (!$updatedMouse) {
+                    throw new Exception("Failed to update mice table");
+                }
+            } else {
+                $query = "INSERT INTO mice (device_id, mouse_type, serial_number) VALUES (?, ?, ?)";
+                $insertedMouse = db_execute($conn, $query, "sss", [$device_id, $mouse_type, $serial_number]);
+                if (!$insertedMouse) {
+                    throw new Exception("Failed to insert into mice table");
+                }
             }
 
             $conn->commit();
@@ -115,7 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
             ];
         } catch (Exception $e) {
             $conn->rollback();
-            $message = "Error: " . $e->getMessage();
+            app_logger()->error("Failed to update Mouse: " . $e->getMessage());
+            $message = "An error occurred while updating the mouse. Please try again.";
             $messageType = "error";
         }
     } else {
@@ -126,17 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_device'])) {
 
 function getLabName($lab_id, $conn)
 {
-    $query = "SELECT lab_name FROM labs WHERE lab_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $lab_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return ($result && $result->num_rows > 0) ? $result->fetch_assoc()['lab_name'] : "Unknown Lab";
+    $row = db_fetch_one($conn, "SELECT lab_name FROM labs WHERE lab_id = ?", "s", [$lab_id]);
+    return $row['lab_name'] ?? "Unknown Lab";
 }
 
 $showModal = ($messageType === 'success' && $deviceDetails !== null);
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -255,6 +248,7 @@ $conn->close();
 
                         <?php if ($isEditMode): ?>
                             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                                <?php echo csrfInputField(); ?>
                                 <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device_data['device_id']); ?>">
 
                                 <div class="selectLabDevice" style="margin-bottom: 0rem !important;">

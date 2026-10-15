@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 use Monolog\Logger;
 
 $projectRoot = dirname(__DIR__);
@@ -48,9 +47,9 @@ if (!function_exists('app_bootstrap_logger')) {
             mkdir($logDirectory, 0775, true);
         }
 
-        if (class_exists(Logger::class) && class_exists(StreamHandler::class)) {
+        if (PHP_VERSION_ID >= 80100 && class_exists(Logger::class) && class_exists(StreamHandler::class) && enum_exists(\Monolog\Level::class)) {
             $logger = new Logger('labtrack');
-            $handler = new StreamHandler($logDirectory . '/app.log', Level::Debug);
+            $handler = new StreamHandler($logDirectory . '/app.log', \Monolog\Level::Debug);
             if (class_exists(JsonFormatter::class)) {
                 $handler->setFormatter(new JsonFormatter());
             }

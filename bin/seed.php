@@ -113,96 +113,106 @@ try {
         $labStatement->execute($lab);
     }
 
-    $computerStatement = $pdo->prepare(
-        'INSERT INTO computers (lab_id, mac_address, hostname, ip_address, status, cpu_usage, ram_usage, disk_usage, active_user, missing_peripherals, last_heartbeat_at)
-         VALUES (:lab_id, :mac_address, :hostname, :ip_address, :status, :cpu_usage, :ram_usage, :disk_usage, :active_user, :missing_peripherals, :last_heartbeat_at)
+    // Seed devices for the labs
+    $devices = [
+        [
+            'device_id' => 'PC-2026-0001',
+            'lab_id' => 'LAB001',
+            'device_type' => 'PC',
+            'device_name' => 'Workstation 01',
+            'serial_number' => 'WS-LAB1-001',
+            'status' => 'Active',
+            'qr_code' => 'PC-2026-0001',
+        ],
+        [
+            'device_id' => 'PC-2026-0002',
+            'lab_id' => 'LAB001',
+            'device_type' => 'PC',
+            'device_name' => 'Workstation 02',
+            'serial_number' => 'WS-LAB1-002',
+            'status' => 'Active',
+            'qr_code' => 'PC-2026-0002',
+        ],
+        [
+            'device_id' => 'PC-2026-0003',
+            'lab_id' => 'LAB002',
+            'device_type' => 'PC',
+            'device_name' => 'Workstation 03',
+            'serial_number' => 'WS-LAB2-001',
+            'status' => 'Under Repair',
+            'qr_code' => 'PC-2026-0003',
+        ],
+        [
+            'device_id' => 'PRT-2026-0001',
+            'lab_id' => 'LAB001',
+            'device_type' => 'Printer',
+            'device_name' => 'HP LaserJet Pro',
+            'serial_number' => 'PRT-HP-001',
+            'status' => 'Active',
+            'qr_code' => 'PRT-2026-0001',
+        ],
+    ];
+
+    $deviceStatement = $pdo->prepare(
+        'INSERT INTO devices (device_id, lab_id, device_type, device_name, serial_number, status, qr_code)
+         VALUES (:device_id, :lab_id, :device_type, :device_name, :serial_number, :status, :qr_code)
          ON DUPLICATE KEY UPDATE
-            hostname = VALUES(hostname),
-            ip_address = VALUES(ip_address),
+            lab_id = VALUES(lab_id),
+            device_type = VALUES(device_type),
+            device_name = VALUES(device_name),
+            serial_number = VALUES(serial_number),
             status = VALUES(status),
-            cpu_usage = VALUES(cpu_usage),
-            ram_usage = VALUES(ram_usage),
-            disk_usage = VALUES(disk_usage),
-            active_user = VALUES(active_user),
-            missing_peripherals = VALUES(missing_peripherals),
-            last_heartbeat_at = VALUES(last_heartbeat_at)'
+            qr_code = VALUES(qr_code)'
     );
 
-    $telemetryInsert = $pdo->prepare(
-        'INSERT INTO telemetry_logs (computer_id, mac_address, hostname, ip_address, cpu_usage, ram_usage, disk_usage, network_latency_ms, active_user, peripherals, received_at)
-         VALUES (:computer_id, :mac_address, :hostname, :ip_address, :cpu_usage, :ram_usage, :disk_usage, :network_latency_ms, :active_user, :peripherals, :received_at)'
+    foreach ($devices as $device) {
+        $deviceStatement->execute($device);
+    }
+
+    $pcStatement = $pdo->prepare(
+        'INSERT INTO pc_details (device_id, processor, ram, storage, operating_system, ethernet_mac, wifi_adapter, ip_address)
+         VALUES (:device_id, :processor, :ram, :storage, :operating_system, :ethernet_mac, :wifi_adapter, :ip_address)'
     );
 
-    $computerLookup = $pdo->prepare('SELECT computer_id FROM computers WHERE mac_address = :mac_address LIMIT 1');
+    $checkPcStmt = $pdo->prepare('SELECT pc_id FROM pc_details WHERE device_id = ? LIMIT 1');
 
-    mt_srand(20261015);
+    $pcList = [
+        [
+            'device_id' => 'PC-2026-0001',
+            'processor' => 'Intel Core i7-12700',
+            'ram' => '16GB DDR4',
+            'storage' => '512GB NVMe SSD',
+            'operating_system' => 'Ubuntu 22.04 LTS',
+            'ethernet_mac' => '02:1B:44:01:01:01',
+            'wifi_adapter' => 'Intel Wi-Fi 6',
+            'ip_address' => '192.168.1.101',
+        ],
+        [
+            'device_id' => 'PC-2026-0002',
+            'processor' => 'Intel Core i7-12700',
+            'ram' => '16GB DDR4',
+            'storage' => '512GB NVMe SSD',
+            'operating_system' => 'Windows 11 Pro',
+            'ethernet_mac' => '02:1B:44:01:01:02',
+            'wifi_adapter' => 'Intel Wi-Fi 6',
+            'ip_address' => '192.168.1.102',
+        ],
+        [
+            'device_id' => 'PC-2026-0003',
+            'processor' => 'AMD Ryzen 7 5700G',
+            'ram' => '16GB DDR4',
+            'storage' => '1TB NVMe SSD',
+            'operating_system' => 'Ubuntu 22.04 LTS',
+            'ethernet_mac' => '02:1B:44:02:01:01',
+            'wifi_adapter' => 'None',
+            'ip_address' => '192.168.2.101',
+        ],
+    ];
 
-    for ($labNumber = 1; $labNumber <= 3; $labNumber++) {
-        $labId = sprintf('LAB%03d', $labNumber);
-        for ($pcNumber = 1; $pcNumber <= 10; $pcNumber++) {
-            $globalIndex = (($labNumber - 1) * 10) + $pcNumber;
-            $hostname = sprintf('LAB%d-PC%02d', $labNumber, $pcNumber);
-            $macAddress = sprintf('02:1B:44:%02X:%02X:%02X', $labNumber, $pcNumber, $globalIndex);
-            $ipAddress = sprintf('192.168.%d.%d', $labNumber, 100 + $pcNumber);
-
-            $baseCpu = mt_rand(10, 65);
-            $baseRam = mt_rand(25, 80);
-            $baseDisk = mt_rand(20, 75);
-            $missingPeripherals = json_encode([], JSON_THROW_ON_ERROR);
-            $lastHeartbeat = (new DateTimeImmutable('-' . mt_rand(0, 20) . ' seconds'))->format('Y-m-d H:i:s');
-
-            $computerStatement->execute([
-                'lab_id' => $labId,
-                'mac_address' => $macAddress,
-                'hostname' => $hostname,
-                'ip_address' => $ipAddress,
-                'status' => 'online',
-                'cpu_usage' => $baseCpu,
-                'ram_usage' => $baseRam,
-                'disk_usage' => $baseDisk,
-                'active_user' => 'student_' . str_pad((string) $globalIndex, 3, '0', STR_PAD_LEFT),
-                'missing_peripherals' => $missingPeripherals,
-                'last_heartbeat_at' => $lastHeartbeat,
-            ]);
-
-            $computerLookup->execute(['mac_address' => $macAddress]);
-            $computerRow = $computerLookup->fetch();
-            $computerId = $computerRow['computer_id'] ?? null;
-
-            for ($hour = 23; $hour >= 0; $hour--) {
-                $timePoint = (new DateTimeImmutable('-' . $hour . ' hours'))->setTime((int) date('H'), mt_rand(0, 59), mt_rand(0, 59));
-
-                $cpuUsage = min(99.9, max(2.0, $baseCpu + mt_rand(-8, 8)));
-                $ramUsage = min(99.9, max(5.0, $baseRam + mt_rand(-6, 6)));
-                $diskUsage = min(99.9, max(10.0, $baseDisk + mt_rand(-2, 3)));
-                $peripherals = [
-                    'keyboard' => true,
-                    'mouse' => true,
-                    'usb_storage_connected' => mt_rand(0, 4) === 0,
-                ];
-
-                if ($globalIndex === 7 && $hour % 6 === 0) {
-                    $cpuUsage = 95.0;
-                }
-
-                if ($globalIndex === 4 && $hour % 5 === 0) {
-                    $peripherals['mouse'] = false;
-                }
-
-                $telemetryInsert->execute([
-                    'computer_id' => $computerId,
-                    'mac_address' => $macAddress,
-                    'hostname' => $hostname,
-                    'ip_address' => $ipAddress,
-                    'cpu_usage' => $cpuUsage,
-                    'ram_usage' => $ramUsage,
-                    'disk_usage' => $diskUsage,
-                    'network_latency_ms' => mt_rand(5, 45),
-                    'active_user' => 'student_' . str_pad((string) $globalIndex, 3, '0', STR_PAD_LEFT),
-                    'peripherals' => json_encode($peripherals, JSON_THROW_ON_ERROR),
-                    'received_at' => $timePoint->format('Y-m-d H:i:s'),
-                ]);
-            }
+    foreach ($pcList as $pc) {
+        $checkPcStmt->execute([$pc['device_id']]);
+        if (!$checkPcStmt->fetch()) {
+            $pcStatement->execute($pc);
         }
     }
 

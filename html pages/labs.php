@@ -1,56 +1,26 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-  header("Location: login.php");
-  exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 
 include 'db.php';
 
-// First, get all labs
-$labsQuery = "SELECT * FROM labs";
-$labsResult = mysqli_query($conn, $labsQuery);
-
-if (!$labsResult) {
-  die("Query failed: " . mysqli_error($conn));
+$restrict = restrictLabSql('lab_id');
+if ($restrict['clause'] !== '') {
+    $labsQuery = "SELECT * FROM labs WHERE " . $restrict['clause'] . " ORDER BY lab_id ASC";
+    $labs = db_fetch_all($conn, $labsQuery, $restrict['types'], $restrict['params']);
+} else {
+    $labsQuery = "SELECT * FROM labs ORDER BY lab_id ASC";
+    $labs = db_fetch_all($conn, $labsQuery);
 }
 
-$labs = mysqli_fetch_all($labsResult, MYSQLI_ASSOC);
-mysqli_free_result($labsResult);
-
-// For each lab, count devices and devices under repair
+// For each lab, count devices and devices under repair using prepared statements
 foreach ($labs as $key => $lab) {
-  // Count total devices in this lab
-  $deviceCountQuery = "SELECT COUNT(*) as total FROM devices 
-                        WHERE lab_id = '" . mysqli_real_escape_string($conn, $lab['lab_id']) . "' 
-                        AND device_id LIKE 'PC-%'";
-  $deviceResult = mysqli_query($conn, $deviceCountQuery);
+    $deviceCount = db_fetch_one($conn, "SELECT COUNT(*) as total FROM devices WHERE lab_id = ? AND device_id LIKE 'PC-%'", 's', [$lab['lab_id']]);
+    $labs[$key]['total_devices'] = (int) ($deviceCount['total'] ?? 0);
 
-  if ($deviceResult) {
-    $deviceCount = mysqli_fetch_assoc($deviceResult);
-    $labs[$key]['total_devices'] = $deviceCount['total'];
-    mysqli_free_result($deviceResult);
-  } else {
-    $labs[$key]['total_devices'] = 0;
-  }
-
-  // Count devices under repair in this lab
-  $repairCountQuery = "SELECT COUNT(*) as repair_count FROM devices 
-                        WHERE lab_id = '" . mysqli_real_escape_string($conn, $lab['lab_id']) . "' 
-                        AND status = 'Under Repair'";
-  $repairResult = mysqli_query($conn, $repairCountQuery);
-
-  if ($repairResult) {
-    $repairCount = mysqli_fetch_assoc($repairResult);
-    $labs[$key]['under_repair_count'] = $repairCount['repair_count'];
-    mysqli_free_result($repairResult);
-  } else {
-    $labs[$key]['under_repair_count'] = 0;
-  }
+    $repairCount = db_fetch_one($conn, "SELECT COUNT(*) as repair_count FROM devices WHERE lab_id = ? AND (status = 'Under Repair' OR status = 'In Repair')", 's', [$lab['lab_id']]);
+    $labs[$key]['under_repair_count'] = (int) ($repairCount['repair_count'] ?? 0);
 }
-
-// Close database connection
-mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>

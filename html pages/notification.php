@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+?>
 <!DOCTYPE html>
 <html lang="en">
 

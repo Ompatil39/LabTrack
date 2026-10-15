@@ -1,28 +1,27 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+requireRole('Admin');
+startCsrfOutputBuffer();
+enforceCsrfProtection();
 
 include 'db.php';
 
 // Function to sanitize input data
 function sanitize_input($data)
 {
-    $data = trim($data);
+    $data = trim((string) $data);
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 
 // Function to validate Indian phone number (10 digits, may start with +91)
 function validate_indian_phone($phone)
 {
-    $phone = preg_replace('/[^0-9]/', '', $phone);
-    if (strlen($phone) == 10) {
+    $phone = preg_replace('/[^0-9]/', '', (string) $phone);
+    if (strlen($phone) === 10) {
         return true;
-    } elseif (strlen($phone) == 12 && substr($phone, 0, 2) == '91') {
+    } elseif (strlen($phone) === 12 && str_starts_with($phone, '91')) {
         return true;
     }
     return false;
@@ -31,56 +30,33 @@ function validate_indian_phone($phone)
 // Function to check if username already exists
 function is_username_unique($conn, $username)
 {
-    $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-    if ($stmt === false) {
-        return false; // Handle error gracefully
-    }
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-    $is_unique = $stmt->num_rows === 0;
-    $stmt->close();
-    return $is_unique;
+    $row = db_fetch_one($conn, "SELECT user_id FROM users WHERE username = ? LIMIT 1", "s", [$username]);
+    return $row === null;
 }
 
 // Function to check if email already exists
 function is_email_unique($conn, $email)
 {
-    $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
-    if ($stmt === false) {
-        return false; // Handle error gracefully
-    }
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-    $is_unique = $stmt->num_rows === 0;
-    $stmt->close();
-    return $is_unique;
+    $row = db_fetch_one($conn, "SELECT user_id FROM users WHERE email = ? LIMIT 1", "s", [$email]);
+    return $row === null;
 }
 
 // Get all lab in-charge users
-$incharge_users = [];
 $sql = "SELECT user_id, username, full_name, email, contact_number 
         FROM users 
         WHERE user_type = 'Incharge'";
-$result = $conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $incharge_users[] = $row;
-    }
-}
+$incharge_users = db_fetch_all($conn, $sql);
 
 // Add new lab in-charge
 $errors = [];
 $success_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'add_incharge') {
-    $username = sanitize_input($_POST['username']);
-    $password = $_POST['password']; // Will be hashed
-    $full_name = sanitize_input($_POST['fullName']);
-    $email = sanitize_input($_POST['email']);
-    $contact_number = sanitize_input($_POST['contactNumber']);
+    $username = trim((string) ($_POST['username'] ?? ''));
+    $password = (string) ($_POST['password'] ?? '');
+    $full_name = trim((string) ($_POST['fullName'] ?? ''));
+    $email = trim((string) ($_POST['email'] ?? ''));
+    $contact_number = trim((string) ($_POST['contactNumber'] ?? ''));
 
     // Validate inputs
     if (empty($username) || strlen($username) < 4) {
@@ -105,61 +81,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     // If no errors, proceed with insertion
     if (empty($errors)) {
-        // Generate a random user_id
-        $user_id = 'INC_' . rand(10000, 99999);
+        // Generate a cryptographically secure random user_id
+        $user_id = 'INC_' . random_int(10000, 99999);
 
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            // Check connection
-            if ($conn->connect_error) {
-                throw new Exception("Database connection lost: " . $conn->connect_error);
-            }
-            if (!$conn->ping()) {
-                throw new Exception("Database server not responding: " . $conn->error);
-            }
-
-            // Insert into users table
             $query = "INSERT INTO users (user_id, username, password, email, user_type, full_name, contact_number) VALUES (?, ?, ?, ?, 'Incharge', ?, ?)";
-            error_log("Executing query: $query with user_id=$user_id, username=$username, email=$email");
-
-            $stmt = $conn->prepare($query);
-            if ($stmt === false) {
-                throw new Exception("Prepare failed: " . $conn->error);
-            }
-            $stmt->bind_param("ssssss", $user_id, $username, $hashed_password, $email, $full_name, $contact_number);
-            if (!$stmt->execute()) {
-                throw new Exception("Execute failed: " . $stmt->error);
+            $inserted = db_execute($conn, $query, "ssssss", [$user_id, $username, $hashed_password, $email, $full_name, $contact_number]);
+            if (!$inserted) {
+                throw new Exception("Insert failed.");
             }
 
             $success_message = "Lab In-charge added successfully!";
             header("Location: " . $_SERVER['PHP_SELF'] . "?success=1");
             exit();
         } catch (Exception $e) {
-            $errors[] = "Error: " . $e->getMessage();
+            app_logger()->error('add_incharge_error', ['error' => $e->getMessage()]);
+            $errors[] = "A database error occurred while creating lab in-charge. Please try again.";
         }
     }
 }
 
 // Delete an in-charge
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'delete_incharge') {
-    $user_id = sanitize_input($_POST['user_id']);
+    $user_id = trim((string) ($_POST['user_id'] ?? ''));
 
     try {
-        $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
-        if ($stmt === false) {
-            throw new Exception("Prepare failed: " . $conn->error);
-        }
-        $stmt->bind_param("s", $user_id);
-        if (!$stmt->execute()) {
-            throw new Exception("Execute failed: " . $stmt->error);
+        $deleted = db_execute($conn, "DELETE FROM users WHERE user_id = ?", "s", [$user_id]);
+        if (!$deleted) {
+            throw new Exception("Delete failed.");
         }
 
         header("Location: " . $_SERVER['PHP_SELF'] . "?deleted=1");
         exit();
     } catch (Exception $e) {
-        $errors[] = "Error: " . $e->getMessage();
+        app_logger()->error('delete_incharge_error', ['error' => $e->getMessage()]);
+        $errors[] = "A database error occurred while deleting lab in-charge. Please try again.";
     }
 }
 

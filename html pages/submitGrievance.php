@@ -1,7 +1,6 @@
 <?php
-
-session_start();
-
+require_once __DIR__ . '/../includes/security.php';
+startSecureSession();
 include 'db.php';
 
 
@@ -132,6 +131,7 @@ if (isset($_GET['check_status']) && isset($_GET['grievance_id'])) {
 $insertId = null;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    enforceCsrfProtection();
 
     // Validate name
 
@@ -334,31 +334,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $successMessage = true;
         } else {
-
-            $errors['db'] = "Error: " . $stmt->error;
+            app_logger()->error('Failed to insert grievance: ' . $stmt->error);
+            $errors['db'] = "Failed to submit grievance due to a system error. Please try again.";
         }
-
-
 
         $stmt->close();
     }
 }
 
-
-
 // Generate CAPTCHA
-
 function generateCaptcha()
-
 {
-
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
     $captcha = '';
+    $maxIndex = strlen($characters) - 1;
 
     for ($i = 0; $i < 6; $i++) {
-
-        $captcha .= $characters[rand(0, strlen($characters) - 1)];
+        $captcha .= $characters[random_int(0, $maxIndex)];
     }
 
     $_SESSION['captcha'] = $captcha;
@@ -366,29 +358,10 @@ function generateCaptcha()
     return $captcha;
 }
 
-
-
-// Start the session to store CAPTCHA
-
 $captcha = generateCaptcha();
 
-
-
 // Fetch labs for dropdown
-
-$labsQuery = "SELECT lab_id, lab_name FROM labs WHERE status = 'Active' ORDER BY lab_name";
-
-$labsResult = $conn->query($labsQuery);
-
-$labs = [];
-
-if ($labsResult->num_rows > 0) {
-
-    while ($row = $labsResult->fetch_assoc()) {
-
-        $labs[] = $row;
-    }
-}
+$labs = db_fetch_all($conn, "SELECT lab_id, lab_name FROM labs WHERE status = 'Active' ORDER BY lab_name");
 
 
 
@@ -1529,6 +1502,7 @@ $conn->close();
             <?php else: ?>
 
                 <form id="grievanceForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                    <?php echo csrfInputField(); ?>
 
                     <div class="error-message" id="formErrorMessage">
 

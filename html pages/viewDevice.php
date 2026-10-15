@@ -1,14 +1,13 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
 include 'db.php';
 
 // Get device ID from URL parameter
-$device_id = isset($_GET['id']) ? $_GET['id'] : '';
+$device_id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 
 if (empty($device_id)) {
+    http_response_code(400);
     echo "Device ID not provided";
     exit;
 }
@@ -32,12 +31,16 @@ $device_result = mysqli_stmt_get_result($stmt);
 
 // Check if device exists
 if (mysqli_num_rows($device_result) == 0) {
+    http_response_code(404);
     echo "Device not found";
     exit;
 }
 
 // Fetch device data
 $device_data = mysqli_fetch_assoc($device_result);
+
+// Enforce lab access for Incharge
+requireLabAccess($conn, (string)$device_data['lab_id']);
 
 // Get device type specific details
 $type_details = [];
