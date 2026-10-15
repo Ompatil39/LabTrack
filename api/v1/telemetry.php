@@ -50,11 +50,67 @@ function is_authenticated_agent(array $headers): bool
     }
 
     try {
-        JWT::decode($token, new Key($config['jwt']['secret'], 'HS256'));
+        if (class_exists(JWT::class) && class_exists(Key::class)) {
+            JWT::decode($token, new Key($config['jwt']['secret'], 'HS256'));
+        } else {
+            if (!is_valid_hs256_jwt($token, (string) $config['jwt']['secret'])) {
+                return false;
+            }
+        }
         return true;
     } catch (Throwable) {
         return false;
     }
+}
+
+function is_valid_hs256_jwt(string $token, string $secret): bool
+{
+    if ($secret === '') {
+        return false;
+    }
+
+    $parts = explode('.', $token);
+    if (count($parts) !== 3) {
+        return false;
+    }
+
+    [$header, $payload, $signature] = $parts;
+    $headerJson = base64url_decode($header);
+    $payloadJson = base64url_decode($payload);
+
+    if ($headerJson === false || $payloadJson === false) {
+        return false;
+    }
+
+    $headerData = json_decode($headerJson, true);
+    $payloadData = json_decode($payloadJson, true);
+
+    if (!is_array($headerData) || !is_array($payloadData) || ($headerData['alg'] ?? '') !== 'HS256') {
+        return false;
+    }
+
+    $expected = hash_hmac('sha256', $header . '.' . $payload, $secret, true);
+    $decodedSignature = base64url_decode($signature);
+
+    if ($decodedSignature === false || !hash_equals($expected, $decodedSignature)) {
+        return false;
+    }
+
+    if (isset($payloadData['exp']) && is_numeric($payloadData['exp']) && (int) $payloadData['exp'] < time()) {
+        return false;
+    }
+
+    return true;
+}
+
+function base64url_decode(string $value): string|false
+{
+    $remainder = strlen($value) % 4;
+    if ($remainder > 0) {
+        $value .= str_repeat('=', 4 - $remainder);
+    }
+
+    return base64_decode(strtr($value, '-_', '+/'), true);
 }
 
 function collect_missing_peripherals(array $peripherals): string

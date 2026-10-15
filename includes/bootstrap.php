@@ -35,11 +35,11 @@ if (!function_exists('env_bool')) {
 }
 
 if (!function_exists('app_bootstrap_logger')) {
-    function app_bootstrap_logger(): Logger
+    function app_bootstrap_logger(): object
     {
         static $logger = null;
 
-        if ($logger instanceof Logger) {
+        if (is_object($logger)) {
             return $logger;
         }
 
@@ -48,17 +48,38 @@ if (!function_exists('app_bootstrap_logger')) {
             mkdir($logDirectory, 0775, true);
         }
 
-        $logger = new Logger('labtrack');
-        $handler = new StreamHandler($logDirectory . '/app.log', Level::Debug);
-        $handler->setFormatter(new JsonFormatter());
-        $logger->pushHandler($handler);
+        if (class_exists(Logger::class) && class_exists(StreamHandler::class)) {
+            $logger = new Logger('labtrack');
+            $handler = new StreamHandler($logDirectory . '/app.log', Level::Debug);
+            if (class_exists(JsonFormatter::class)) {
+                $handler->setFormatter(new JsonFormatter());
+            }
+            $logger->pushHandler($handler);
+        } else {
+            $logger = new class ($logDirectory . '/app.log') {
+                public function __construct(private string $logFile)
+                {
+                }
+
+                public function error(string $message, array $context = []): void
+                {
+                    $record = json_encode([
+                        'level' => 'error',
+                        'message' => $message,
+                        'context' => $context,
+                        'timestamp' => gmdate('c'),
+                    ]);
+                    error_log(($record ?: $message) . PHP_EOL, 3, $this->logFile);
+                }
+            };
+        }
 
         return $logger;
     }
 }
 
 if (!function_exists('app_logger')) {
-    function app_logger(): Logger
+    function app_logger(): object
     {
         return app_bootstrap_logger();
     }
