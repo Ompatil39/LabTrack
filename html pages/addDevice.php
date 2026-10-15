@@ -5,32 +5,28 @@ requireRole('Admin');
 startCsrfOutputBuffer();
 
 include 'db.php';
-// Function to generate unique device IDs
+require_once __DIR__ . '/../includes/AssetTagGenerator.php';
+use LabTrack\AssetTagGenerator;
+
+// Function to generate unique device IDs using atomic database sequence
 function generateDeviceId($type, $conn)
 {
-    $prefix = match ($type) {
-        'PC' => 'PC',
-        'Monitor' => 'MON',
-        'Keyboard' => 'KEY',
-        'Mouse' => 'MOU',
-        'CPU' => 'CPU',
-        'Printer' => 'PRT',
-        default => 'DEV',
-    };
-
-    $year = date('Y');
-    $pattern = $prefix . '-' . $year . '-%';
-    $row = db_fetch_one($conn, 'SELECT device_id FROM devices WHERE device_id LIKE ? ORDER BY device_id DESC LIMIT 1', 's', [$pattern]);
-
-    $newNum = 1;
-    if ($row && !empty($row['device_id'])) {
-        $lastId = (string) $row['device_id'];
-        $lastNum = (int) substr($lastId, -4);
-        $newNum = $lastNum + 1;
+    try {
+        return AssetTagGenerator::nextTag($conn, $type);
+    } catch (\Throwable $e) {
+        $prefix = match ($type) {
+            'PC' => 'PC',
+            'Monitor' => 'MON',
+            'Keyboard' => 'KBD',
+            'Mouse' => 'MSE',
+            'CPU' => 'CPU',
+            'Printer' => 'PRT',
+            default => 'DEV',
+        };
+        $year = (int) date('Y');
+        $random = random_int(1000, 9999);
+        return "$prefix-$year-$random";
     }
-
-    $serial = str_pad((string) $newNum, 4, '0', STR_PAD_LEFT);
-    return "$prefix-$year-$serial";
 }
 
 // Get all active labs
@@ -178,6 +174,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pc'])) {
                 $stmt = $conn->prepare($query);
                 $stmt->bind_param("sssss", $cpu_device_id, $case_model, $cpu_serial, $power_supply, $cpu_status);
                 $stmt->execute();
+
+                // Phase 2: Populate workstations, assets, and asset_assignments
+                $wsCheck = $conn->query("SHOW TABLES LIKE 'workstations'");
+                if ($wsCheck && $wsCheck->num_rows > 0) {
+                    $wsCountRow = db_fetch_one($conn, "SELECT COUNT(*) as c FROM workstations WHERE lab_id = ?", "s", [$lab_id]);
+                    $seatNum = ((int)($wsCountRow['c'] ?? 0)) + 1;
+                    $seatCode = 'S-' . str_pad((string)$seatNum, 2, '0', STR_PAD_LEFT);
+
+                    $wsInsert = $conn->prepare("INSERT INTO workstations (lab_id, seat_code, hostname, status) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE workstation_id = LAST_INSERT_ID(workstation_id)");
+                    $host = strtolower($pc_device_id);
+                    $wsInsert->bind_param("ssss", $lab_id, $seatCode, $host, $device_status);
+                    $wsInsert->execute();
+                    $wsId = (int)$conn->insert_id;
+                    $wsInsert->close();
+
+                    if ($wsId > 0) {
+                        $pcSpecs = json_encode(['processor' => $processor, 'ram' => $ram, 'storage' => $storage, 'operating_system' => $os, 'ethernet_mac' => $ethernet_mac, 'wifi_adapter' => $wifi_adapter, 'ip_address' => $ip_address]);
+                        $astStmt = $conn->prepare("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, serial_number, status, specs, legacy_device_id) VALUES (?, 'PC', ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE asset_id = LAST_INSERT_ID(asset_id)");
+                        $astStmt->bind_param("sssssss", $pc_device_id, $lab_id, $device_name, $serial_number, $device_status, $pcSpecs, $pc_device_id);
+                        $astStmt->execute();
+                        $pcAssetId = (int)$conn->insert_id;
+                        $astStmt->close();
+
+                        if ($pcAssetId > 0) {
+                            $conn->query("INSERT IGNORE INTO asset_assignments (asset_id, workstation_id, parent_asset_id) VALUES ({$pcAssetId}, {$wsId}, NULL)");
+
+                            $monSpecs = json_encode(['resolution' => $monitor_resolution]);
+                            $astStmt = $conn->prepare("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, serial_number, status, specs, legacy_device_id) VALUES (?, 'Monitor', ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE asset_id = LAST_INSERT_ID(asset_id)");
+                            $astStmt->bind_param("sssssss", $monitor_device_id, $lab_id, $monitor_brand, $monitor_serial, $monitor_status, $monSpecs, $monitor_device_id);
+                            $astStmt->execute();
+                            $monAssetId = (int)$conn->insert_id;
+                            $astStmt->close();
+                            if ($monAssetId > 0) {
+                                $conn->query("INSERT IGNORE INTO asset_assignments (asset_id, workstation_id, parent_asset_id) VALUES ({$monAssetId}, {$wsId}, {$pcAssetId})");
+                            }
+
+                            $kbdSpecs = json_encode(['keyboard_type' => $keyboard_type]);
+                            $astStmt = $conn->prepare("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, serial_number, status, specs, legacy_device_id) VALUES (?, 'Keyboard', ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE asset_id = LAST_INSERT_ID(asset_id)");
+                            $astStmt->bind_param("sssssss", $keyboard_device_id, $lab_id, $keyboard_name, $keyboard_serial, $keyboard_status, $kbdSpecs, $keyboard_device_id);
+                            $astStmt->execute();
+                            $kbdAssetId = (int)$conn->insert_id;
+                            $astStmt->close();
+                            if ($kbdAssetId > 0) {
+                                $conn->query("INSERT IGNORE INTO asset_assignments (asset_id, workstation_id, parent_asset_id) VALUES ({$kbdAssetId}, {$wsId}, {$pcAssetId})");
+                            }
+
+                            $mseSpecs = json_encode(['mouse_type' => $mouse_type]);
+                            $astStmt = $conn->prepare("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, serial_number, status, specs, legacy_device_id) VALUES (?, 'Mouse', ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE asset_id = LAST_INSERT_ID(asset_id)");
+                            $astStmt->bind_param("sssssss", $mouse_device_id, $lab_id, $mouse_name, $mouse_serial, $mouse_status, $mseSpecs, $mouse_device_id);
+                            $astStmt->execute();
+                            $mseAssetId = (int)$conn->insert_id;
+                            $astStmt->close();
+                            if ($mseAssetId > 0) {
+                                $conn->query("INSERT IGNORE INTO asset_assignments (asset_id, workstation_id, parent_asset_id) VALUES ({$mseAssetId}, {$wsId}, {$pcAssetId})");
+                            }
+
+                            $cpuSpecs = json_encode(['power_supply' => $power_supply]);
+                            $astStmt = $conn->prepare("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, serial_number, status, specs, legacy_device_id) VALUES (?, 'CPU', ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE asset_id = LAST_INSERT_ID(asset_id)");
+                            $astStmt->bind_param("sssssss", $cpu_device_id, $lab_id, $case_model, $cpu_serial, $cpu_status, $cpuSpecs, $cpu_device_id);
+                            $astStmt->execute();
+                            $cpuAssetId = (int)$conn->insert_id;
+                            $astStmt->close();
+                            if ($cpuAssetId > 0) {
+                                $conn->query("INSERT IGNORE INTO asset_assignments (asset_id, workstation_id, parent_asset_id) VALUES ({$cpuAssetId}, {$wsId}, {$pcAssetId})");
+                            }
+                        }
+                    }
+                }
 
                 // Commit the transaction
                 $conn->commit();

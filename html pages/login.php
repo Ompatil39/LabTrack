@@ -23,18 +23,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isLoginLocked($username, $clientIp, $remaining)) {
             $error = 'Too many failed login attempts. Try again in ' . max(1, (int) ceil($remaining / 60)) . ' minute(s).';
         } else {
+            $hasUidCol = (bool) db_fetch_one($conn, "SHOW COLUMNS FROM users LIKE 'uid'");
+            $loginSql = $hasUidCol
+                ? 'SELECT user_id, username, password, user_type, full_name, uid FROM users WHERE username = ? LIMIT 1'
+                : 'SELECT user_id, username, password, user_type, full_name FROM users WHERE username = ? LIMIT 1';
+
             $user = db_fetch_one(
                 $conn,
-                'SELECT user_id, username, password, user_type FROM users WHERE username = ? LIMIT 1',
+                $loginSql,
                 's',
                 [$username]
             );
 
             if ($user && password_verify($password, (string) $user['password'])) {
                 session_regenerate_id(true);
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['user_type'] = $user['user_type'];
+                $_SESSION['user_id'] = (string) $user['user_id'];
+                $_SESSION['uid'] = isset($user['uid']) && $user['uid'] !== null ? (int) $user['uid'] : null;
+                $_SESSION['full_name'] = (string) ($user['full_name'] ?? '');
+                $_SESSION['username'] = (string) $user['username'];
+                $_SESSION['user_type'] = (string) $user['user_type'];
                 $_SESSION['logged_in'] = true;
                 $_SESSION['last_activity'] = time();
 

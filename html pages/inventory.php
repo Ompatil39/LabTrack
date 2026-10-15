@@ -261,10 +261,14 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                         <tbody>
                             <?php
                             $sql = "SELECT d.device_id, d.device_name, d.device_type, l.lab_name, 
-                    COALESCE(p.pc_id, 'N/A') as pc_id, d.status, 'Working' as remarks
+                    COALESCE(p.pc_id, 'N/A') as pc_id, d.status, 'Working' as remarks,
+                    w.workstation_id, w.seat_code
                     FROM devices d
                     LEFT JOIN labs l ON d.lab_id = l.lab_id
                     LEFT JOIN pc_details p ON d.device_id = p.device_id
+                    LEFT JOIN assets a ON a.legacy_device_id = d.device_id OR a.asset_tag = d.device_id
+                    LEFT JOIN asset_assignments aa ON aa.asset_id = a.asset_id AND aa.removed_at IS NULL
+                    LEFT JOIN workstations w ON w.workstation_id = aa.workstation_id
                     $whereSql
                     LIMIT ?, ?";
                             $mainTypes = $filterTypes . 'ii';
@@ -282,7 +286,7 @@ function generatePagination($total_items, $items_per_page, $current_page, $base_
                                     echo "<td><span class='status status-" . strtolower(str_replace(' ', '-', (string)$row['status'])) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
 
                                     echo "<td>
-                            <a href='viewDevice.php?id=" . urlencode($row['device_id']) . "' class='none'>
+                            " . (!empty($row['workstation_id']) ? "<a href='workstation.php?id=" . urlencode((string)$row['workstation_id']) . "' class='none' title='View Workstation Seat " . htmlspecialchars($row['seat_code'] ?? '', ENT_QUOTES, 'UTF-8') . "'><button class='btn-icon' style='color:#4f46e5;'><i class='fas fa-desktop'></i></button></a> " : "") . "<a href='viewDevice.php?id=" . urlencode($row['device_id']) . "' class='none'>
                                 <button class='btn-icon view-btn'><i class='fas fa-eye'></i></button>
                             </a>
                             <a href='../edit/deviceRouter.php?id=" . urlencode($row['device_id']) . "' class='none'>

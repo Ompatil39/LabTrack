@@ -98,12 +98,27 @@ $count_result = db_fetch_one($conn, $count_query, $types, $params);
 $total_items = $count_result ? (int) $count_result['total'] : 0;
 
 // Fetch page items with prepared statement
-$base_query = "SELECT g.*, l.lab_name 
-               FROM grievances g 
-               LEFT JOIN labs l ON g.lab_id = l.lab_id 
-               WHERE " . $whereClause . " 
-               ORDER BY " . $sort_field . " " . $sort_order . " 
-               LIMIT ?, ?";
+$hasAssetsTable = (bool) db_fetch_one($conn, "SHOW TABLES LIKE 'assets'");
+$hasWsTable = (bool) db_fetch_one($conn, "SHOW TABLES LIKE 'workstations'");
+
+if ($hasAssetsTable && $hasWsTable) {
+    $base_query = "SELECT g.*, l.lab_name, a.asset_tag, w.seat_code, w.workstation_id AS ws_id
+                   FROM grievances g 
+                   LEFT JOIN labs l ON g.lab_id = l.lab_id 
+                   LEFT JOIN assets a ON (g.asset_id IS NOT NULL AND g.asset_id = a.asset_id)
+                                      OR (g.asset_id IS NULL AND (a.legacy_device_id = g.device_id OR a.asset_tag = g.device_id))
+                   LEFT JOIN workstations w ON g.workstation_id = w.workstation_id
+                   WHERE " . $whereClause . " 
+                   ORDER BY " . $sort_field . " " . $sort_order . " 
+                   LIMIT ?, ?";
+} else {
+    $base_query = "SELECT g.*, l.lab_name 
+                   FROM grievances g 
+                   LEFT JOIN labs l ON g.lab_id = l.lab_id 
+                   WHERE " . $whereClause . " 
+                   ORDER BY " . $sort_field . " " . $sort_order . " 
+                   LIMIT ?, ?";
+}
 $pageTypes = $types . 'ii';
 $pageParams = array_merge($params, [$offset, $items_per_page]);
 $grievanceRows = db_fetch_all($conn, $base_query, $pageTypes, $pageParams);
@@ -451,6 +466,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_grievance'])) 
                                     Device/Category
                                 </a>
                             </th>
+                            <th>Workstation / Asset</th>
                             <th class="<?php echo $sort_column == 'status' ? 'sort-' . strtolower($sort_order) : ''; ?>">
                                 <a class="none" href="grievance.php?sort=status&order=<?php echo ($sort_column == 'status' && $sort_order == 'ASC') ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>&lab=<?php echo urlencode($lab_filter); ?>&status=<?php echo urlencode($status_filter); ?>&category=<?php echo urlencode($category_filter); ?>">
                                     Status
@@ -492,9 +508,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_grievance'])) 
                                     <td>#GRV<?php echo str_pad((string) $row['grievance_id'], 3, '0', STR_PAD_LEFT); ?></td>
                                     <td><?php echo htmlspecialchars($row['submitted_by'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo htmlspecialchars($row['stud_enrollment'], ENT_QUOTES, 'UTF-8'); ?>)</td>
                                     <td><?php echo htmlspecialchars($row['device_category'], ENT_QUOTES, 'UTF-8'); ?> <?php echo !empty($row['device_name']) ? '- ' . htmlspecialchars($row['device_name'], ENT_QUOTES, 'UTF-8') : ''; ?></td>
+                                    <td>
+                                        <?php if (!empty($row['ws_id'])): ?>
+                                            <div>
+                                                <a href="workstation.php?id=<?php echo urlencode((string)$row['ws_id']); ?>" style="color: #4f46e5; font-weight: 600; text-decoration: none;">
+                                                    <i class="fa-solid fa-desktop"></i> Seat <?php echo htmlspecialchars((string)($row['seat_code'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($row['asset_tag'])): ?>
+                                            <span style="font-family: monospace; font-size: 0.78rem; background: #eef2ff; color: #4338ca; padding: 1px 6px; border-radius: 3px;">
+                                                <?php echo htmlspecialchars((string)$row['asset_tag'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
+                                        <?php elseif (empty($row['ws_id'])): ?>
+                                            <span style="color: #9ca3af;">—</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></span></td>
                                     <td><?php echo date('Y-m-d', strtotime($row['submission_date'])); ?></td>
                                     <td>
+                                        <?php if (!empty($row['ws_id'])): ?>
+                                            <a href="workstation.php?id=<?php echo urlencode((string)$row['ws_id']); ?>" class="none" title="View Workstation Seat <?php echo htmlspecialchars((string)($row['seat_code'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+                                                <button class="btn-icon" style="color:#4f46e5;"><i class="fas fa-desktop"></i></button>
+                                            </a>
+                                        <?php endif; ?>
                                         <a href="viewGrievance.php?id=<?php echo (int) $row['grievance_id']; ?>" class="none">
                                              <button class="btn-icon view-btn"><i class="fas fa-eye"></i></button>
                                         </a>
@@ -509,7 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_grievance'])) 
                         } else {
                             ?>
                             <tr>
-                                <td colspan="6" style="text-align: center;">No grievances found matching your criteria.</td>
+                                <td colspan="7" style="text-align: center;">No grievances found matching your criteria.</td>
                             </tr>
                         <?php } ?>
                     </tbody>

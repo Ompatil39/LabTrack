@@ -42,6 +42,25 @@ $device_data = mysqli_fetch_assoc($device_result);
 // Enforce lab access for Incharge
 requireLabAccess($conn, (string)$device_data['lab_id']);
 
+// Phase 2: Check for Workstation assignment
+$workstation_data = null;
+$wsQuery = "SELECT w.workstation_id, w.seat_code, w.status as ws_status, w.hostname
+            FROM assets a
+            JOIN asset_assignments aa ON aa.asset_id = a.asset_id AND aa.removed_at IS NULL
+            JOIN workstations w ON w.workstation_id = aa.workstation_id
+            WHERE a.legacy_device_id = ? OR a.asset_tag = ?
+            LIMIT 1";
+$wsStmt = mysqli_prepare($conn, $wsQuery);
+if ($wsStmt) {
+    mysqli_stmt_bind_param($wsStmt, "ss", $device_id, $device_id);
+    mysqli_stmt_execute($wsStmt);
+    $wsRes = mysqli_stmt_get_result($wsStmt);
+    if ($wsRes && mysqli_num_rows($wsRes) > 0) {
+        $workstation_data = mysqli_fetch_assoc($wsRes);
+    }
+    mysqli_stmt_close($wsStmt);
+}
+
 // Get device type specific details
 $type_details = [];
 switch ($device_data['device_type']) {
@@ -252,6 +271,20 @@ if (!empty($detail_query)) {
                         <label class="detail-label">Status</label>
                         <div class="label-value"><?php echo htmlspecialchars($device_data['status']); ?></div>
                     </div>
+                    <?php if ($workstation_data): ?>
+                    <div style="grid-column: 1 / -1; margin-top: 0.75rem; padding: 0.85rem 1rem; background: #eef2ff; border-radius: 8px; border: 1px solid #c7d2fe; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: #4338ca;"><i class="fa-solid fa-desktop"></i> Workstation:</strong>
+                            <span style="font-weight: 600; margin-left: 0.25rem;">Seat <?php echo htmlspecialchars($workstation_data['seat_code']); ?></span>
+                            <?php if ($workstation_data['hostname']): ?>
+                                <span style="color: #6b7280; font-size: 0.85rem;">(<?php echo htmlspecialchars($workstation_data['hostname']); ?>)</span>
+                            <?php endif; ?>
+                        </div>
+                        <a href="workstation.php?id=<?php echo urlencode($workstation_data['workstation_id']); ?>" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; background: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 500;">
+                            View Workstation <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- QR Code Section -->

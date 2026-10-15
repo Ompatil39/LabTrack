@@ -289,38 +289,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // If no errors, insert data into database
-
     if (empty($errors)) {
+        // Phase 2: Link to asset_id and workstation_id if available
+        $assetId = null;
+        $workstationId = null;
+        if (!empty($formData['device_id'])) {
+            $matchedAsset = db_fetch_one($conn, "SELECT asset_id FROM assets WHERE legacy_device_id = ? OR asset_tag = ? LIMIT 1", "ss", [$formData['device_id'], $formData['device_id']]);
+            if ($matchedAsset) {
+                $assetId = (int)$matchedAsset['asset_id'];
+                $matchedWs = db_fetch_one($conn, "SELECT workstation_id FROM asset_assignments WHERE asset_id = ? AND removed_at IS NULL LIMIT 1", "i", [$assetId]);
+                if ($matchedWs) {
+                    $workstationId = (int)$matchedWs['workstation_id'];
+                }
+            }
+        }
 
-        $sql = "INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_id, device_category, stud_email, grievance_desc)
+        $hasAssetIdCol = (bool) db_fetch_one($conn, "SHOW COLUMNS FROM grievances LIKE 'asset_id'");
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-
-
-        $stmt = $conn->prepare($sql);
-
-        $stmt->bind_param(
-
-            "ssssssss",
-
-            $formData['submitted_by'],
-
-            $formData['stud_enrollment'],
-
-            $formData['class'],
-
-            $formData['lab_selection'],
-
-            $formData['device_id'],
-
-            $formData['device_category'],
-
-            $formData['stud_email'],
-
-            $formData['grievance_desc']
-
-        );
+        if ($hasAssetIdCol) {
+            $sql = "INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_id, device_category, stud_email, grievance_desc, asset_id, workstation_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(
+                "ssssssssii",
+                $formData['submitted_by'],
+                $formData['stud_enrollment'],
+                $formData['class'],
+                $formData['lab_selection'],
+                $formData['device_id'],
+                $formData['device_category'],
+                $formData['stud_email'],
+                $formData['grievance_desc'],
+                $assetId,
+                $workstationId
+            );
+        } else {
+            $sql = "INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_id, device_category, stud_email, grievance_desc)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(
+                "ssssssss",
+                $formData['submitted_by'],
+                $formData['stud_enrollment'],
+                $formData['class'],
+                $formData['lab_selection'],
+                $formData['device_id'],
+                $formData['device_category'],
+                $formData['stud_email'],
+                $formData['grievance_desc']
+            );
+        }
 
 
 

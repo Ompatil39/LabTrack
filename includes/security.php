@@ -120,6 +120,14 @@ if (!function_exists('inchargeDisplayName')) {
     }
 }
 
+if (!function_exists('currentUserUid')) {
+    function currentUserUid(): ?int
+    {
+        $uid = $_SESSION['uid'] ?? null;
+        return $uid !== null ? (int) $uid : null;
+    }
+}
+
 if (!function_exists('restrictLabSql')) {
     function restrictLabSql(string $labColumn = 'lab_id', string $labAlias = ''): array
     {
@@ -128,8 +136,26 @@ if (!function_exists('restrictLabSql')) {
         }
 
         $column = $labAlias !== '' ? $labAlias . '.' . $labColumn : $labColumn;
-        $sql = " {$column} IN (SELECT lab_id FROM labs WHERE lab_incharge = ? OR lab_incharge = ? OR lab_incharge = ?)";
+        $uid = currentUserUid();
 
+        if ($uid !== null) {
+            // Relational path: use lab_incharges table (Phase 2)
+            $sql = " {$column} IN (
+                SELECT li.lab_id FROM lab_incharges li WHERE li.uid = ?
+                UNION
+                SELECT l.lab_id FROM labs l WHERE l.incharge_uid = ?
+                UNION
+                SELECT l.lab_id FROM labs l WHERE l.lab_incharge = ? OR l.lab_incharge = ? OR l.lab_incharge = ?
+            )";
+            return [
+                'clause' => $sql,
+                'types' => 'iisss',
+                'params' => [$uid, $uid, inchargeDisplayName(), currentUsername(), (string) ($_SESSION['full_name'] ?? '')],
+            ];
+        }
+
+        // Legacy fallback: match by name string
+        $sql = " {$column} IN (SELECT lab_id FROM labs WHERE lab_incharge = ? OR lab_incharge = ? OR lab_incharge = ?)";
         return [
             'clause' => $sql,
             'types' => 'sss',
@@ -145,6 +171,31 @@ if (!function_exists('canAccessLab')) {
             return true;
         }
 
+        $uid = currentUserUid();
+        if ($uid !== null) {
+            // Relational path: lab_incharges or labs.incharge_uid (Phase 2)
+            $row = db_fetch_one(
+                $conn,
+                'SELECT 1 FROM lab_incharges WHERE lab_id = ? AND uid = ? LIMIT 1',
+                'si',
+                [$labId, $uid]
+            );
+            if ($row !== null) {
+                return true;
+            }
+            // Also check labs.incharge_uid
+            $row2 = db_fetch_one(
+                $conn,
+                'SELECT 1 FROM labs WHERE lab_id = ? AND incharge_uid = ? LIMIT 1',
+                'si',
+                [$labId, $uid]
+            );
+            if ($row2 !== null) {
+                return true;
+            }
+        }
+
+        // Legacy fallback: string match
         $username = currentUsername();
         $displayName = inchargeDisplayName();
         $fullName = (string) ($_SESSION['full_name'] ?? '');

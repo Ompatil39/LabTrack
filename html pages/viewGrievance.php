@@ -11,14 +11,50 @@ $grievance_id_formatted = '#GRV' . sprintf('%03d', $grievance_id);
 // Fetch grievance details from database
 $grievance = null;
 if ($grievance_id > 0) {
-    $grievance = db_fetch_one($conn, "SELECT g.*, l.lab_name, d.device_name 
-                                       FROM grievances g 
-                                       LEFT JOIN labs l ON g.lab_id = l.lab_id 
-                                       LEFT JOIN devices d ON g.device_id = d.device_id 
-                                       WHERE g.grievance_id = ?", "i", [$grievance_id]);
+    // Check if assets and workstations tables exist
+    $hasAssetsTable = (bool) db_fetch_one($conn, "SHOW TABLES LIKE 'assets'");
+    $hasWsTable = (bool) db_fetch_one($conn, "SHOW TABLES LIKE 'workstations'");
+
+    if ($hasAssetsTable && $hasWsTable) {
+        $grievance = db_fetch_one($conn, "
+            SELECT g.*, l.lab_name, d.device_name,
+                   a.asset_tag, a.asset_type, a.brand_model AS asset_brand_model,
+                   w.seat_code, w.workstation_id AS ws_id, w.hostname AS ws_hostname
+            FROM grievances g 
+            LEFT JOIN labs l ON g.lab_id = l.lab_id 
+            LEFT JOIN devices d ON g.device_id = d.device_id 
+            LEFT JOIN assets a ON (g.asset_id IS NOT NULL AND g.asset_id = a.asset_id)
+                               OR (g.asset_id IS NULL AND (a.legacy_device_id = g.device_id OR a.asset_tag = g.device_id))
+            LEFT JOIN workstations w ON (g.workstation_id IS NOT NULL AND g.workstation_id = w.workstation_id)
+            WHERE g.grievance_id = ? LIMIT 1", "i", [$grievance_id]);
+    } else {
+        $grievance = db_fetch_one($conn, "SELECT g.*, l.lab_name, d.device_name 
+                                           FROM grievances g 
+                                           LEFT JOIN labs l ON g.lab_id = l.lab_id 
+                                           LEFT JOIN devices d ON g.device_id = d.device_id 
+                                           WHERE g.grievance_id = ?", "i", [$grievance_id]);
+    }
+
     if (!$grievance) {
         header("Location: grievance.php");
         exit;
+    }
+
+    // If workstation wasn't linked directly on grievance, try resolving via active assignment
+    if (empty($grievance['ws_id']) && !empty($grievance['asset_id']) && $hasWsTable) {
+        $wsAssigned = db_fetch_one($conn, "
+            SELECT w.workstation_id AS ws_id, w.seat_code, w.hostname AS ws_hostname
+            FROM asset_assignments aa
+            JOIN workstations w ON aa.workstation_id = w.workstation_id
+            WHERE aa.asset_id = ? AND aa.removed_at IS NULL LIMIT 1",
+            "i",
+            [(int)$grievance['asset_id']]
+        );
+        if ($wsAssigned) {
+            $grievance['ws_id'] = $wsAssigned['ws_id'];
+            $grievance['seat_code'] = $wsAssigned['seat_code'];
+            $grievance['ws_hostname'] = $wsAssigned['ws_hostname'];
+        }
     }
 
     if (!canAccessLab($conn, (string)$grievance['lab_id'])) {
@@ -303,6 +339,27 @@ $grievance_id_formatted = $grievance_id;
                             <label class="detail-label">Device Category</label>
                             <div class="label-value"><?php echo htmlspecialchars($grievance['device_category']); ?></div>
                         </div>
+                        <?php if (!empty($grievance['asset_tag'])): ?>
+                        <div class="input-group">
+                            <label class="detail-label">Asset Tag</label>
+                            <div class="label-value">
+                                <span style="font-family: monospace; font-weight: 600; background: #eef2ff; color: #4338ca; padding: 2px 8px; border-radius: 4px;">
+                                    <?php echo htmlspecialchars((string)$grievance['asset_tag'], ENT_QUOTES, 'UTF-8'); ?>
+                                </span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        <?php if (!empty($grievance['ws_id'])): ?>
+                        <div class="input-group">
+                            <label class="detail-label">Workstation Seat</label>
+                            <div class="label-value">
+                                <a href="workstation.php?id=<?php echo urlencode((string)$grievance['ws_id']); ?>" style="display: inline-flex; align-items: center; gap: 0.35rem; color: #4f46e5; font-weight: 600; text-decoration: none;">
+                                    <i class="fa-solid fa-desktop"></i> Seat <?php echo htmlspecialchars((string)($grievance['seat_code'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem;"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         <div>
                             <label class="detail-label">Lab</label>
                             <div class="label-value"><?php echo htmlspecialchars($grievance['lab_id']); ?>
