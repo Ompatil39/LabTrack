@@ -1,9 +1,8 @@
 <?php
-session_start();
-if (isset($_SESSION["logged_in"]) !== true) {
-    header("Location: login.php");
-    exit;
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin(true);
+requireRole('Admin', true);
+enforceCsrfProtection(true);
 
 include 'db.php';
 

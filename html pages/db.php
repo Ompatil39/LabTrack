@@ -14,5 +14,7 @@ $conn = new mysqli(
 
 if ($conn->connect_error) {
     app_logger()->error('mysqli_connection_failed', ['error' => $conn->connect_error]);
-    die('Connection failed.');
+    http_response_code(500);
+    echo 'A database error occurred.';
+    exit;
 }

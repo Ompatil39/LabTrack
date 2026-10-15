@@ -1,14 +1,11 @@
 <?php
-session_start();
-if (!isset($_SESSION["logged_in"])) {
-    header("Location: login.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/security.php';
+requireLogin();
+requireRole('Admin');
+startCsrfOutputBuffer();
+enforceCsrfProtection();
 
 include 'db.php';
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 $lab_id = $_GET['id'] ?? '';
 if (empty($lab_id)) {

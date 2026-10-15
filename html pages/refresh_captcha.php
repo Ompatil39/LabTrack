@@ -1,18 +1,20 @@
 <?php
-// Start the session
-session_start();
+require_once __DIR__ . '/../includes/security.php';
+startSecureSession();
 
-// Generate a new CAPTCHA
-function generateCaptcha()
+function generateCaptcha(): string
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $captcha = '';
+    $maxIndex = strlen($characters) - 1;
+
     for ($i = 0; $i < 6; $i++) {
-        $captcha .= $characters[rand(0, strlen($characters) - 1)];
+        $captcha .= $characters[random_int(0, $maxIndex)];
     }
-    $_SESSION['captcha'] = $captcha;
+
     return $captcha;
 }
 
-// Generate and return the new CAPTCHA
-echo generateCaptcha();
+$_SESSION['captcha'] = generateCaptcha();
+
+echo $_SESSION['captcha'];
