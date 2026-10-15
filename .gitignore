@@ -1,4 +1,6 @@
+/vendor/
 .env
-
-send_mail.php
-grievance_mailer.php
+/logs/*.log
+!/logs/.gitkeep
+/uploads/*
+!/uploads/.gitkeep

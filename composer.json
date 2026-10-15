@@ -1,7 +1,23 @@
 {
+  "name": "ompatil39/labtrack",
+  "description": "LabTrack computer lab monitoring and management system",
+  "type": "project",
   "require": {
+    "php": ">=8.2",
     "phpmailer/phpmailer": "^6.9",
     "chillerlan/php-qrcode": "^5.0",
-    "tecnickcom/tcpdf": "^6.10"
+    "tecnickcom/tcpdf": "^6.10",
+    "vlucas/phpdotenv": "^5.6",
+    "firebase/php-jwt": "^7.2",
+    "monolog/monolog": "^3.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "LabTrack\\": [
+        "controllers/",
+        "models/",
+        "includes/"
+      ]
+    }
   }
 }

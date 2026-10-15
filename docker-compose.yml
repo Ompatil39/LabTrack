@@ -1,0 +1,54 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-labtrack}
+      MYSQL_USER: ${DB_USERNAME:-labtrack_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-labtrack_secret}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root_secret}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-labtrack}
+      DB_USERNAME: ${DB_USERNAME:-labtrack_user}
+      DB_PASSWORD: ${DB_PASSWORD:-labtrack_secret}
+      JWT_SECRET: ${JWT_SECRET:-replace_with_64_char_random_hex}
+      AGENT_INGEST_KEY: ${AGENT_INGEST_KEY:-dev_lab_agent_secret_key}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "php /var/www/html/bin/migrate.php &&
+             php /var/www/html/bin/seed.php &&
+             apache2-foreground"
+    ports:
+      - "8080:80"
+
+  lab-simulator:
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
+    environment:
+      SIMULATOR_API_URL: http://app/api/v1/telemetry.php
+      AGENT_INGEST_KEY: ${AGENT_INGEST_KEY:-dev_lab_agent_secret_key}
+      SIMULATOR_INTERVAL_SECONDS: 5
+    depends_on:
+      - app
+
+volumes:
+  db_data:
