@@ -31,22 +31,22 @@ $conn = new mysqli(
 );
 
 if ($conn->connect_error) {
-    fwrite(STDERR, "DB connect failed: " . $conn->connect_error . PHP_EOL);
+    fwrite(STDERR, 'DB connect failed: ' . $conn->connect_error . PHP_EOL);
     exit(1);
 }
 
 $conn->set_charset('utf8mb4');
 
-echo "=== LabTrack Legacy Device Migration ===" . PHP_EOL;
+echo '=== LabTrack Legacy Device Migration ===' . PHP_EOL;
 
 // ----------------------------------------------------------------
 // 1. Migrate devices => assets  (idempotent via legacy_device_id)
 // ----------------------------------------------------------------
-echo PHP_EOL . "Step 1: Migrating devices to assets..." . PHP_EOL;
+echo PHP_EOL . 'Step 1: Migrating devices to assets...' . PHP_EOL;
 
-$devices = $conn->query("SELECT * FROM devices ORDER BY created_at ASC");
+$devices = $conn->query('SELECT * FROM devices ORDER BY created_at ASC');
 if (!$devices) {
-    fwrite(STDERR, "Could not query devices: " . $conn->error . PHP_EOL);
+    fwrite(STDERR, 'Could not query devices: ' . $conn->error . PHP_EOL);
     exit(1);
 }
 
@@ -168,9 +168,17 @@ while ($dev = $devices->fetch_assoc()) {
     $qrPayload = $dev['qr_code'] ? substr($dev['qr_code'], 0, 255) : null;
     $stmt->bind_param(
         'sssssssssss',
-        $assetTag, $deviceType, $dev['lab_id'], $brandModel,
-        $serialNumber, $assetStatus, $specsJson, $qrPayload,
-        $deviceId, $dev['created_at'], $dev['updated_at']
+        $assetTag,
+        $deviceType,
+        $dev['lab_id'],
+        $brandModel,
+        $serialNumber,
+        $assetStatus,
+        $specsJson,
+        $qrPayload,
+        $deviceId,
+        $dev['created_at'],
+        $dev['updated_at']
     );
     $stmt->execute();
     $assetId = (int)$conn->insert_id;
@@ -188,12 +196,12 @@ while ($dev = $devices->fetch_assoc()) {
     echo "  Migrated {$deviceId} ({$deviceType}) => asset #{$assetId} tag:{$assetTag}" . PHP_EOL;
 }
 
-echo "  Done. " . count($deviceToAssetId) . " devices in assets table." . PHP_EOL;
+echo '  Done. ' . count($deviceToAssetId) . ' devices in assets table.' . PHP_EOL;
 
 // ----------------------------------------------------------------
 // 2. Group PCs and peripherals into workstations
 // ----------------------------------------------------------------
-echo PHP_EOL . "Step 2: Creating workstations from PC assets..." . PHP_EOL;
+echo PHP_EOL . 'Step 2: Creating workstations from PC assets...' . PHP_EOL;
 
 $assetToWorkstation = [];  // asset_id => workstation_id
 
@@ -230,7 +238,7 @@ if ($pcs) {
         // Create workstation
         $ws = $conn->prepare('INSERT INTO workstations (lab_id, seat_code, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE workstation_id = LAST_INSERT_ID(workstation_id)');
         if (!$ws) {
-            fwrite(STDERR, "  workstations prepare failed: " . $conn->error . PHP_EOL);
+            fwrite(STDERR, '  workstations prepare failed: ' . $conn->error . PHP_EOL);
             continue;
         }
         $wsStatus = 'Active';
@@ -252,11 +260,11 @@ if ($pcs) {
 // ----------------------------------------------------------------
 // 3. Build asset_assignments
 // ----------------------------------------------------------------
-echo PHP_EOL . "Step 3: Creating asset_assignments..." . PHP_EOL;
+echo PHP_EOL . 'Step 3: Creating asset_assignments...' . PHP_EOL;
 
 // Map device_ids to their lab_id and create_at for grouping
 $deviceMeta = [];
-$devResult = $conn->query("SELECT device_id, lab_id, device_type, created_at FROM devices ORDER BY created_at");
+$devResult = $conn->query('SELECT device_id, lab_id, device_type, created_at FROM devices ORDER BY created_at');
 while ($row = $devResult->fetch_assoc()) {
     $deviceMeta[$row['device_id']] = $row;
 }
@@ -313,7 +321,7 @@ function assignAssetToWorkstation(\mysqli $conn, int $assetId, int $workstationI
         'INSERT INTO asset_assignments (asset_id, workstation_id, parent_asset_id, installed_at) VALUES (?, ?, ?, ?)'
     );
     if (!$stmt) {
-        fwrite(STDERR, "  asset_assignments prepare failed: " . $conn->error . PHP_EOL);
+        fwrite(STDERR, '  asset_assignments prepare failed: ' . $conn->error . PHP_EOL);
         return;
     }
     $stmt->bind_param('iiis', $assetId, $workstationId, $parentAssetId, $installedAt);
@@ -321,14 +329,14 @@ function assignAssetToWorkstation(\mysqli $conn, int $assetId, int $workstationI
     $stmt->close();
 }
 
-echo "  Done." . PHP_EOL;
+echo '  Done.' . PHP_EOL;
 
 // ----------------------------------------------------------------
 // 4. Backfill lab_incharges and labs.incharge_uid
 // ----------------------------------------------------------------
-echo PHP_EOL . "Step 4: Backfilling lab_incharges from labs.lab_incharge..." . PHP_EOL;
+echo PHP_EOL . 'Step 4: Backfilling lab_incharges from labs.lab_incharge...' . PHP_EOL;
 
-$labs = $conn->query("SELECT lab_id, lab_incharge FROM labs");
+$labs = $conn->query('SELECT lab_id, lab_incharge FROM labs');
 while ($lab = $labs->fetch_assoc()) {
     $labId = $lab['lab_id'];
     $inchargeName = $lab['lab_incharge'];
@@ -358,9 +366,9 @@ while ($lab = $labs->fetch_assoc()) {
 // ----------------------------------------------------------------
 // 5. Backfill grievance.asset_id and grievance.workstation_id
 // ----------------------------------------------------------------
-echo PHP_EOL . "Step 5: Backfilling grievance.asset_id / workstation_id..." . PHP_EOL;
+echo PHP_EOL . 'Step 5: Backfilling grievance.asset_id / workstation_id...' . PHP_EOL;
 
-$grievances = $conn->query("SELECT grievance_id, device_id FROM grievances WHERE device_id IS NOT NULL AND (asset_id IS NULL OR workstation_id IS NULL)");
+$grievances = $conn->query('SELECT grievance_id, device_id FROM grievances WHERE device_id IS NOT NULL AND (asset_id IS NULL OR workstation_id IS NULL)');
 if ($grievances) {
     while ($g = $grievances->fetch_assoc()) {
         $deviceId = $g['device_id'];
@@ -391,4 +399,4 @@ if ($grievances) {
     }
 }
 
-echo PHP_EOL . "=== Legacy migration complete! ===" . PHP_EOL;
+echo PHP_EOL . '=== Legacy migration complete! ===' . PHP_EOL;

@@ -1,0 +1,912 @@
+openapi: 3.0.3
+info:
+  title: LabTrack API
+  description: |
+    REST and JSON API specification for LabTrack, the modern laboratory inventory,
+    workstation management, asset tracking, and grievance handling platform.
+  version: 3.0.0
+  contact:
+    name: LabTrack Engineering
+servers:
+  - url: /
+    description: Current Environment
+
+tags:
+  - name: Authentication
+    description: User authentication, session management, and CAPTCHA verification
+  - name: Assets API
+    description: JSON endpoints for asset search, filtering, and dynamic select controls
+  - name: Assets & Hardware
+    description: Physical hardware asset management, barcode/QR generation, and PDF reporting
+  - name: Labs
+    description: Laboratory spaces, capacity, and assigned incharges
+  - name: Workstations
+    description: Computer workstations, seat configurations, and device attachments
+  - name: Grievances
+    description: Fault reports, issue tracking, and resolution workflow
+  - name: Notifications
+    description: System notifications, maintenance alerts, and grievance updates
+  - name: Profile & Users
+    description: User profile management and Incharge administration
+  - name: Audit Logs
+    description: System-wide audit trail and security event logs
+  - name: Maintenance & Lifecycle
+    description: Equipment maintenance records, warranty alerts, straight-line depreciation, and asset disposal
+
+paths:
+  /auth/captcha:
+    get:
+      tags:
+        - Authentication
+      summary: Get or refresh arithmetic CAPTCHA
+      description: Generates a new arithmetic challenge (e.g. "8 + 5 = ?") stored in the session for brute-force prevention.
+      responses:
+        '200':
+          description: CAPTCHA challenge successfully generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptchaResponse'
+
+  /login:
+    get:
+      tags:
+        - Authentication
+      summary: Show login form
+      description: Renders the authentication interface with CSRF token and CAPTCHA challenge.
+      responses:
+        '200':
+          description: HTML login page
+          content:
+            text/html:
+              schema:
+                type: string
+        '302':
+          description: Redirects to /dashboard if user is already authenticated
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user credentials
+      description: Validates credentials, verifies CAPTCHA and CSRF token, enforces IP rate-limiting lockout, regenerates session ID, and establishes user session.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - csrf_token
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  format: password
+                  example: Password@123
+                captcha:
+                  type: string
+                  description: Answer to the arithmetic CAPTCHA challenge
+                  example: "13"
+                csrf_token:
+                  type: string
+                  description: Valid session CSRF token
+      responses:
+        '302':
+          description: Successful authentication. Redirects to /dashboard or /profile if password change is required.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: PHPSESSID=abc123xyz; Path=/; Secure; HttpOnly; SameSite=Strict
+        '401':
+          description: Authentication failed (invalid credentials or IP account locked)
+          content:
+            text/html:
+              schema:
+                type: string
+        '403':
+          description: Invalid or missing CSRF token
+        '422':
+          description: CAPTCHA verification failed
+
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: Log out current user
+      description: Destroys the active session and clears session cookies.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+              properties:
+                csrf_token:
+                  type: string
+      responses:
+        '302':
+          description: Session destroyed. Redirects to /login.
+        '403':
+          description: Invalid CSRF token
+
+  /api/assets:
+    get:
+      tags:
+        - Assets API
+      summary: Search and filter hardware assets
+      description: Returns a paginated JSON list of physical assets matching filter criteria with lab-scope enforcement.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: lab_id
+          in: query
+          description: Filter by Lab identifier (e.g., LAB-A)
+          required: false
+          schema:
+            type: string
+        - name: asset_type
+          in: query
+          description: Filter by hardware category
+          required: false
+          schema:
+            type: string
+            enum: [Monitor, Keyboard, Mouse, CPU, UPS, Other]
+        - name: status
+          in: query
+          description: Filter by operational status
+          required: false
+          schema:
+            type: string
+            enum: [Active, Inactive, Maintenance, Decommissioned]
+        - name: search
+          in: query
+          description: Substring search across asset_tag, brand_model, serial_number, and seat_code
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Current page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Paginated asset list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetSearchResponse'
+        '401':
+          description: Unauthenticated session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/assets/select:
+    get:
+      tags:
+        - Assets API
+      summary: Fetch active assets for dropdown select menus
+      description: Returns lightweight key-value asset pairs formatted for dynamic HTML select controls (e.g. workstation assignment).
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: lab_id
+          in: query
+          description: Restrict assets to a specific lab
+          required: false
+          schema:
+            type: string
+        - name: asset_type
+          in: query
+          description: Filter by asset type
+          required: false
+          schema:
+            type: string
+            enum: [Monitor, Keyboard, Mouse, CPU, UPS, Other]
+      responses:
+        '200':
+          description: List of selectable asset options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetSelectResponse'
+        '401':
+          description: Unauthenticated session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /assets/{tag}/qr:
+    get:
+      tags:
+        - Assets & Hardware
+      summary: Generate asset QR code image
+      description: Generates an SVG QR code encoding asset tag, type, and lab metadata.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: Unique asset tag (e.g., LAB-A-MON-001)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SVG image containing QR code
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        '404':
+          description: Asset tag not found
+
+  /assets/export-pdf:
+    get:
+      tags:
+        - Assets & Hardware
+      summary: Export asset inventory to PDF
+      description: Generates a formatted PDF report of assets matching lab and status filters using TCPDF.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: lab_id
+          in: query
+          required: false
+          description: Target lab identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Generated PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+    post:
+      tags:
+        - Assets & Hardware
+      summary: Export asset inventory to PDF via POST
+      description: Alternative export endpoint accepting form data.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lab_id:
+                  type: string
+                csrf_token:
+                  type: string
+      responses:
+        '200':
+          description: Generated PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: List notifications and alerts
+      description: Returns notifications for recent grievances, device issues, and system events for the current user's scope.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Notifications view
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /notifications/{id}/read:
+    post:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Marks a specific notification ID as read in the user session. Returns JSON when requested via AJAX or application/json.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Notification or grievance ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+              properties:
+                csrf_token:
+                  type: string
+      responses:
+        '200':
+          description: Notification marked as read (AJAX response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  marked:
+                    type: integer
+                    example: 101
+        '302':
+          description: Notification marked as read (Standard form submit redirects to /notifications)
+        '403':
+          description: Invalid CSRF token
+
+  /profile:
+    get:
+      tags:
+        - Profile & Users
+      summary: View current user profile
+      description: Displays user account information and password update form.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User profile view
+          content:
+            text/html:
+              schema:
+                type: string
+        '302':
+          description: Redirects to /login if unauthenticated
+    post:
+      tags:
+        - Profile & Users
+      summary: Update user profile and password
+      description: Updates email, full name, contact information, and changes password (clearing must_change_password flag).
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+                - full_name
+                - email
+              properties:
+                csrf_token:
+                  type: string
+                full_name:
+                  type: string
+                  example: Jane Doe
+                email:
+                  type: string
+                  format: email
+                  example: jane.doe@college.edu
+                current_password:
+                  type: string
+                  format: password
+                  description: Required if changing password
+                new_password:
+                  type: string
+                  format: password
+                  description: Must be at least 8 characters
+                confirm_password:
+                  type: string
+                  format: password
+      responses:
+        '302':
+          description: Profile updated. Redirects back to /profile with flash notification.
+        '403':
+          description: Invalid CSRF token
+        '422':
+          description: Validation error in profile data or password fields
+
+  /admin/users:
+    get:
+      tags:
+        - Profile & Users
+      summary: List all users and lab incharges
+      description: Administrator view for managing system users, roles, and lab assignments.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Incharge management view
+          content:
+            text/html:
+              schema:
+                type: string
+        '403':
+          description: Forbidden for non-Admin users
+    post:
+      tags:
+        - Profile & Users
+      summary: Register new Lab Incharge
+      description: Creates a new Incharge user account and assigns responsible laboratories.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+                - username
+                - full_name
+                - email
+                - password
+              properties:
+                csrf_token:
+                  type: string
+                username:
+                  type: string
+                  example: incharge_b
+                full_name:
+                  type: string
+                  example: Robert Smith
+                email:
+                  type: string
+                  format: email
+                  example: rsmith@college.edu
+                password:
+                  type: string
+                  format: password
+                labs:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of lab IDs assigned to this incharge
+                  example: ["LAB-A", "LAB-B"]
+      responses:
+        '302':
+          description: Incharge created. Redirects to /admin/users.
+        '403':
+          description: Forbidden or invalid CSRF token
+        '422':
+          description: Validation error
+
+  /admin/audit-logs:
+    get:
+      tags:
+        - Audit Logs
+      summary: Search and inspect audit trail
+      description: Returns immutable security and activity log records. Admin only.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: entity_type
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Audit log records
+        '403':
+          description: Forbidden - Admin role required
+
+  /tickets/track/{code}:
+    get:
+      tags:
+        - Grievances
+      summary: Public ticket status lookup
+      description: Publicly query ticket state, SLA target date, and non-internal comments using tracking code.
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+            example: TKT-2026-8F3A9C
+      responses:
+        '200':
+          description: Ticket details, SLA targets, and progress timeline
+        '404':
+          description: Ticket tracking code not found
+
+  /grievances/{id}/comments:
+    post:
+      tags:
+        - Grievances
+      summary: Add comment or internal note to ticket
+      description: Appends a student update or staff-only internal remark to the ticket history.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - body
+              properties:
+                body:
+                  type: string
+                is_internal:
+                  type: integer
+                  enum: [0, 1]
+      responses:
+        '200':
+          description: Comment added (JSON format)
+        '302':
+          description: Comment added (redirects to ticket view)
+
+  /maintenance:
+    get:
+      tags:
+        - Maintenance & Lifecycle
+      summary: List maintenance records
+      description: View equipment servicing history, repair costs, and preventive schedules.
+      responses:
+        '200':
+          description: Maintenance records
+    post:
+      tags:
+        - Maintenance & Lifecycle
+      summary: Log maintenance activity
+      description: Log a completed repair or schedule preventive servicing for an asset.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - asset_id
+                - lab_id
+                - maintenance_type
+                - title
+                - started_at
+              properties:
+                asset_id:
+                  type: integer
+                lab_id:
+                  type: string
+                maintenance_type:
+                  type: string
+                  enum: [Repair, Preventive, Inspection, Upgrade]
+                title:
+                  type: string
+                cost:
+                  type: number
+                started_at:
+                  type: string
+                  format: date-time
+                completed_at:
+                  type: string
+                  format: date-time
+                next_scheduled_date:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Maintenance record created
+        '302':
+          description: Maintenance logged (redirects to /maintenance)
+
+  /maintenance/reports:
+    get:
+      tags:
+        - Maintenance & Lifecycle
+      summary: Warranty alerts and asset depreciation
+      description: Lists assets nearing warranty expiration (30/60/90 days) and computes current book values using straight-line depreciation.
+      responses:
+        '200':
+          description: Maintenance reports and depreciation table
+
+  /assets/{tag}/retire:
+    post:
+      tags:
+        - Assets & Hardware
+      summary: Retire / dispose asset
+      description: Atomically unassigns asset from workstation, marks status Retired, sets retired_at timestamp, and records audit trail.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Asset retired successfully (JSON)
+        '302':
+          description: Asset retired (redirects to asset view)
+
+  /a/{tag}:
+    get:
+      tags:
+        - Assets & Hardware
+      summary: Mobile PWA QR quick landing
+      description: Mobile-first responsive card displaying asset specifications and one-tap grievance reporting button.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+            example: MON-2026-0004
+      responses:
+        '200':
+          description: Mobile QR landing page or JSON metadata
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: PHP standard session cookie established upon login.
+
+  schemas:
+    ApiResponseEnvelope:
+      type: object
+      required:
+        - success
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-10-16T18:30:00Z'
+        data:
+          type: object
+          nullable: true
+        error:
+          type: object
+          nullable: true
+          properties:
+            message:
+              type: string
+              example: 'Resource not found'
+            details:
+              type: array
+              items:
+                type: string
+              nullable: true
+
+    ApiResponseError:
+      type: object
+      required:
+        - success
+        - timestamp
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-10-16T18:30:00Z'
+        data:
+          type: object
+          nullable: true
+          example: null
+        error:
+          type: object
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              example: 'Unauthorized: authentication required.'
+            details:
+              type: array
+              items:
+                type: string
+              nullable: true
+
+    CaptchaResponse:
+      type: object
+      required:
+        - success
+        - captcha
+      properties:
+        success:
+          type: boolean
+          example: true
+        captcha:
+          type: string
+          example: '7 + 6 = ?'
+
+    Asset:
+      type: object
+      required:
+        - asset_id
+        - asset_tag
+        - asset_type
+        - lab_id
+        - status
+      properties:
+        asset_id:
+          type: integer
+          example: 12
+        asset_tag:
+          type: string
+          example: 'LAB-A-MON-001'
+        asset_type:
+          type: string
+          enum: [Monitor, Keyboard, Mouse, CPU, UPS, Other]
+          example: 'Monitor'
+        lab_id:
+          type: string
+          example: 'LAB-A'
+        seat_code:
+          type: string
+          nullable: true
+          example: 'W-01'
+        status:
+          type: string
+          enum: [Active, Inactive, Maintenance, Decommissioned]
+          example: 'Active'
+        brand_model:
+          type: string
+          nullable: true
+          example: 'Dell P2419H 24" IPS'
+        serial_number:
+          type: string
+          nullable: true
+          example: 'CN-0F525M-74261-05E'
+        specifications:
+          type: string
+          nullable: true
+          example: '1080p 60Hz HDMI DP'
+        purchase_date:
+          type: string
+          format: date
+          nullable: true
+          example: '2024-01-15'
+        warranty_expiry:
+          type: string
+          format: date
+          nullable: true
+          example: '2027-01-15'
+        is_active:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-01-15 10:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-16 12:00:00'
+
+    AssetSearchResponse:
+      type: object
+      required:
+        - success
+        - data
+        - pagination
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        pagination:
+          type: object
+          required:
+            - total
+            - page
+            - per_page
+            - total_pages
+          properties:
+            total:
+              type: integer
+              example: 48
+            page:
+              type: integer
+              example: 1
+            per_page:
+              type: integer
+              example: 50
+            total_pages:
+              type: integer
+              example: 1
+
+    AssetSelectOption:
+      type: object
+      required:
+        - id
+        - tag
+        - label
+        - type
+      properties:
+        id:
+          type: integer
+          example: 12
+        tag:
+          type: string
+          example: 'LAB-A-MON-001'
+        label:
+          type: string
+          example: 'LAB-A-MON-001 — Dell P2419H (Seat: W-01)'
+        type:
+          type: string
+          example: 'Monitor'
+        seat_code:
+          type: string
+          nullable: true
+          example: 'W-01'
+
+    AssetSelectResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetSelectOption'

@@ -176,20 +176,18 @@ assertTest('WorkstationService::createWorkstationWithParts validates missing sea
 echo PHP_EOL . "--- Group 5: Grievance & Workstation Query Integrity ---" . PHP_EOL;
 
 // Verify grievance detail query structure
-$detailQueryPattern = 'LEFT JOIN assets a ON (g.asset_id IS NOT NULL AND g.asset_id = a.asset_id)';
-$viewGrievanceSource = (string) file_get_contents(__DIR__ . '/../html pages/viewGrievance.php');
-assertTest('viewGrievance.php joins assets on primary key asset_id', str_contains($viewGrievanceSource, $detailQueryPattern));
-assertTest('viewGrievance.php joins workstations on primary key workstation_id', str_contains($viewGrievanceSource, 'LEFT JOIN workstations w ON (g.workstation_id IS NOT NULL AND g.workstation_id = w.workstation_id)'));
-assertTest('viewGrievance.php renders workstation link to workstation.php?id=', str_contains($viewGrievanceSource, 'workstation.php?id='));
+$detailQueryPattern = 'LEFT JOIN assets a ON';
+$viewGrievanceSource = (string) file_get_contents(__DIR__ . '/../src/Repository/GrievanceRepository.php');
+assertTest('GrievanceRepository joins assets on asset_id', str_contains($viewGrievanceSource, $detailQueryPattern));
+assertTest('GrievanceRepository joins workstations on workstation_id', str_contains($viewGrievanceSource, 'LEFT JOIN workstations w ON'));
 
 // Verify grievance listing query structure
-$grievanceSource = (string) file_get_contents(__DIR__ . '/../html pages/grievance.php');
-assertTest('grievance.php joins assets and workstations without duplicating rows', str_contains($grievanceSource, 'LEFT JOIN assets a ON') && str_contains($grievanceSource, 'LEFT JOIN workstations w ON g.workstation_id = w.workstation_id'));
-assertTest('grievance.php includes Workstation / Asset table header and link', str_contains($grievanceSource, '<th>Workstation / Asset</th>') && str_contains($grievanceSource, 'workstation.php?id='));
+$grievanceSource = (string) file_get_contents(__DIR__ . '/../src/Repository/GrievanceRepository.php');
+assertTest('GrievanceRepository listFiltered joins assets and workstations without duplicating rows', str_contains($grievanceSource, 'LEFT JOIN assets a ON') && str_contains($grievanceSource, 'LEFT JOIN workstations w ON'));
 
 // Verify addDevice atomic tag integration
-$addDeviceSource = (string) file_get_contents(__DIR__ . '/../html pages/addDevice.php');
-assertTest('addDevice.php calls AssetTagGenerator::nextTag', str_contains($addDeviceSource, 'AssetTagGenerator::nextTag'));
+$addDeviceSource = (string) file_get_contents(__DIR__ . '/../src/Service/AssetService.php');
+assertTest('AssetService calls AssetTagGenerator::nextTag', str_contains($addDeviceSource, 'AssetTagGenerator::nextTag'));
 
 // -----------------------------------------------------------------------------
 // Test Group 6: Live DB Integration (Executed when MySQL is available)

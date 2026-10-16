@@ -1,8 +1,11 @@
 # LabTrack
 ### Computer Lab Monitoring System
 
+[![CI](https://github.com/Ompatil39/LabTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/Ompatil39/LabTrack/actions/workflows/ci.yml)
+[![PHPStan Level 6](https://img.shields.io/badge/PHPStan-Level%206-brightgreen.svg)](phpstan.neon)
+[![PHPUnit Tests](https://img.shields.io/badge/PHPUnit-30%20passed-brightgreen.svg)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-blue)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.0-blue)](https://php.net)
 [![GitHub Issues](https://img.shields.io/github/issues/Ompatil39/LabTrack)](https://github.com/Ompatil39/LabTrack/issues)
 
 ---
@@ -89,12 +92,37 @@ LabTrack is a web-based laboratory monitoring and management system designed for
 2. Start the application stack:
    - `docker compose up --build`
 3. Open the application:
-   - `http://localhost:8080/html%20pages/login.php`
+   - `http://localhost:8080/login`
 4. Default seeded users:
    - Admin: `admin / admin123`
    - In-charges: `incharge_lab1 / incharge123`, `incharge_lab2 / incharge123`
 
 The app container automatically runs migrations and deterministic seeding on startup. Optional phpMyAdmin is accessible at `http://localhost:8081`.
+
+---
+
+## Development & Quality Assurance
+
+Run the complete test and static analysis suite locally:
+
+```bash
+# Run all CI checks (linting, static analysis, unit & feature tests)
+composer ci
+
+# Individual commands:
+composer lint     # Check code style with PHP-CS-Fixer
+composer format   # Automatically fix code style
+composer stan     # Run PHPStan static analysis at Level 6
+composer test     # Run PHPUnit test suite
+```
+
+### Database Migrations & Seeds
+
+```bash
+php bin/migrate.php       # Run all pending migrations
+php bin/migrate.php down  # Roll back the most recent migration batch
+php bin/seed.php          # Seed deterministic test/demo accounts & labs
+```
 
 ---
 

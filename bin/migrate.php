@@ -22,7 +22,7 @@ $deleteStatement = $pdo->prepare('DELETE FROM schema_migrations WHERE migration_
 if ($direction === 'up') {
     $migrationFiles = glob(__DIR__ . '/../database/migrations/*.sql') ?: [];
     // Exclude .down.sql files
-    $migrationFiles = array_filter($migrationFiles, fn($f) => !str_ends_with($f, '.down.sql'));
+    $migrationFiles = array_filter($migrationFiles, fn ($f) => !str_ends_with($f, '.down.sql'));
     sort($migrationFiles, SORT_NATURAL);
 
     foreach ($migrationFiles as $filePath) {
@@ -65,7 +65,7 @@ if ($direction === 'up') {
                 ? " NOTE: {$executedBeforeFailure} statement(s) executed before this failure; MySQL DDL is auto-committed and cannot be rolled back."
                 : '';
             echo sprintf(
-                "ERROR [file=%s direction=up stmt=%d]: %s.%s",
+                'ERROR [file=%s direction=up stmt=%d]: %s.%s',
                 $migrationName,
                 $stmtIndex,
                 $throwable->getMessage(),
@@ -90,13 +90,13 @@ if ($direction === 'up') {
     $downFile = __DIR__ . '/../database/migrations/' . preg_replace('/\.sql$/', '.down.sql', $last);
 
     if (!file_exists($downFile)) {
-        echo "No down migration found for {$last} (looked for: " . basename($downFile) . ")" . PHP_EOL;
+        echo "No down migration found for {$last} (looked for: " . basename($downFile) . ')' . PHP_EOL;
         exit(1);
     }
 
     $sql = file_get_contents($downFile);
     if ($sql === false) {
-        throw new RuntimeException("Unable to read down migration file: " . basename($downFile));
+        throw new RuntimeException('Unable to read down migration file: ' . basename($downFile));
     }
 
     $pdo->beginTransaction();
@@ -124,7 +124,7 @@ if ($direction === 'up') {
             ? " NOTE: {$executedBeforeFailure} statement(s) executed before this failure; MySQL DDL is auto-committed and cannot be rolled back."
             : '';
         echo sprintf(
-            "ERROR [file=%s direction=down stmt=%d]: %s.%s",
+            'ERROR [file=%s direction=down stmt=%d]: %s.%s',
             $last,
             $stmtIndex,
             $throwable->getMessage(),

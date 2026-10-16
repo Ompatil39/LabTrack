@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
-    header("Location: html pages/login.php");
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: html pages/login.php');
     exit;
 }
 
@@ -14,7 +14,7 @@ $updatedCount = 0;
 $totalDevices = 0;
 
 // Get total devices count
-$countQuery = "SELECT COUNT(*) as total FROM devices";
+$countQuery = 'SELECT COUNT(*) as total FROM devices';
 $countResult = $conn->query($countQuery);
 if ($countResult && $countResult->num_rows > 0) {
     $totalDevices = $countResult->fetch_assoc()['total'];
@@ -23,15 +23,15 @@ if ($countResult && $countResult->num_rows > 0) {
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_all_qr'])) {
     try {
-        $query = "SELECT device_id, device_name, lab_id, qr_code FROM devices ORDER BY device_id";
+        $query = 'SELECT device_id, device_name, lab_id, qr_code FROM devices ORDER BY device_id';
         $result = $conn->query($query);
 
         if ($result && $result->num_rows > 0) {
             while ($device = $result->fetch_assoc()) {
-                $device_id   = $device['device_id'];
+                $device_id = $device['device_id'];
                 $device_name = $device['device_name'];
-                $lab_id      = $device['lab_id'];
-                $current_qr  = $device['qr_code'];
+                $lab_id = $device['lab_id'];
+                $current_qr = $device['qr_code'];
 
                 // Update if empty or old Google QR
                 $needsUpdate = empty($current_qr) || strpos($current_qr, 'chart.googleapis.com') !== false;
@@ -39,9 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_all_qr'])) {
                 if ($needsUpdate) {
                     $new_qr_code = generateQRCode($device_id, $device_name, $lab_id);
 
-                    $updateQuery = "UPDATE devices SET qr_code = ? WHERE device_id = ?";
+                    $updateQuery = 'UPDATE devices SET qr_code = ? WHERE device_id = ?';
                     $updateStmt = $conn->prepare($updateQuery);
-                    $updateStmt->bind_param("ss", $new_qr_code, $device_id);
+                    $updateStmt->bind_param('ss', $new_qr_code, $device_id);
 
                     if ($updateStmt->execute()) {
                         $updatedCount++;
@@ -51,27 +51,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_all_qr'])) {
 
             if ($updatedCount > 0) {
                 $message = "Successfully updated QR codes for $updatedCount devices!";
-                $messageType = "success";
+                $messageType = 'success';
             } else {
-                $message = "All devices already have up-to-date QR codes.";
-                $messageType = "info";
+                $message = 'All devices already have up-to-date QR codes.';
+                $messageType = 'info';
             }
         } else {
-            $message = "No devices found in the database.";
-            $messageType = "info";
+            $message = 'No devices found in the database.';
+            $messageType = 'info';
         }
     } catch (Exception $e) {
-        $message = "Error updating QR codes: " . $e->getMessage();
-        $messageType = "error";
+        $message = 'Error updating QR codes: ' . $e->getMessage();
+        $messageType = 'error';
     }
 }
 
 // Get devices for display
 $devices = [];
-$displayQuery = "SELECT d.device_id, d.device_name, d.device_type, d.qr_code, l.lab_name 
+$displayQuery = 'SELECT d.device_id, d.device_name, d.device_type, d.qr_code, l.lab_name 
                  FROM devices d 
                  LEFT JOIN labs l ON d.lab_id = l.lab_id 
-                 ORDER BY d.device_id";
+                 ORDER BY d.device_id';
 $displayResult = $conn->query($displayQuery);
 if ($displayResult && $displayResult->num_rows > 0) {
     while ($row = $displayResult->fetch_assoc()) {
@@ -295,7 +295,7 @@ $conn->close();
                                                 echo 'No QR Code';
                                                 break;
                                         }
-                                        ?>
+                            ?>
                                     </span>
                                 </div>
                             </div>

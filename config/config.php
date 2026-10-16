@@ -75,3 +75,39 @@ if (!function_exists('db_pdo')) {
         return $pdo;
     }
 }
+
+if (!function_exists('db_mysqli')) {
+    function db_mysqli(): ?mysqli
+    {
+        static $conn = null;
+
+        if ($conn instanceof mysqli) {
+            return $conn;
+        }
+
+        $dbConfig = app_config()['db'];
+        try {
+            $conn = mysqli_init();
+            $conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 2);
+            $connected = @$conn->real_connect(
+                $dbConfig['host'],
+                $dbConfig['username'],
+                $dbConfig['password'],
+                $dbConfig['database'],
+                $dbConfig['port']
+            );
+
+            if (!$connected || $conn->connect_errno) {
+                $conn = null;
+                return null;
+            }
+
+            $conn->set_charset('utf8mb4');
+            return $conn;
+        } catch (\Throwable) {
+            $conn = null;
+            return null;
+        }
+    }
+}
+

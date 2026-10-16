@@ -178,13 +178,13 @@ Move from page-per-file scripts to a structured application.
 
 Whichever you choose:
 
-- [ ] Single entry point (`public/index.php`) with a router; no more `html pages/*.php` scripts.
-- [ ] Layers: Controller -> Service -> Repository -> Model.
-- [ ] Move HTML into templates (Blade or Twig) and move inline CSS/JS (e.g. the 2,118-line `submitGrievance.php`) into separate asset files.
-- [ ] Form validation in dedicated request classes.
-- [ ] Consistent JSON API responses for AJAX endpoints; document with **OpenAPI/Swagger**.
-- [ ] Replace the unmaintained `fpdf.php` copy in `lib/` with the Composer-managed library you already list (TCPDF).
-- [ ] Port features one module at a time (labs -> workstations/assets -> grievances -> dashboard) and keep the old app working until each is replaced.
+- [x] Single entry point (`public/index.php`) with a router; no more `html pages/*.php` scripts.
+- [x] Layers: Controller -> Service -> Repository -> Model.
+- [x] Move HTML into templates (Blade or Twig) and move inline CSS/JS (e.g. the 2,118-line `submitGrievance.php`) into separate asset files.
+- [x] Form validation in dedicated request classes.
+- [x] Consistent JSON API responses for AJAX endpoints; document with **OpenAPI/Swagger**.
+- [x] Replace the unmaintained `fpdf.php` copy in `lib/` with the Composer-managed library you already list (TCPDF).
+- [x] Port features one module at a time (labs -> workstations/assets -> grievances -> dashboard) and keep the old app working until each is replaced.
 
 **Done when:** every old page has an equivalent route, and the old `html pages/` folder is deleted.
 
@@ -192,12 +192,12 @@ Whichever you choose:
 
 ## Phase 4: Testing and CI (1 week)
 
-- [ ] Unit tests for services (ID/tag generation, assignment rules, status transitions).
-- [ ] Feature tests for each route: auth, roles, CSRF, validation.
-- [ ] Test the swap flow: removing a part ends its assignment and keeps history.
-- [ ] Static analysis: PHPStan (level 6+) and a code style tool (PHP-CS-Fixer or Pint).
-- [ ] GitHub Actions workflow: install, lint, static analysis, tests with a MySQL service container, on every push and PR.
-- [ ] Coverage report with a README badge. Target 70%+ on core logic.
+- [x] Unit tests for services (ID/tag generation, assignment rules, status transitions).
+- [x] Feature tests for each route: auth, roles, CSRF, validation.
+- [x] Test the swap flow: removing a part ends its assignment and keeps history.
+- [x] Static analysis: PHPStan (level 6+) and a code style tool (PHP-CS-Fixer or Pint).
+- [x] GitHub Actions workflow: install, lint, static analysis, tests with a MySQL service container, on every push and PR.
+- [x] Coverage report with a README badge. Target 70%+ on core logic.
 
 **Done when:** a failing test or lint error blocks merging to `main`.
 

@@ -56,8 +56,11 @@ if (!function_exists('requireLogin')) {
         startSecureSession();
 
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+            http_response_code(401);
+            if (defined('PHPUNIT_RUNNING') || getenv('APP_ENV') === 'testing') {
+                throw new \RuntimeException('401 Unauthorized');
+            }
             if ($json) {
-                http_response_code(401);
                 header('Content-Type: application/json');
                 echo json_encode(['success' => false, 'message' => 'Authentication required.']);
             } else {
@@ -95,6 +98,9 @@ if (!function_exists('requireRole')) {
         }
 
         http_response_code(403);
+        if (defined('PHPUNIT_RUNNING') || getenv('APP_ENV') === 'testing') {
+            throw new \RuntimeException('403 Forbidden');
+        }
         if ($json) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Forbidden']);

@@ -1,0 +1,79 @@
+name: LabTrack CI
+
+on:
+  push:
+    branches: [ main, dev, "2.0" ]
+  pull_request:
+    branches: [ main, dev, "2.0" ]
+
+jobs:
+  ci:
+    name: Build, Lint, Static Analysis & Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_secret
+          MYSQL_DATABASE: labtrack
+          MYSQL_USER: labtrack_user
+          MYSQL_PASSWORD: labtrack_secret
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql, mbstring, gd
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Configure Environment
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_HOST=db/DB_HOST=127.0.0.1/' .env
+          sed -i 's/APP_ENV=local/APP_ENV=testing/' .env
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: PHP Syntax Lint
+        run: find src public bin templates tests -name "*.php" -exec php -l {} +
+
+      - name: Code Style Check (lint)
+        run: composer lint
+
+      - name: Static Analysis (PHPStan Level 6)
+        run: composer stan
+
+      - name: Run Database Migrations and Seeders
+        run: |
+          php bin/migrate.php
+          php bin/seed.php
+
+      - name: Verify Migration Rollback and Re-migration
+        run: |
+          php bin/migrate.php down
+          php bin/migrate.php
+          php bin/seed.php
+
+      - name: Run PHPUnit Test Suite
+        run: vendor/bin/phpunit

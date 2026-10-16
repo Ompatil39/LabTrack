@@ -32,25 +32,25 @@ $conn = new mysqli(
 );
 
 if ($conn->connect_error) {
-    fwrite(STDERR, "DB connect failed: " . $conn->connect_error . PHP_EOL);
+    fwrite(STDERR, 'DB connect failed: ' . $conn->connect_error . PHP_EOL);
     exit(1);
 }
 $conn->set_charset('utf8mb4');
 
 if ($reset) {
-    echo "Resetting tables..." . PHP_EOL;
+    echo 'Resetting tables...' . PHP_EOL;
     $conn->query('SET FOREIGN_KEY_CHECKS = 0');
-    foreach (['asset_assignments','asset_tag_sequences','assets','workstations','lab_incharges','grievances','devices','pc_details','monitors','keyboards','mice','cpus','printers','labs','users'] as $t) {
+    foreach (['audit_logs','ticket_comments','ticket_status_history','notification_jobs','maintenance_records','sla_policies','asset_assignments','asset_tag_sequences','assets','workstations','lab_incharges','grievances','devices','pc_details','monitors','keyboards','mice','cpus','printers','labs','users'] as $t) {
         $conn->query("DELETE FROM `{$t}`");
     }
     $conn->query('SET FOREIGN_KEY_CHECKS = 1');
-    echo "Reset complete." . PHP_EOL;
+    echo 'Reset complete.' . PHP_EOL;
 }
 
 // ----------------------------------------------------------------
 // Users
 // ----------------------------------------------------------------
-echo "Seeding users..." . PHP_EOL;
+echo 'Seeding users...' . PHP_EOL;
 
 $users = [
     ['user_id' => 'USR-001', 'username' => 'admin',        'full_name' => 'Admin User',        'email' => 'admin@labtrack.local',      'user_type' => 'Admin'],
@@ -70,11 +70,11 @@ foreach ($users as $u) {
     $stmt->execute();
     $stmt->close();
 }
-echo "  Seeded " . count($users) . " users." . PHP_EOL;
+echo '  Seeded ' . count($users) . ' users.' . PHP_EOL;
 
 // Fetch user UIDs (auto-increment surrogate key added in Phase 2 migration)
 $uidMap = []; // user_id => uid
-$uidResult = $conn->query("SELECT user_id, uid FROM users");
+$uidResult = $conn->query('SELECT user_id, uid FROM users');
 while ($row = $uidResult->fetch_assoc()) {
     if ($row['uid'] !== null) {
         $uidMap[$row['user_id']] = (int)$row['uid'];
@@ -84,7 +84,7 @@ while ($row = $uidResult->fetch_assoc()) {
 // ----------------------------------------------------------------
 // Labs
 // ----------------------------------------------------------------
-echo "Seeding labs..." . PHP_EOL;
+echo 'Seeding labs...' . PHP_EOL;
 
 $labs = [
     ['lab_id' => 'LAB-101', 'lab_name' => 'Computer Science Lab A', 'department' => 'Computer Science', 'lab_incharge' => 'prof_sharma',  'room_number' => '101', 'building' => 'Block A', 'room_capacity' => 30, 'establishment_date' => '2020-06-01'],
@@ -102,12 +102,12 @@ foreach ($labs as $l) {
     $stmt->execute();
     $stmt->close();
 }
-echo "  Seeded " . count($labs) . " labs." . PHP_EOL;
+echo '  Seeded ' . count($labs) . ' labs.' . PHP_EOL;
 
 // ----------------------------------------------------------------
 // lab_incharges backfill from labs.lab_incharge
 // ----------------------------------------------------------------
-echo "Seeding lab_incharges..." . PHP_EOL;
+echo 'Seeding lab_incharges...' . PHP_EOL;
 
 $labInchargeMap = [
     'LAB-101' => 'USR-002',
@@ -128,7 +128,7 @@ foreach ($labInchargeMap as $labId => $userId) {
 // ----------------------------------------------------------------
 // Workstations + Assets (Phase 2 flow via WorkstationService)
 // ----------------------------------------------------------------
-echo "Seeding workstations and assets..." . PHP_EOL;
+echo 'Seeding workstations and assets...' . PHP_EOL;
 
 $labWorkstationCount = ['LAB-101' => 10, 'LAB-102' => 10, 'LAB-201' => 10];
 
@@ -154,14 +154,14 @@ foreach ($labWorkstationCount as $labId => $count) {
             continue;
         }
 
-        $ramOptions  = ['4GB DDR4', '8GB DDR4', '16GB DDR4'];
-        $hddOptions  = ['256GB SSD', '512GB SSD', '1TB HDD', '256GB SSD + 1TB HDD'];
-        $cpuOptions  = ['Intel Core i3-10100', 'Intel Core i5-10400', 'Intel Core i7-10700', 'AMD Ryzen 5 3600'];
-        $osOptions   = ['Windows 10 Pro', 'Ubuntu 22.04 LTS', 'Windows 11 Pro'];
+        $ramOptions = ['4GB DDR4', '8GB DDR4', '16GB DDR4'];
+        $hddOptions = ['256GB SSD', '512GB SSD', '1TB HDD', '256GB SSD + 1TB HDD'];
+        $cpuOptions = ['Intel Core i3-10100', 'Intel Core i5-10400', 'Intel Core i7-10700', 'AMD Ryzen 5 3600'];
+        $osOptions = ['Windows 10 Pro', 'Ubuntu 22.04 LTS', 'Windows 11 Pro'];
         $resolutions = ['1920x1080', '2560x1440', '1366x768'];
-        $kbTypes     = ['Wired', 'Mechanical', 'Membrane'];
-        $mouseTypes  = ['Wired', 'Wireless'];
-        $psuOptions  = ['450W', '550W', '650W', '750W'];
+        $kbTypes = ['Wired', 'Mechanical', 'Membrane'];
+        $mouseTypes = ['Wired', 'Wireless'];
+        $psuOptions = ['450W', '550W', '650W', '750W'];
 
         $cpuModel = $cpuOptions[array_rand($cpuOptions)];
         $ram = $ramOptions[array_rand($ramOptions)];
@@ -170,50 +170,50 @@ foreach ($labWorkstationCount as $labId => $count) {
 
         try {
             $result = WorkstationService::createWorkstationWithParts($conn, [
-                'lab_id'    => $labId,
+                'lab_id' => $labId,
                 'seat_code' => $seatCode,
-                'hostname'  => "ws-{$prefix}-" . str_pad((string)$i, 2, '0', STR_PAD_LEFT),
-                'status'    => 'Active',
+                'hostname' => "ws-{$prefix}-" . str_pad((string)$i, 2, '0', STR_PAD_LEFT),
+                'status' => 'Active',
             ], [
                 [
-                    'asset_type'  => 'PC',
+                    'asset_type' => 'PC',
                     'brand_model' => 'Dell OptiPlex 3080',
-                    'status'      => 'Active',
-                    'specs'       => [
-                        'processor'        => $cpuModel,
-                        'ram'              => $ram,
-                        'storage'          => $storage,
+                    'status' => 'Active',
+                    'specs' => [
+                        'processor' => $cpuModel,
+                        'ram' => $ram,
+                        'storage' => $storage,
                         'operating_system' => $osOptions[array_rand($osOptions)],
-                        'ethernet_mac'     => sprintf('AA:BB:CC:%02X:%02X:%02X', random_int(0,255), random_int(0,255), random_int(0,255)),
-                        'ip_address'       => '192.168.' . random_int(1,5) . '.' . random_int(10, 250),
+                        'ethernet_mac' => sprintf('AA:BB:CC:%02X:%02X:%02X', random_int(0, 255), random_int(0, 255), random_int(0, 255)),
+                        'ip_address' => '192.168.' . random_int(1, 5) . '.' . random_int(10, 250),
                     ],
                 ],
                 [
-                    'asset_type'  => 'Monitor',
+                    'asset_type' => 'Monitor',
                     'brand_model' => 'LG 22MK600M',
-                    'status'      => 'Active',
-                    'specs'       => ['resolution' => $resolution, 'panel_type' => 'IPS'],
+                    'status' => 'Active',
+                    'specs' => ['resolution' => $resolution, 'panel_type' => 'IPS'],
                 ],
                 [
-                    'asset_type'  => 'Keyboard',
+                    'asset_type' => 'Keyboard',
                     'brand_model' => 'Logitech K120',
-                    'status'      => 'Active',
-                    'specs'       => ['keyboard_type' => $kbTypes[array_rand($kbTypes)], 'layout' => 'QWERTY'],
+                    'status' => 'Active',
+                    'specs' => ['keyboard_type' => $kbTypes[array_rand($kbTypes)], 'layout' => 'QWERTY'],
                 ],
                 [
-                    'asset_type'  => 'Mouse',
+                    'asset_type' => 'Mouse',
                     'brand_model' => 'Logitech M100',
-                    'status'      => 'Active',
-                    'specs'       => ['mouse_type' => $mouseTypes[array_rand($mouseTypes)], 'dpi' => '1000'],
+                    'status' => 'Active',
+                    'specs' => ['mouse_type' => $mouseTypes[array_rand($mouseTypes)], 'dpi' => '1000'],
                 ],
                 [
-                    'asset_type'  => 'CPU',
+                    'asset_type' => 'CPU',
                     'brand_model' => 'Dell OptiPlex Tower',
-                    'status'      => 'Active',
-                    'specs'       => ['processor' => $cpuModel, 'power_supply' => $psuOptions[array_rand($psuOptions)]],
+                    'status' => 'Active',
+                    'specs' => ['processor' => $cpuModel, 'power_supply' => $psuOptions[array_rand($psuOptions)]],
                 ],
             ]);
-            echo "  Created {$labId}/{$seatCode} workstation#{$result['workstation_id']} with " . count($result['assets']) . " assets" . PHP_EOL;
+            echo "  Created {$labId}/{$seatCode} workstation#{$result['workstation_id']} with " . count($result['assets']) . ' assets' . PHP_EOL;
         } catch (\Throwable $e) {
             echo "  ERROR creating {$labId}/{$seatCode}: " . $e->getMessage() . PHP_EOL;
         }
@@ -226,9 +226,9 @@ foreach ($labWorkstationCount as $labId => $count) {
         try {
             $pTag = AssetTagGenerator::nextTag($conn, 'Printer');
             $specsJson = json_encode([
-                'printer_type'      => $pd['printer_type'],
-                'color_capability'  => $pd['color_capability'],
-                'connectivity'      => $pd['connectivity'],
+                'printer_type' => $pd['printer_type'],
+                'color_capability' => $pd['color_capability'],
+                'connectivity' => $pd['connectivity'],
             ]);
             $pStatus = 'Active';
             $stmt = $conn->prepare('INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, status, specs) VALUES (?, "Printer", ?, ?, ?, ?)');
@@ -245,7 +245,7 @@ foreach ($labWorkstationCount as $labId => $count) {
 // ----------------------------------------------------------------
 // Historical Part Swaps (for demo data)
 // ----------------------------------------------------------------
-echo "Seeding historical part swaps..." . PHP_EOL;
+echo 'Seeding historical part swaps...' . PHP_EOL;
 
 // Find 2 mouse assets from LAB-101 — close one assignment, insert a swap
 $mouseAssets = $conn->query(
@@ -264,28 +264,28 @@ if (count($mouseRows) >= 2) {
     try {
         $spareTag = AssetTagGenerator::nextTag($conn, 'Mouse');
         $spareStatus = 'Active';
-        $spareSpecs  = json_encode(['mouse_type' => 'Wired', 'dpi' => '1200']);
+        $spareSpecs = json_encode(['mouse_type' => 'Wired', 'dpi' => '1200']);
         $conn->query("INSERT INTO assets (asset_tag, asset_type, lab_id, brand_model, status, specs) VALUES ('{$spareTag}', 'Mouse', 'LAB-101', 'HP HID Mouse (Spare)', 'Inactive', '{$spareSpecs}')");
         $spareAssetId = (int)$conn->insert_id;
 
         // Now swap
-        $oldAssetId     = (int)$mouseRows[0]['asset_id'];
-        $workstationId  = (int)$mouseRows[0]['workstation_id'];
+        $oldAssetId = (int)$mouseRows[0]['asset_id'];
+        $workstationId = (int)$mouseRows[0]['workstation_id'];
         WorkstationService::swapWorkstationPart($conn, $workstationId, $oldAssetId, $spareAssetId, 'Left click button failed — replaced with spare', 'Faulty');
         echo "  Historical swap: Mouse#{$oldAssetId} at workstation#{$workstationId} replaced by spare#{$spareAssetId}" . PHP_EOL;
     } catch (\Throwable $e) {
-        echo "  Swap demo error: " . $e->getMessage() . PHP_EOL;
+        echo '  Swap demo error: ' . $e->getMessage() . PHP_EOL;
     }
 }
 
 // ----------------------------------------------------------------
 // Grievances linked to assets and workstations
 // ----------------------------------------------------------------
-echo "Seeding grievances..." . PHP_EOL;
+echo 'Seeding grievances...' . PHP_EOL;
 
 $firstWs = $conn->query("SELECT workstation_id, lab_id FROM workstations WHERE lab_id = 'LAB-101' LIMIT 1")->fetch_assoc();
 if ($firstWs) {
-    $wsId  = (int)$firstWs['workstation_id'];
+    $wsId = (int)$firstWs['workstation_id'];
     $labId = $firstWs['lab_id'];
 
     // Get a mouse asset at this workstation
@@ -297,20 +297,21 @@ if ($firstWs) {
     $assetId = $mouseAtWs && $mouseAtWs->num_rows > 0 ? (int)$mouseAtWs->fetch_assoc()['asset_id'] : null;
 
     $stmt = $conn->prepare(
-        'INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_category, device_name, submission_date, status, stud_email, grievance_desc, asset_id, workstation_id)
-         VALUES (?, ?, ?, ?, ?, ?, NOW(), "Submitted", ?, ?, ?, ?)'
+        'INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_category, device_name, submission_date, status, stud_email, grievance_desc, asset_id, workstation_id, tracking_code, priority, sla_response_due_at, sla_resolve_due_at, assigned_to_uid)
+         VALUES (?, ?, ?, ?, ?, ?, NOW(), "Submitted", ?, ?, ?, ?, "TKT-2026-M100AA", "Medium", DATE_ADD(NOW(), INTERVAL 8 HOUR), DATE_ADD(NOW(), INTERVAL 48 HOUR), 2)'
     );
-    $submitter   = 'John Doe';
-    $enrollment  = 'EN2024001';
-    $class       = 'CS-3A';
-    $category    = 'Mouse';
-    $deviceName  = 'Logitech M100';
-    $email       = 'john.doe@student.local';
-    $desc        = 'The mouse scroll wheel is not working properly at Seat A-01. Scrolling is erratic and skips pages.';
+    $submitter = 'John Doe';
+    $enrollment = 'EN2024001';
+    $class = 'CS-3A';
+    $category = 'Mouse';
+    $deviceName = 'Logitech M100';
+    $email = 'john.doe@student.local';
+    $desc = 'The mouse scroll wheel is not working properly at Seat A-01. Scrolling is erratic and skips pages.';
     $stmt->bind_param('sssssssssii', $submitter, $enrollment, $class, $labId, $category, $deviceName, $email, $desc, $assetId, $wsId);
     $stmt->execute();
+    $grvId1 = $conn->insert_id;
     $stmt->close();
-    echo "  Grievance #1 seeded for workstation#{$wsId} / asset#{$assetId}" . PHP_EOL;
+    echo "  Grievance #{$grvId1} seeded (TKT-2026-M100AA) for workstation#{$wsId} / asset#{$assetId}" . PHP_EOL;
 
     // Second grievance — PC issue
     $pcAtWs = $conn->query(
@@ -321,20 +322,71 @@ if ($firstWs) {
     $pcAssetId = $pcAtWs && $pcAtWs->num_rows > 0 ? (int)$pcAtWs->fetch_assoc()['asset_id'] : null;
 
     $stmt2 = $conn->prepare(
-        'INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_category, device_name, submission_date, status, stud_email, grievance_desc, asset_id, workstation_id)
-         VALUES (?, ?, ?, ?, ?, ?, NOW(), "In Progress", ?, ?, ?, ?)'
+        'INSERT INTO grievances (submitted_by, stud_enrollment, class, lab_id, device_category, device_name, submission_date, status, stud_email, grievance_desc, asset_id, workstation_id, tracking_code, priority, sla_response_due_at, sla_resolve_due_at, assigned_to_uid)
+         VALUES (?, ?, ?, ?, ?, ?, NOW(), "In Progress", ?, ?, ?, ?, "TKT-2026-OPT308", "High", DATE_ADD(NOW(), INTERVAL 4 HOUR), DATE_ADD(NOW(), INTERVAL 24 HOUR), 2)'
     );
-    $submitter2  = 'Jane Smith';
+    $submitter2 = 'Jane Smith';
     $enrollment2 = 'EN2024002';
-    $class2      = 'CS-3B';
-    $category2   = 'PC';
+    $class2 = 'CS-3B';
+    $category2 = 'PC';
     $deviceName2 = 'Dell OptiPlex 3080';
-    $email2      = 'jane.smith@student.local';
-    $desc2       = 'PC at Seat A-01 freezes after 20 minutes of use. Blue screen error observed twice this week.';
+    $email2 = 'jane.smith@student.local';
+    $desc2 = 'PC at Seat A-01 freezes after 20 minutes of use. Blue screen error observed twice this week.';
     $stmt2->bind_param('sssssssssii', $submitter2, $enrollment2, $class2, $labId, $category2, $deviceName2, $email2, $desc2, $pcAssetId, $wsId);
     $stmt2->execute();
+    $grvId2 = $conn->insert_id;
     $stmt2->close();
-    echo "  Grievance #2 seeded for workstation#{$wsId} / PC asset#{$pcAssetId}" . PHP_EOL;
+    echo "  Grievance #{$grvId2} seeded (TKT-2026-OPT308) for workstation#{$wsId} / PC asset#{$pcAssetId}" . PHP_EOL;
+
+    // Seed comments & status history
+    $conn->query("INSERT INTO ticket_comments (grievance_id, author_uid, author_name, is_internal, body) VALUES
+        ({$grvId2}, 2, 'Lab Incharge', 0, 'Inspected hardware diagnostics. Running memory stress test.'),
+        ({$grvId2}, 2, 'Lab Incharge', 1, 'Internal note: thermal paste may need replacement.')");
+    $conn->query("INSERT INTO ticket_status_history (grievance_id, old_status, new_status, changed_by_uid, note) VALUES
+        ({$grvId2}, 'Submitted', 'In Progress', 2, 'Diagnosing intermittent freeze issue')");
 }
 
-echo PHP_EOL . "=== Phase 2 Seed complete! ===" . PHP_EOL;
+// ----------------------------------------------------------------
+// 8. SLA Policies (Phase 5.2)
+// ----------------------------------------------------------------
+echo 'Seeding SLA Policies...' . PHP_EOL;
+$conn->query("INSERT IGNORE INTO sla_policies (priority, response_hours, resolve_hours) VALUES
+    ('Critical', 1, 4),
+    ('High', 4, 24),
+    ('Medium', 8, 48),
+    ('Low', 24, 120)");
+
+// ----------------------------------------------------------------
+// 9. Update Assets with Financials & Warranties (Phase 5.3)
+// ----------------------------------------------------------------
+echo 'Updating Assets with warranty dates and purchase costs...' . PHP_EOL;
+$conn->query("UPDATE assets SET purchase_cost = 650.00, salvage_value = 50.00, useful_life_years = 5, purchase_date = DATE_SUB(CURDATE(), INTERVAL 1 YEAR), warranty_expiry = DATE_ADD(CURDATE(), INTERVAL 25 DAY) WHERE asset_type = 'PC'");
+$conn->query("UPDATE assets SET purchase_cost = 180.00, salvage_value = 20.00, useful_life_years = 4, purchase_date = DATE_SUB(CURDATE(), INTERVAL 2 YEAR), warranty_expiry = DATE_ADD(CURDATE(), INTERVAL 180 DAY) WHERE asset_type = 'Monitor'");
+$conn->query("UPDATE assets SET purchase_cost = 25.00, salvage_value = 0.00, useful_life_years = 3, purchase_date = DATE_SUB(CURDATE(), INTERVAL 6 MONTH), warranty_expiry = DATE_ADD(CURDATE(), INTERVAL 45 DAY) WHERE asset_type IN ('Keyboard', 'Mouse')");
+
+// ----------------------------------------------------------------
+// 10. Maintenance Records (Phase 5.3)
+// ----------------------------------------------------------------
+echo 'Seeding Maintenance Records...' . PHP_EOL;
+$sampleAsset = $conn->query('SELECT asset_id, lab_id, workstation_id FROM assets a JOIN asset_assignments aa ON aa.asset_id = a.asset_id AND aa.removed_at IS NULL LIMIT 1');
+if ($sampleAsset && $sampleAsset->num_rows > 0) {
+    $row = $sampleAsset->fetch_assoc();
+    $aId = (int)$row['asset_id'];
+    $lId = $conn->real_escape_string((string)$row['lab_id']);
+    $wId = (int)$row['workstation_id'];
+
+    $conn->query("INSERT INTO maintenance_records (asset_id, workstation_id, lab_id, maintenance_type, title, description, vendor, cost, started_at, completed_at, downtime_hours, next_scheduled_date, performed_by_uid) VALUES
+        ({$aId}, {$wId}, '{$lId}', 'Repair', 'RAM Replacement', 'Replaced faulty 8GB DDR4 module due to repeated memory panics.', 'Dell Support Services', 45.00, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), 24.50, NULL, 1),
+        ({$aId}, {$wId}, '{$lId}', 'Preventive', 'Quarterly Dust & Thermal Inspection', 'Routine internal heatsink cleaning and cable routing.', 'Internal Lab Staff', 0.00, NOW(), NOW(), 0.50, DATE_ADD(CURDATE(), INTERVAL 90 DAY), 2)");
+}
+
+// ----------------------------------------------------------------
+// 11. Sample Audit Logs (Phase 5.1)
+// ----------------------------------------------------------------
+echo 'Seeding Sample Audit Logs...' . PHP_EOL;
+$conn->query("INSERT INTO audit_logs (user_uid, username, action, entity_type, entity_id, old_values, new_values, ip_address, user_agent) VALUES
+    (1, 'admin', 'LOGIN', 'user', '1', NULL, NULL, '127.0.0.1', 'CLI Seeder'),
+    (1, 'admin', 'CREATE', 'lab', 'LAB-A', NULL, '{\"lab_name\":\"Computer Science Lab A\"}', '127.0.0.1', 'CLI Seeder'),
+    (2, 'incharge_lab_a', 'STATUS_CHANGE', 'ticket', 'TKT-2026-OPT308', '{\"status\":\"Submitted\"}', '{\"status\":\"In Progress\"}', '127.0.0.1', 'CLI Seeder')");
+
+echo PHP_EOL . '=== Phase 5 Seed complete! ===' . PHP_EOL;
