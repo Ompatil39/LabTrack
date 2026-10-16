@@ -144,7 +144,35 @@ php bin/seed.php          # Seed deterministic test/demo accounts & labs
 - XSS protection through input sanitization
 - CSRF token validation
 - Session-based authentication
-- Role-based access control
+---
+
+## Phase 6: Monitoring Agent & Telemetry
+
+LabTrack includes a lightweight Python monitoring daemon (`agent/labtrack_agent.py`) for automated host metrics collection, live status monitoring, and hardware drift detection.
+
+### 1. Enrolling a Workstation Agent
+1. In the Web UI as an Administrator, navigate to **Workstations** &rarr; select the target seat.
+2. In the **Workstation Monitoring Agent** panel, click **Generate Enrollment Token** (valid for 24 hours, shown only once).
+3. On the client machine, run:
+   ```bash
+   python agent/labtrack_agent.py --enroll --server https://YOUR-SERVER --token <ENROLLMENT_TOKEN>
+   ```
+4. Start continuous telemetry collection:
+   ```bash
+   # Run once to test:
+   python agent/labtrack_agent.py --once --inventory
+
+   # Run as continuous daemon (heartbeat every 60s, inventory every 24h):
+   python agent/labtrack_agent.py
+   ```
+   On Windows, use `powershell -ExecutionPolicy Bypass -File agent/windows/install_service.ps1` to install as a startup task. On Linux, deploy `agent/systemd/labtrack-agent.service`.
+
+### 2. Telemetry Retention & Rollups Job
+To roll up completed hourly samples, purge raw telemetry samples older than 30 days, purge rollups older than 365 days, and prune expired nonces, run:
+```bash
+php bin/telemetry-retention.php
+```
+This script is idempotent and safe to schedule in cron (e.g. hourly or daily).
 
 ---
 

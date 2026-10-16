@@ -98,7 +98,7 @@ class WorkstationAndSwapTest extends TestCase
             ['asset_type' => 'Monitor', 'brand_model' => 'Dell P2419H'],
             ['asset_type' => 'Keyboard', 'brand_model' => 'Dell KB216'],
             ['asset_type' => 'Mouse', 'brand_model' => 'Dell MS116'],
-            ['asset_type' => 'UPS', 'brand_model' => 'APC Back-UPS 650'],
+            ['asset_type' => 'CPU', 'brand_model' => 'Intel Core i5-10500'],
         ];
 
         $created = WorkstationService::createWorkstationWithParts($conn, $wsData, $parts);

@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
+require_once dirname(__DIR__) . '/config/config.php';
 require_once dirname(__DIR__) . '/includes/security.php';
 
 use LabTrack\Controller\LabController;
 use LabTrack\Controller\WorkstationController;
+use LabTrack\Controller\AgentController;
 use LabTrack\Controller\AssetController;
 use LabTrack\Controller\AuditLogController;
 use LabTrack\Controller\AuthController;
@@ -41,6 +43,14 @@ $router->get('/workstations/{id}', [WorkstationController::class, 'show']);
 $router->get('/workstations/{id}/edit', [WorkstationController::class, 'edit']);
 $router->post('/workstations/{id}', [WorkstationController::class, 'update']);
 $router->post('/workstations/{id}/swap', [WorkstationController::class, 'swap']);
+
+// Phase 6 Agent & Telemetry routes
+$router->post('/workstations/{id}/enroll-token', [AgentController::class, 'createEnrollToken']);
+$router->post('/workstations/{id}/drift/{driftId}/resolve', [AgentController::class, 'resolveDrift']);
+$router->get('/api/workstations/{id}/telemetry', [AgentController::class, 'telemetry']);
+$router->post('/api/agent/enroll', [AgentController::class, 'enroll']);
+$router->post('/api/agent/heartbeat', [AgentController::class, 'heartbeat']);
+$router->post('/api/agent/inventory', [AgentController::class, 'inventory']);
 
 // Hardware & Assets Module routes
 $router->get('/inventory', [AssetController::class, 'index']);

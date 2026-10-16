@@ -45,6 +45,163 @@ $statusClass = match (strtolower(trim($status))) {
     </div>
 </div>
 
+<?php
+$hasDrift = (bool) ($workstation['has_hardware_drift'] ?? ($telemetry['has_hardware_drift'] ?? false));
+$driftAlerts = $openDriftAlerts ?? ($telemetry['drift_alerts'] ?? []);
+?>
+<!-- Prominent Drift Warning Banner -->
+<div id="telemetry-drift-banner" class="alert alert-warning" style="display: <?= $hasDrift ? 'block' : 'none' ?>; margin-bottom: 1.5rem; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 6px;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.25rem;">⚠️</span>
+        <strong style="color: #92400e; font-size: 1rem;">Hardware Drift Detected!</strong>
+    </div>
+    <p style="font-size: 0.875rem; color: #78350f; margin-bottom: 0.75rem;">
+        The workstation reported hardware specifications differing from registered asset inventory.
+    </p>
+    <div id="telemetry-drift-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <?php foreach ($driftAlerts as $alert): ?>
+            <?php
+            $fieldName = (string) $alert['field_name'];
+            $label = match ($fieldName) {
+                'ram_gb' => 'RAM',
+                'disk_gb' => 'Disk',
+                'cpu_model' => 'CPU Model',
+                'mac_address' => 'MAC Address',
+                default => ucfirst(str_replace('_', ' ', $fieldName)),
+            };
+            ?>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid #fef3c7;">
+                <span style="font-size: 0.875rem; color: #1e293b;">
+                    <strong><?= View::e($label) ?> drift detected:</strong> registered <?= View::e((string)$alert['expected_value']) ?>, reported <?= View::e((string)$alert['reported_value']) ?>
+                </span>
+                <form method="POST" action="/workstations/<?= $wsId ?>/drift/<?= (int)$alert['drift_id'] ?>/resolve" style="margin: 0; display: inline-flex; gap: 0.25rem;">
+                    <?= View::csrf() ?>
+                    <button type="submit" name="action" value="Acknowledged" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Acknowledge</button>
+                    <button type="submit" name="action" value="Resolved" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Resolve</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<?php
+$telStatus = (string) ($telemetry['status'] ?? 'Offline');
+$telBadgeClass = match (strtolower($telStatus)) {
+    'online' => 'status-active',
+    'stale' => 'status-in-repair',
+    default => 'status-inactive',
+};
+$lastSeen = $telemetry['last_seen_at'] ?? $workstation['last_seen_at'] ?? null;
+$loggedUser = $telemetry['logged_in_user'] ?? $workstation['logged_in_user'] ?? '—';
+$cpuPct = isset($telemetry['latest_cpu_pct']) ? (float)$telemetry['latest_cpu_pct'] : (isset($workstation['latest_cpu_pct']) ? (float)$workstation['latest_cpu_pct'] : 0.0);
+$ramPct = isset($telemetry['latest_ram_pct']) ? (float)$telemetry['latest_ram_pct'] : (isset($workstation['latest_ram_pct']) ? (float)$workstation['latest_ram_pct'] : 0.0);
+$diskPct = isset($telemetry['latest_disk_pct']) ? (float)$telemetry['latest_disk_pct'] : (isset($workstation['latest_disk_pct']) ? (float)$workstation['latest_disk_pct'] : 0.0);
+$temp = isset($telemetry['cpu_temp_c']) ? (float)$telemetry['cpu_temp_c'] : (isset($workstation['cpu_temp_c']) ? (float)$workstation['cpu_temp_c'] : null);
+$smartHealth = (string) ($telemetry['smart_health'] ?? $workstation['smart_health'] ?? 'UNKNOWN');
+$smartClass = match (strtoupper($smartHealth)) {
+    'HEALTHY' => 'status-active',
+    'WARNING' => 'status-in-repair',
+    'FAILING' => 'status-inactive',
+    default => 'status-inactive',
+};
+?>
+<!-- Live Host Telemetry Card -->
+<div class="card" id="telemetry-card" data-workstation-id="<?= $wsId ?>" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0;">Live Host Telemetry</h2>
+            <span id="telemetry-status-badge" class="status-badge <?= $telBadgeClass ?>"><?= View::e($telStatus) ?></span>
+        </div>
+        <div style="font-size: 0.85rem; color: #64748b;">
+            Last Seen: <span id="telemetry-last-seen" style="font-weight: 600; color: #334155;"><?= $lastSeen ? View::e((string)$lastSeen) : 'Never' ?></span>
+            &bull; User: <span id="telemetry-logged-user" style="font-weight: 600; color: #334155;"><?= View::e((string)$loggedUser) ?></span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <!-- CPU Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">CPU Usage</span>
+                <span id="telemetry-cpu-text" style="font-weight: 700; color: #0284c7;"><?= number_format($cpuPct, 1) ?>%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-cpu-bar" style="background: #0284c7; height: 100%; width: <?= min(100.0, max(0.0, $cpuPct)) ?>%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- RAM Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">RAM Usage</span>
+                <span id="telemetry-ram-text" style="font-weight: 700; color: #8b5cf6;"><?= number_format($ramPct, 1) ?>%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-ram-bar" style="background: #8b5cf6; height: 100%; width: <?= min(100.0, max(0.0, $ramPct)) ?>%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Disk Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">Disk Usage</span>
+                <span id="telemetry-disk-text" style="font-weight: 700; color: #10b981;"><?= number_format($diskPct, 1) ?>%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-disk-bar" style="background: #10b981; height: 100%; width: <?= min(100.0, max(0.0, $diskPct)) ?>%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Temperature & SMART -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align: center;">
+                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">CPU Temp</div>
+                <div id="telemetry-temp" style="font-size: 1.1rem; font-weight: 700; color: #334155; margin-top: 0.15rem;">
+                    <?= $temp !== null ? View::e(number_format($temp, 1) . '°C') : 'N/A' ?>
+                </div>
+            </div>
+            <div style="width: 1px; height: 32px; background: #cbd5e1;"></div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 0.25rem;">S.M.A.R.T.</div>
+                <span id="telemetry-smart-badge" class="status-badge <?= $smartClass ?>"><?= View::e($smartHealth) ?></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Agent Enrollment Panel -->
+<?php if ($isAdmin): ?>
+    <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px dashed #cbd5e1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 0.25rem 0;">Workstation Monitoring Agent</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Generate a one-time 24-hour token to link the Python background agent to this seat.</p>
+            </div>
+            <form method="POST" action="/workstations/<?= $wsId ?>/enroll-token">
+                <?= View::csrf() ?>
+                <button type="submit" class="btn btn-secondary" style="font-weight: 600;">
+                    Generate Enrollment Token
+                </button>
+            </form>
+        </div>
+        <?php if (!empty($flash['enroll_token'])): ?>
+            <div style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px;">
+                <p style="font-size: 0.875rem; font-weight: 700; color: #065f46; margin: 0 0 0.5rem 0;">
+                    Enrollment Token Generated (Expires in 24 hours — displayed only once):
+                </p>
+                <div style="margin-bottom: 0.5rem;">
+                    <label style="font-size: 0.75rem; color: #047857; font-weight: 600;">Plaintext Token:</label>
+                    <input type="text" readonly value="<?= View::e((string)$flash['enroll_token']) ?>" style="width: 100%; font-family: monospace; font-size: 0.85rem; padding: 0.35rem 0.5rem; border: 1px solid #6ee7b7; border-radius: 4px; background: #fff;" onclick="this.select()">
+                </div>
+                <div>
+                    <label style="font-size: 0.75rem; color: #047857; font-weight: 600;">Run command on workstation:</label>
+                    <input type="text" readonly value="<?= View::e((string)$flash['enroll_command']) ?>" style="width: 100%; font-family: monospace; font-size: 0.85rem; padding: 0.35rem 0.5rem; border: 1px solid #6ee7b7; border-radius: 4px; background: #fff;" onclick="this.select()">
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
 <!-- Current Installed Parts -->
 <div style="margin-bottom: 2rem;">
     <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;">Currently Installed Hardware</h2>
@@ -271,3 +428,5 @@ function filterSparesByType(selectedOldAssetId) {
     }
 }
 </script>
+
+<script src="/assets/js/telemetry.js"></script>

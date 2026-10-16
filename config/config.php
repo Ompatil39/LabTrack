@@ -29,6 +29,7 @@ if (!function_exists('app_config')) {
                 'env' => (string) config_env('APP_ENV', 'production'),
                 'debug' => filter_var(config_env('APP_DEBUG', false), FILTER_VALIDATE_BOOL),
                 'url' => (string) config_env('APP_URL', 'http://localhost'),
+                'key' => (string) config_env('APP_KEY', config_env('AGENT_SECRET_KEY', 'labtrack-32-byte-default-master-key!')),
             ],
             'db' => [
                 'host' => (string) config_env('DB_HOST', '127.0.0.1'),

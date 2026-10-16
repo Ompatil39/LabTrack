@@ -19,13 +19,20 @@ class Request
         ?array $post = null,
         ?array $server = null,
         ?array $cookies = null,
-        ?array $files = null
+        ?array $files = null,
+        ?string $rawBody = null
     ) {
         $this->get = $get ?? $_GET;
         $this->post = $post ?? $_POST;
         $this->server = $server ?? $_SERVER;
         $this->cookies = $cookies ?? $_COOKIE;
         $this->files = $files ?? $_FILES;
+        $this->rawBody = $rawBody;
+    }
+
+    public function setRawBody(string $rawBody): void
+    {
+        $this->rawBody = $rawBody;
     }
 
     public static function createFromGlobals(): self

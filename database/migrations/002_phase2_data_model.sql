@@ -3,7 +3,7 @@
 
 -- ============================================================
 -- 1. Fix users table: ensure integer user_id for FK support
---    (existing user_id is VARCHAR(20) PK; add int surrogate key)
+--    (existing user_id is VARCHAR(20) PK - add int surrogate key)
 -- ============================================================
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS uid INT NULL AUTO_INCREMENT UNIQUE;

@@ -1,0 +1,23 @@
+[Unit]
+Description=LabTrack Workstation Monitoring Agent
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=labtrack-agent
+Group=labtrack-agent
+WorkingDirectory=/opt/labtrack-agent
+ExecStart=/opt/labtrack-agent/venv/bin/python3 /opt/labtrack-agent/labtrack_agent.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+# Security Hardening
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

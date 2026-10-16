@@ -307,7 +307,7 @@ if ($firstWs) {
     $deviceName = 'Logitech M100';
     $email = 'john.doe@student.local';
     $desc = 'The mouse scroll wheel is not working properly at Seat A-01. Scrolling is erratic and skips pages.';
-    $stmt->bind_param('sssssssssii', $submitter, $enrollment, $class, $labId, $category, $deviceName, $email, $desc, $assetId, $wsId);
+    $stmt->bind_param('ssssssssii', $submitter, $enrollment, $class, $labId, $category, $deviceName, $email, $desc, $assetId, $wsId);
     $stmt->execute();
     $grvId1 = $conn->insert_id;
     $stmt->close();
@@ -332,7 +332,7 @@ if ($firstWs) {
     $deviceName2 = 'Dell OptiPlex 3080';
     $email2 = 'jane.smith@student.local';
     $desc2 = 'PC at Seat A-01 freezes after 20 minutes of use. Blue screen error observed twice this week.';
-    $stmt2->bind_param('sssssssssii', $submitter2, $enrollment2, $class2, $labId, $category2, $deviceName2, $email2, $desc2, $pcAssetId, $wsId);
+    $stmt2->bind_param('ssssssssii', $submitter2, $enrollment2, $class2, $labId, $category2, $deviceName2, $email2, $desc2, $pcAssetId, $wsId);
     $stmt2->execute();
     $grvId2 = $conn->insert_id;
     $stmt2->close();
@@ -389,4 +389,134 @@ $conn->query("INSERT INTO audit_logs (user_uid, username, action, entity_type, e
     (1, 'admin', 'CREATE', 'lab', 'LAB-A', NULL, '{\"lab_name\":\"Computer Science Lab A\"}', '127.0.0.1', 'CLI Seeder'),
     (2, 'incharge_lab_a', 'STATUS_CHANGE', 'ticket', 'TKT-2026-OPT308', '{\"status\":\"Submitted\"}', '{\"status\":\"In Progress\"}', '127.0.0.1', 'CLI Seeder')");
 
-echo PHP_EOL . '=== Phase 5 Seed complete! ===' . PHP_EOL;
+// ----------------------------------------------------------------
+// 12. Agent Telemetry, Credentials & Hardware Drift (Phase 6)
+// ----------------------------------------------------------------
+echo 'Seeding Agent Telemetry, Credentials & Hardware Drift...' . PHP_EOL;
+
+$workstationsQuery = $conn->query('SELECT workstation_id FROM workstations ORDER BY workstation_id ASC LIMIT 3');
+$seededWsIds = [];
+if ($workstationsQuery) {
+    while ($row = $workstationsQuery->fetch_assoc()) {
+        $seededWsIds[] = (int) $row['workstation_id'];
+    }
+}
+
+if (!empty($seededWsIds)) {
+    // Clean old phase 6 seed rows
+    $wsInList = implode(',', $seededWsIds);
+    $conn->query("DELETE FROM hardware_drift_alerts WHERE workstation_id IN ({$wsInList})");
+    $conn->query("DELETE FROM workstation_inventory_snapshots WHERE workstation_id IN ({$wsInList})");
+    $conn->query("DELETE FROM telemetry_samples WHERE workstation_id IN ({$wsInList})");
+    $conn->query("DELETE FROM agent_credentials WHERE workstation_id IN ({$wsInList})");
+
+    $appKey = (string) (
+        ($_ENV['AGENT_SECRET_KEY'] ?? null)
+        ?: ($_ENV['APP_KEY'] ?? null)
+        ?: 'secret-key-for-labtrack-telemetry-dev-32b'
+    );
+
+    foreach ($seededWsIds as $idx => $wsId) {
+        $apiKeyId = \LabTrack\Security\AgentSecurity::generateUuidV4();
+        $plainSecret = bin2hex(random_bytes(32));
+        $encryptedSecret = \LabTrack\Security\AgentSecurity::encrypt($plainSecret, $appKey);
+
+        $ip = '192.168.1.' . (100 + $wsId);
+        $mac = sprintf('00:1A:2B:3C:4D:%02X', $wsId);
+        $hostname = 'WS-LAB-A-' . sprintf('%02d', $wsId);
+
+        // 1. Credentials
+        $stmtCred = $conn->prepare("INSERT INTO agent_credentials
+            (workstation_id, api_key_id, signing_secret_encrypted, agent_version, enrolled_at, last_seen_at, last_ip, is_revoked)
+            VALUES (?, ?, ?, '1.0.0', DATE_SUB(NOW(), INTERVAL 2 DAY), NOW(), ?, 0)");
+        $stmtCred->bind_param('isss', $wsId, $apiKeyId, $encryptedSecret, $ip);
+        $stmtCred->execute();
+        $stmtCred->close();
+
+        // 2. Workstation Live Columns
+        $cpuPct = 22.5 + ($idx * 8.0);
+        $ramPct = 48.0 + ($idx * 6.5);
+        $diskPct = 62.0 - ($idx * 4.0);
+        $temp = 42.0 + ($idx * 3.5);
+        $hasDrift = ($idx < 2) ? 1 : 0;
+
+        $stmtWs = $conn->prepare("UPDATE workstations SET
+            mac_address = ?,
+            ip_address = ?,
+            os_info = 'Ubuntu 22.04 LTS (x86_64)',
+            last_seen_at = NOW(),
+            logged_in_user = 'student_lab',
+            uptime_seconds = 7200,
+            latest_cpu_pct = ?,
+            latest_ram_pct = ?,
+            latest_disk_pct = ?,
+            cpu_temp_c = ?,
+            smart_health = 'HEALTHY',
+            has_hardware_drift = ?
+            WHERE workstation_id = ?");
+        $stmtWs->bind_param('ssddddii', $mac, $ip, $cpuPct, $ramPct, $diskPct, $temp, $hasDrift, $wsId);
+        $stmtWs->execute();
+        $stmtWs->close();
+
+        // 3. Telemetry Samples (2 hours of samples: every 5 minutes = 24 samples)
+        for ($m = 120; $m >= 0; $m -= 5) {
+            $sampleCpu = min(95.0, max(5.0, $cpuPct + (sin($m) * 7.0)));
+            $sampleRam = min(95.0, max(20.0, $ramPct + (cos($m) * 4.0)));
+            $sampleDisk = $diskPct;
+            $sampleTemp = $temp + (sin($m) * 2.0);
+
+            $stmtSample = $conn->prepare("INSERT INTO telemetry_samples
+                (workstation_id, sampled_at, cpu_pct, ram_pct, disk_pct, cpu_temp_c, uptime_seconds, logged_in_user, smart_health)
+                VALUES (?, DATE_SUB(NOW(), INTERVAL ? MINUTE), ?, ?, ?, ?, 7200, 'student_lab', 'HEALTHY')");
+            $stmtSample->bind_param('iidddd', $wsId, $m, $sampleCpu, $sampleRam, $sampleDisk, $sampleTemp);
+            $stmtSample->execute();
+            $stmtSample->close();
+        }
+
+        // 4. Inventory Snapshots
+        $hw = [
+            'ram_bytes' => ($idx === 0) ? (8 * 1024 * 1024 * 1024) : (16 * 1024 * 1024 * 1024),
+            'disk_bytes' => ($idx === 1) ? (256 * 1024 * 1024 * 1024) : (512 * 1024 * 1024 * 1024),
+            'cpu_model' => 'Intel Core i7-10700 @ 2.90GHz',
+            'mac_address' => $mac,
+        ];
+        $sw = [
+            ['name' => 'Ubuntu Base', 'version' => '22.04.3'],
+            ['name' => 'Python', 'version' => '3.10.12'],
+            ['name' => 'Google Chrome', 'version' => '120.0.6099'],
+            ['name' => 'VS Code', 'version' => '1.85.1'],
+        ];
+
+        $hwJson = json_encode($hw);
+        $swJson = json_encode($sw);
+        $stmtSnap = $conn->prepare('INSERT INTO workstation_inventory_snapshots
+            (workstation_id, reported_hardware, installed_software, updated_at)
+            VALUES (?, ?, ?, NOW())');
+        $stmtSnap->bind_param('iss', $wsId, $hwJson, $swJson);
+        $stmtSnap->execute();
+        $stmtSnap->close();
+    }
+
+    // Ensure registered PC asset specs exist for drift comparison
+    $conn->query("UPDATE assets a
+                  JOIN asset_assignments aa ON aa.asset_id = a.asset_id AND aa.removed_at IS NULL
+                  SET a.specs = '{\"ram_gb\": 16, \"disk_gb\": 512, \"cpu_model\": \"Intel Core i7-10700 @ 2.90GHz\"}'
+                  WHERE aa.workstation_id IN ({$wsInList}) AND a.asset_type = 'PC'");
+
+    // 5. Open Hardware Drift Alerts (At least 2 Open alerts)
+    // Alert 1: Workstation 1 reported 8 GB RAM vs 16 GB registered
+    $conn->query("INSERT INTO hardware_drift_alerts
+        (workstation_id, field_name, expected_value, reported_value, status, detected_at)
+        VALUES ({$seededWsIds[0]}, 'ram_gb', '16 GB', '8 GB', 'Open', DATE_SUB(NOW(), INTERVAL 1 HOUR))");
+
+    // Alert 2: Workstation 2 reported 256 GB Disk vs 512 GB registered
+    if (isset($seededWsIds[1])) {
+        $conn->query("INSERT INTO hardware_drift_alerts
+            (workstation_id, field_name, expected_value, reported_value, status, detected_at)
+            VALUES ({$seededWsIds[1]}, 'disk_gb', '512 GB', '256 GB', 'Open', DATE_SUB(NOW(), INTERVAL 45 MINUTE))");
+    }
+
+    echo '  Seeded credentials, telemetry time series, inventory snapshots & 2 Open drift alerts.' . PHP_EOL;
+}
+
+echo PHP_EOL . '=== Phase 6 Seed complete! ===' . PHP_EOL;

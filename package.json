@@ -1,0 +1,12 @@
+{
+  "name": "labtrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LabTrack Workstation Monitoring Telemetry and Dashboard",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

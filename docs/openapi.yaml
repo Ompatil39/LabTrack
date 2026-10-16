@@ -32,6 +32,8 @@ tags:
     description: System-wide audit trail and security event logs
   - name: Maintenance & Lifecycle
     description: Equipment maintenance records, warranty alerts, straight-line depreciation, and asset disposal
+  - name: Agent & Telemetry
+    description: Host telemetry ingestion, agent enrollment, hardware drift tracking, and HMAC authentication
 
 paths:
   /auth/captcha:
@@ -686,9 +688,173 @@ paths:
           schema:
             type: string
             example: MON-2026-0004
+  /workstations/{id}/enroll-token:
+    post:
+      tags:
+        - Agent & Telemetry
+      summary: Generate workstation agent enrollment token
+      description: Admin-only endpoint. Generates a one-time 24-hour token returned once.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+              properties:
+                csrf_token:
+                  type: string
       responses:
         '200':
-          description: Mobile QR landing page or JSON metadata
+          description: Enrollment token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentEnrollTokenResponse'
+        '403':
+          description: Forbidden (Admin role required)
+
+  /api/agent/enroll:
+    post:
+      tags:
+        - Agent & Telemetry
+      summary: Agent enrollment and credentials generation
+      description: Atomically consumes the enrollment token and issues an API key ID and signing secret. Rate limited to 10 per minute per IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentEnrollRequest'
+      responses:
+        '200':
+          description: Enrollment successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentEnrollResponse'
+        '401':
+          description: Invalid or expired enrollment token
+        '429':
+          description: Enrollment rate limit exceeded
+
+  /api/agent/heartbeat:
+    post:
+      tags:
+        - Agent & Telemetry
+      summary: Ingest workstation telemetry heartbeat
+      description: Ingests CPU, RAM, disk, temperature, uptime, and SMART metrics. Authenticated via HMAC-SHA256 with nonce and timestamp replay protection.
+      security:
+        - AgentHmacAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentHeartbeatRequest'
+      responses:
+        '200':
+          description: Heartbeat recorded
+        '401':
+          description: Authentication failed (bad signature, nonce replay, or stale timestamp)
+        '422':
+          description: Invalid metrics payload
+        '429':
+          description: Telemetry rate limit exceeded (max 12 samples per minute)
+
+  /api/agent/inventory:
+    post:
+      tags:
+        - Agent & Telemetry
+      summary: Ingest workstation hardware and software inventory
+      description: Stores inventory snapshot and evaluates hardware drift against assigned PC/CPU specifications.
+      security:
+        - AgentHmacAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentInventoryRequest'
+      responses:
+        '200':
+          description: Inventory recorded and drift checked
+        '401':
+          description: Authentication failed
+
+  /api/workstations/{id}/telemetry:
+    get:
+      tags:
+        - Agent & Telemetry
+      summary: Get workstation live telemetry and drift status
+      description: Returns online/stale/offline status, latest hardware telemetry, rolling 60-minute samples, and open drift alerts.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Live workstation telemetry data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkstationTelemetryResponse'
+        '403':
+          description: Forbidden - Not assigned to this laboratory
+
+  /workstations/{id}/drift/{driftId}/resolve:
+    post:
+      tags:
+        - Agent & Telemetry
+      summary: Acknowledge or resolve hardware drift alert
+      description: Admin or assigned lab incharge resolves or acknowledges a hardware mismatch alert.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: driftId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - csrf_token
+              properties:
+                csrf_token:
+                  type: string
+                action:
+                  type: string
+                  enum: [Acknowledged, Resolved]
+                  default: Resolved
+      responses:
+        '200':
+          description: Drift alert updated
+        '302':
+          description: Redirect to workstation view
+        '403':
+          description: Access denied
 
 components:
   securitySchemes:
@@ -697,6 +863,15 @@ components:
       in: cookie
       name: PHPSESSID
       description: PHP standard session cookie established upon login.
+    AgentHmacAuth:
+      type: apiKey
+      in: header
+      name: X-Agent-Signature
+      description: |
+        HMAC-SHA256 signature calculated over:
+        METHOD + "\n" + PATH + "\n" + TIMESTAMP + "\n" + NONCE + "\n" + hex(sha256(raw_body))
+        using the workstation's decrypted signing secret.
+        Requires headers: X-Agent-Key-Id, X-Agent-Timestamp, X-Agent-Nonce, X-Agent-Signature.
 
   schemas:
     ApiResponseEnvelope:
@@ -910,3 +1085,202 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssetSelectOption'
+
+    AgentEnrollTokenResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - token
+            - expires_at
+            - workstation_id
+            - enroll_command
+          properties:
+            token:
+              type: string
+              example: 'd41d8cd98f00b204e9800998ecf8427e...'
+            expires_at:
+              type: string
+              format: date-time
+            workstation_id:
+              type: integer
+              example: 4
+            enroll_command:
+              type: string
+              example: 'python agent/labtrack_agent.py --enroll --server https://labtrack.local --token ...'
+
+    AgentEnrollRequest:
+      type: object
+      required:
+        - token
+        - hostname
+      properties:
+        token:
+          type: string
+        hostname:
+          type: string
+          example: 'LAB-A-WS01'
+        mac_address:
+          type: string
+          example: '00:1A:2B:3C:4D:5E'
+        ip_address:
+          type: string
+          example: '192.168.1.101'
+        agent_version:
+          type: string
+          example: '1.0.0'
+
+    AgentEnrollResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - api_key_id
+            - signing_secret
+            - workstation_id
+          properties:
+            api_key_id:
+              type: string
+              format: uuid
+            signing_secret:
+              type: string
+            workstation_id:
+              type: integer
+
+    AgentHeartbeatRequest:
+      type: object
+      required:
+        - cpu_pct
+        - ram_pct
+        - disk_pct
+      properties:
+        cpu_pct:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 24.5
+        ram_pct:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 58.2
+        disk_pct:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 71.0
+        cpu_temp_c:
+          type: number
+          nullable: true
+          example: 48.5
+        uptime_seconds:
+          type: integer
+          minimum: 0
+          example: 86400
+        logged_in_user:
+          type: string
+          nullable: true
+          example: 'student01'
+        smart_health:
+          type: string
+          enum: [HEALTHY, WARNING, FAILING, UNKNOWN]
+          example: 'HEALTHY'
+
+    AgentInventoryRequest:
+      type: object
+      required:
+        - reported_hardware
+        - installed_software
+      properties:
+        reported_hardware:
+          type: object
+          properties:
+            ram_bytes:
+              type: integer
+            disk_bytes:
+              type: integer
+            cpu_model:
+              type: string
+            mac_address:
+              type: string
+        installed_software:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              version:
+                type: string
+
+    WorkstationTelemetryResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - workstation_id
+            - status
+            - has_hardware_drift
+            - samples
+            - drift_alerts
+          properties:
+            workstation_id:
+              type: integer
+            seat_code:
+              type: string
+            status:
+              type: string
+              enum: [Online, Stale, Offline]
+            last_seen_at:
+              type: string
+              format: date-time
+              nullable: true
+            logged_in_user:
+              type: string
+              nullable: true
+            latest_cpu_pct:
+              type: number
+              nullable: true
+            latest_ram_pct:
+              type: number
+              nullable: true
+            latest_disk_pct:
+              type: number
+              nullable: true
+            cpu_temp_c:
+              type: number
+              nullable: true
+            smart_health:
+              type: string
+            has_hardware_drift:
+              type: boolean
+            samples:
+              type: array
+              items:
+                type: object
+            drift_alerts:
+              type: array
+              items:
+                type: object
+

@@ -43,8 +43,9 @@ if ($direction === 'up') {
 
         try {
             // Execute each statement separately (PDO doesn't support multi-statement by default)
+            $cleanSql = (string) preg_replace('/--.*$/m', '', $sql);
             $stmtIndex = 0;
-            foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
+            foreach (array_filter(array_map('trim', explode(';', $cleanSql))) as $statement) {
                 if ($statement !== '') {
                     $stmtIndex++;
                     $pdo->exec($statement . ';');
@@ -102,8 +103,9 @@ if ($direction === 'up') {
     $pdo->beginTransaction();
 
     try {
+        $cleanSql = (string) preg_replace('/--.*$/m', '', $sql);
         $stmtIndex = 0;
-        foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
+        foreach (array_filter(array_map('trim', explode(';', $cleanSql))) as $statement) {
             if ($statement !== '') {
                 $stmtIndex++;
                 $pdo->exec($statement . ';');

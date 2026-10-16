@@ -55,6 +55,16 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build TypeScript Assets
+        run: |
+          npm ci
+          npm run build
+
       - name: PHP Syntax Lint
         run: find src public bin templates tests -name "*.php" -exec php -l {} +
 

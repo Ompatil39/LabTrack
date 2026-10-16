@@ -16,13 +16,21 @@ class WorkstationController
 {
     private WorkstationAppService $wsService;
     private LabRepository $labRepository;
+    private \LabTrack\Service\TelemetryService $telemetryService;
 
     public function __construct(
         ?WorkstationAppService $wsService = null,
-        ?LabRepository $labRepository = null
+        ?LabRepository $labRepository = null,
+        mixed $legacyOrTelemetry = null,
+        ?\LabTrack\Service\TelemetryService $telemetryService = null
     ) {
         $this->wsService = $wsService ?? new WorkstationAppService();
         $this->labRepository = $labRepository ?? new LabRepository();
+        if ($legacyOrTelemetry instanceof \LabTrack\Service\TelemetryService) {
+            $this->telemetryService = $legacyOrTelemetry;
+        } else {
+            $this->telemetryService = $telemetryService ?? new \LabTrack\Service\TelemetryService();
+        }
     }
 
     public function index(Request $request, ?string $lab = null): Response
@@ -86,6 +94,15 @@ class WorkstationController
             return new Response('404 Not Found: Workstation not found.', 404, ['Content-Type' => 'text/plain; charset=UTF-8']);
         }
 
+        $telemetry = null;
+        try {
+            $telemetry = $this->telemetryService->getWorkstationTelemetry($wsId);
+        } catch (\Throwable $e) {
+            // Optional telemetry fetch
+        }
+
+        $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost:8000');
+
         $html = View::render('workstations/show', [
             'title' => 'Workstation ' . ($data['workstation']['seat_code'] ?? "#{$wsId}"),
             'workstation' => $data['workstation'],
@@ -94,6 +111,9 @@ class WorkstationController
             'grievances' => $data['grievances'] ?? [],
             'availableSpares' => $data['available_spares'] ?? [],
             'isAdmin' => $isAdmin,
+            'telemetry' => $telemetry,
+            'openDriftAlerts' => $telemetry['drift_alerts'] ?? [],
+            'serverUrl' => $serverUrl,
             'flash' => $this->getAndClearFlash(),
         ]);
 

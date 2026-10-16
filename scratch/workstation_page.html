@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workstation A-01 - LabTrack</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="/public/css/style.css" onerror="this.onerror=null;this.href='../public/css/style.css';">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.875rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+        .nav-brand { font-size: 1.25rem; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .nav-links { display: flex; gap: 1.25rem; align-items: center; }
+        .nav-link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.35rem 0.65rem; border-radius: 6px; transition: all 0.15s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); background: #eff6ff; }
+        .nav-user { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
+        .role-badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        .role-admin { background: #dbeafe; color: #1e40af; }
+        .role-incharge { background: #dcfce7; color: #166534; }
+        .btn-logout { background: transparent; border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--muted); }
+        .btn-logout:hover { background: #fee2e2; border-color: #fca5a5; color: var(--danger); }
+        .main-container { flex: 1; max-width: 1200px; width: 100%; margin: 1.5rem auto; padding: 0 1.25rem; }
+        .flash-alert { padding: 0.875rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 500; }
+        .flash-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .flash-error, .flash-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .btn { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; font-size: 0.9rem; text-decoration: none; cursor: pointer; border: none; transition: background 0.15s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .table { width: 100%; border-collapse: collapse; text-align: left; }
+        .table th { background: #f8fafc; padding: 0.75rem 1rem; font-size: 0.8rem; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+        .table td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .status-active { background: #ecfdf5; color: #047857; }
+        .status-inactive { background: #f1f5f9; color: #64748b; }
+        .status-in-repair { background: #fffbeb; color: #b45309; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.35rem; color: #334155; }
+        .form-control { width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        .form-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; }
+        footer { border-top: 1px solid var(--border); padding: 1.25rem; text-align: center; color: var(--muted); font-size: 0.85rem; background: var(--surface); }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/labs" class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            LabTrack
+        </a>
+                <nav class="nav-links">
+            <a href="/labs" class="nav-link ">Labs</a>
+            <a href="/workstations" class="nav-link active">Workstations</a>
+            <a href="/inventory" class="nav-link ">Inventory</a>
+            <a href="/grievances" class="nav-link" onerror="this.href='html%20pages/grievance.php'">Grievances</a>
+                            <a href="/admin/users" class="nav-link" onerror="this.href='html%20pages/inchargeManage.php'">Staff</a>
+                    </nav>
+        <div class="nav-user">
+                            <span>admin</span>
+                <span class="role-badge role-admin">Admin</span>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="f5f2c6dccd453379ebbfe215e8d23533d87a8a527b34e884e3ee5accec5cd247">                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+                    </div>
+    </header>
+
+    <main class="main-container">
+        
+        
+<div style="margin-bottom: 1.5rem;">
+    <a href="/workstations?lab_id=LAB-101" style="color: var(--muted); text-decoration: none; font-size: 0.875rem;">
+        &larr; Back to Workstations (LAB-101)
+    </a>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 0.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <h1 style="font-size: 1.85rem; font-weight: 700; color: #0f172a;">Seat: A-01</h1>
+                <span class="status-badge status-active">Active</span>
+            </div>
+            <p style="color: var(--muted); font-size: 0.95rem; margin-top: 0.25rem;">
+                Lab: <a href="/labs/LAB-101" style="color: var(--primary); text-decoration: none; font-weight: 600;">LAB-101</a>
+                                    &bull; Hostname: <span style="font-family: monospace; color: #334155; font-weight: 600;">ws-101-01</span>
+                            </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+                            <a href="/workstations/1/edit" class="btn btn-secondary">Edit Seat</a>
+                        <a href="#swap-section" class="btn btn-primary" onclick="document.getElementById('swap-card').scrollIntoView({behavior: 'smooth'})">
+                Swap Component
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Prominent Drift Warning Banner -->
+<div id="telemetry-drift-banner" class="alert alert-warning" style="display: none; margin-bottom: 1.5rem; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 6px;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.25rem;">⚠️</span>
+        <strong style="color: #92400e; font-size: 1rem;">Hardware Drift Detected!</strong>
+    </div>
+    <p style="font-size: 0.875rem; color: #78350f; margin-bottom: 0.75rem;">
+        The workstation reported hardware specifications differing from registered asset inventory.
+    </p>
+    <div id="telemetry-drift-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            </div>
+</div>
+
+<!-- Live Host Telemetry Card -->
+<div class="card" id="telemetry-card" data-workstation-id="1" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0;">Live Host Telemetry</h2>
+            <span id="telemetry-status-badge" class="status-badge status-active">Online</span>
+        </div>
+        <div style="font-size: 0.85rem; color: #64748b;">
+            Last Seen: <span id="telemetry-last-seen" style="font-weight: 600; color: #334155;">2026-10-16 22:32:36</span>
+            &bull; User: <span id="telemetry-logged-user" style="font-weight: 600; color: #334155;">student_lab</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <!-- CPU Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">CPU Usage</span>
+                <span id="telemetry-cpu-text" style="font-weight: 700; color: #0284c7;">34.2%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-cpu-bar" style="background: #0284c7; height: 100%; width: 34.2%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- RAM Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">RAM Usage</span>
+                <span id="telemetry-ram-text" style="font-weight: 700; color: #8b5cf6;">68.5%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-ram-bar" style="background: #8b5cf6; height: 100%; width: 68.5%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Disk Bar -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+                <span style="font-weight: 600; color: #334155;">Disk Usage</span>
+                <span id="telemetry-disk-text" style="font-weight: 700; color: #10b981;">45.0%</span>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden;">
+                <div id="telemetry-disk-bar" style="background: #10b981; height: 100%; width: 45%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Temperature & SMART -->
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align: center;">
+                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">CPU Temp</div>
+                <div id="telemetry-temp" style="font-size: 1.1rem; font-weight: 700; color: #334155; margin-top: 0.15rem;">
+                    42.0°C                </div>
+            </div>
+            <div style="width: 1px; height: 32px; background: #cbd5e1;"></div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 0.25rem;">S.M.A.R.T.</div>
+                <span id="telemetry-smart-badge" class="status-badge status-active">HEALTHY</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Agent Enrollment Panel -->
+    <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px dashed #cbd5e1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 0.25rem 0;">Workstation Monitoring Agent</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Generate a one-time 24-hour token to link the Python background agent to this seat.</p>
+            </div>
+            <form method="POST" action="/workstations/1/enroll-token">
+                <input type="hidden" name="csrf_token" value="f5f2c6dccd453379ebbfe215e8d23533d87a8a527b34e884e3ee5accec5cd247">                <button type="submit" class="btn btn-secondary" style="font-weight: 600;">
+                    Generate Enrollment Token
+                </button>
+            </form>
+        </div>
+            </div>
+
+<!-- Current Installed Parts -->
+<div style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;">Currently Installed Hardware</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
+                                            <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted);">PC</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem;">
+                            <a href="http://127.0.0.1:8088/assets/PC-2026-0001" style="color: var(--primary); text-decoration: none;">
+                                PC-2026-0001                            </a>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: #334155; margin-top: 0.25rem; font-weight: 500;">
+                            Dell OptiPlex 3080                        </p>
+                        
+                                                    <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.8rem; color: #475569;">
+                                                                                                            <div><strong>Ram Gb:</strong> 16</div>
+                                                                                                                                                <div><strong>Disk Gb:</strong> 512</div>
+                                                                                                                                                <div><strong>Cpu Model:</strong> Intel Core i7-10700 @ 2.90GHz</div>
+                                                                                                </div>
+                                            </div>
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: var(--muted); font-size: 0.75rem;">Installed: 2026-10-16</small>
+                        <a href="http://127.0.0.1:8088/assets/PC-2026-0001" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">Details &rarr;</a>
+                    </div>
+                </div>
+                                            <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted);">Monitor</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem;">
+                            <a href="http://127.0.0.1:8088/assets/MON-2026-0001" style="color: var(--primary); text-decoration: none;">
+                                MON-2026-0001                            </a>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: #334155; margin-top: 0.25rem; font-weight: 500;">
+                            LG 22MK600M                        </p>
+                        
+                                                    <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.8rem; color: #475569;">
+                                                                                                            <div><strong>Resolution:</strong> 2560x1440</div>
+                                                                                                                                                <div><strong>Panel Type:</strong> IPS</div>
+                                                                                                </div>
+                                            </div>
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: var(--muted); font-size: 0.75rem;">Installed: 2026-10-16</small>
+                        <a href="http://127.0.0.1:8088/assets/MON-2026-0001" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">Details &rarr;</a>
+                    </div>
+                </div>
+                                            <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted);">Keyboard</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem;">
+                            <a href="http://127.0.0.1:8088/assets/KBD-2026-0001" style="color: var(--primary); text-decoration: none;">
+                                KBD-2026-0001                            </a>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: #334155; margin-top: 0.25rem; font-weight: 500;">
+                            Logitech K120                        </p>
+                        
+                                                    <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.8rem; color: #475569;">
+                                                                                                            <div><strong>Keyboard Type:</strong> Wired</div>
+                                                                                                                                                <div><strong>Layout:</strong> QWERTY</div>
+                                                                                                </div>
+                                            </div>
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: var(--muted); font-size: 0.75rem;">Installed: 2026-10-16</small>
+                        <a href="http://127.0.0.1:8088/assets/KBD-2026-0001" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">Details &rarr;</a>
+                    </div>
+                </div>
+                                            <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted);">Mouse</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem;">
+                            <a href="http://127.0.0.1:8088/assets/MSE-2026-0031" style="color: var(--primary); text-decoration: none;">
+                                MSE-2026-0031                            </a>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: #334155; margin-top: 0.25rem; font-weight: 500;">
+                            HP HID Mouse (Spare)                        </p>
+                        
+                                                    <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.8rem; color: #475569;">
+                                                                                                            <div><strong>Mouse Type:</strong> Wired</div>
+                                                                                                                                                <div><strong>Dpi:</strong> 1200</div>
+                                                                                                </div>
+                                            </div>
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: var(--muted); font-size: 0.75rem;">Installed: 2026-10-16</small>
+                        <a href="http://127.0.0.1:8088/assets/MSE-2026-0031" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">Details &rarr;</a>
+                    </div>
+                </div>
+                                            <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted);">CPU</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem;">
+                            <a href="http://127.0.0.1:8088/assets/CPU-2026-0001" style="color: var(--primary); text-decoration: none;">
+                                CPU-2026-0001                            </a>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: #334155; margin-top: 0.25rem; font-weight: 500;">
+                            Dell OptiPlex Tower                        </p>
+                        
+                                                    <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.8rem; color: #475569;">
+                                                                                                            <div><strong>Processor:</strong> Intel Core i7-10700</div>
+                                                                                                                                                <div><strong>Power Supply:</strong> 650W</div>
+                                                                                                </div>
+                                            </div>
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: var(--muted); font-size: 0.75rem;">Installed: 2026-10-16</small>
+                        <a href="http://127.0.0.1:8088/assets/CPU-2026-0001" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">Details &rarr;</a>
+                    </div>
+                </div>
+                    </div>
+    </div>
+
+<!-- Swap Component Section -->
+<div id="swap-section" style="margin-bottom: 2rem;">
+    <div class="card" id="swap-card" style="border-left: 4px solid var(--primary);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">Hardware Component Swap</h2>
+        <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+            Atomically replace an installed component with a lab spare. Reassignment history is preserved automatically.
+        </p>
+
+        <form action="/workstations/1/swap" method="POST" id="swap-form">
+            <input type="hidden" name="csrf_token" value="f5f2c6dccd453379ebbfe215e8d23533d87a8a527b34e884e3ee5accec5cd247">            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                    <label for="old_asset_id" class="form-label">Part to Remove *</label>
+                    <select id="old_asset_id" name="old_asset_id" class="form-control" required onchange="filterSparesByType(this.value)">
+                        <option value="">-- Select Installed Part --</option>
+                                                    <option value="1" data-type="PC">
+                                PC: PC-2026-0001 (Dell OptiPlex 3080)
+                            </option>
+                                                    <option value="2" data-type="Monitor">
+                                Monitor: MON-2026-0001 (LG 22MK600M)
+                            </option>
+                                                    <option value="3" data-type="Keyboard">
+                                Keyboard: KBD-2026-0001 (Logitech K120)
+                            </option>
+                                                    <option value="157" data-type="Mouse">
+                                Mouse: MSE-2026-0031 (HP HID Mouse (Spare))
+                            </option>
+                                                    <option value="5" data-type="CPU">
+                                CPU: CPU-2026-0001 (Dell OptiPlex Tower)
+                            </option>
+                                            </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_asset_id" class="form-label">Replacement Spare Part *</label>
+                    <select id="new_asset_id" name="new_asset_id" class="form-control" required>
+                        <option value="">-- Select Spare from Lab --</option>
+                                                    <optgroup label="Spares: Printer" class="spare-group spare-group-Printer">
+                                                                    <option value="51" data-type="Printer">
+                                        PRT-2026-0001 &bull; HP LaserJet Pro M404n                                    </option>
+                                                                    <option value="52" data-type="Printer">
+                                        PRT-2026-0002 &bull; Canon PIXMA G3010                                    </option>
+                                                                    <option value="158" data-type="Printer">
+                                        PRT-2026-0007 &bull; HP LaserJet Pro M404n                                    </option>
+                                                                    <option value="159" data-type="Printer">
+                                        PRT-2026-0008 &bull; Canon PIXMA G3010                                    </option>
+                                                                    <option value="205" data-type="Printer">
+                                        PRT-2026-0013 &bull; HP LaserJet Pro M404n                                    </option>
+                                                                    <option value="206" data-type="Printer">
+                                        PRT-2026-0014 &bull; Canon PIXMA G3010                                    </option>
+                                                            </optgroup>
+                                            </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="old_status" class="form-label">Status for Removed Part *</label>
+                    <select id="old_status" name="old_status" class="form-control" required>
+                        <option value="Faulty">Faulty (Needs repair)</option>
+                        <option value="Under Repair">Under Repair</option>
+                        <option value="Inactive">Inactive (Spare / Storage)</option>
+                        <option value="Retired">Retired (Decommissioned)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 0.5rem;">
+                <label for="reason" class="form-label">Reason for Replacement *</label>
+                <input type="text" id="reason" name="reason" class="form-control"
+                       placeholder="e.g. Broken left click button, upgrading RAM, fan failure" required>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Execute Swap &amp; Log History</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Assignment History -->
+<div style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;">Hardware Assignment History</h2>
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Asset Tag</th>
+                    <th>Component Type</th>
+                    <th>Model / Description</th>
+                    <th>Installed At</th>
+                    <th>Removed At</th>
+                    <th>Removal Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/PC-2026-0001" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    PC-2026-0001                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">PC</span></td>
+                            <td>Dell OptiPlex 3080</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span class="status-badge status-active">Currently Installed</span>
+                                                            </td>
+                            <td>—</td>
+                        </tr>
+                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/MON-2026-0001" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    MON-2026-0001                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">Monitor</span></td>
+                            <td>LG 22MK600M</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span class="status-badge status-active">Currently Installed</span>
+                                                            </td>
+                            <td>—</td>
+                        </tr>
+                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/KBD-2026-0001" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    KBD-2026-0001                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">Keyboard</span></td>
+                            <td>Logitech K120</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span class="status-badge status-active">Currently Installed</span>
+                                                            </td>
+                            <td>—</td>
+                        </tr>
+                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/MSE-2026-0001" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    MSE-2026-0001                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">Mouse</span></td>
+                            <td>Logitech M100</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span style="color: var(--muted);">2026-10-16 21:28:53</span>
+                                                            </td>
+                            <td>Left click button failed — replaced with spare</td>
+                        </tr>
+                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/CPU-2026-0001" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    CPU-2026-0001                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">CPU</span></td>
+                            <td>Dell OptiPlex Tower</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span class="status-badge status-active">Currently Installed</span>
+                                                            </td>
+                            <td>—</td>
+                        </tr>
+                                            <tr>
+                            <td>
+                                <a href="http://127.0.0.1:8088/assets/MSE-2026-0031" style="font-family: monospace; font-weight: 600; color: var(--primary); text-decoration: none;">
+                                    MSE-2026-0031                                </a>
+                            </td>
+                            <td><span style="font-weight: 600;">Mouse</span></td>
+                            <td>HP HID Mouse (Spare)</td>
+                            <td>2026-10-16 21:28:53</td>
+                            <td>
+                                                                    <span class="status-badge status-active">Currently Installed</span>
+                                                            </td>
+                            <td>—</td>
+                        </tr>
+                                                </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Open Grievances -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #ef4444; margin-bottom: 1rem;">Open Grievances on this Seat</h2>
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Grievance ID</th>
+                        <th>Submitted By</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                            <tr>
+                            <td style="font-weight: 600;">#1</td>
+                            <td>John Doe</td>
+                            <td>The mouse scroll wheel is not working properly at Seat A-01. Scrolling is errati...</td>
+                            <td><span class="status-badge status-in-repair">Submitted</span></td>
+                            <td>2026-10-16</td>
+                        </tr>
+                                            <tr>
+                            <td style="font-weight: 600;">#2</td>
+                            <td>Jane Smith</td>
+                            <td>PC at Seat A-01 freezes after 20 minutes of use. Blue screen error observed twic...</td>
+                            <td><span class="status-badge status-in-repair">In Progress</span></td>
+                            <td>2026-10-16</td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+function filterSparesByType(selectedOldAssetId) {
+    var oldSelect = document.getElementById('old_asset_id');
+    var opt = oldSelect.options[oldSelect.selectedIndex];
+    var type = opt.getAttribute('data-type');
+    var newSelect = document.getElementById('new_asset_id');
+
+    if (!type) {
+        return;
+    }
+
+    // Auto-focus matching group
+    var groups = newSelect.getElementsByTagName('optgroup');
+    for (var i = 0; i < groups.length; i++) {
+        if (groups[i].classList.contains('spare-group-' + type)) {
+            groups[i].style.display = '';
+        } else {
+            groups[i].style.display = 'none';
+        }
+    }
+}
+</script>
+
+<script src="http://127.0.0.1:8088/assets/js/telemetry.js"></script>
+    </main>
+
+    <footer>
+        LabTrack &mdash; Institutional Computer Lab Asset &amp; Grievance Management System
+    </footer>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
